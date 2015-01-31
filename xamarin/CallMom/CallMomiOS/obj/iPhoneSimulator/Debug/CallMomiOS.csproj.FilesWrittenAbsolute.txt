@@ -1,0 +1,14 @@
+/Users/belabursan/Projects/CallMom/CallMomiOS/obj/iPhoneSimulator/Debug/Xamarin.iOS,Version=v1.0.AssemblyAttribute.cs
+/Users/belabursan/Projects/CallMom/CallMomiOS/obj/iPhoneSimulator/Debug/ibtool/MainStoryboard.plist
+/Users/belabursan/Projects/CallMom/CallMomiOS/obj/iPhoneSimulator/Debug/ibtool/MainStoryboard.storyboardc/Info.plist
+/Users/belabursan/Projects/CallMom/CallMomiOS/obj/iPhoneSimulator/Debug/ibtool/MainStoryboard.storyboardc/UIViewController-vXZ-lx-hvc.nib
+/Users/belabursan/Projects/CallMom/CallMomiOS/obj/iPhoneSimulator/Debug/ibtool/MainStoryboard.storyboardc/vXZ-lx-hvc-view-kh9-bI-dsS.nib
+/Users/belabursan/Projects/CallMom/CallMomiOS/obj/iPhoneSimulator/Debug/actool/partial-info.plist
+/Users/belabursan/Projects/CallMom/CallMomiOS/obj/iPhoneSimulator/Debug/actool/asset-manifest.plist
+/Users/belabursan/Projects/CallMom/CallMomiOS/obj/iPhoneSimulator/Debug/Default-568h@2x.png
+/Users/belabursan/Projects/CallMom/CallMomiOS/bin/iPhoneSimulator/Debug/CallMomiOS.exe.mdb
+/Users/belabursan/Projects/CallMom/CallMomiOS/bin/iPhoneSimulator/Debug/CallMomiOS.exe
+/Users/belabursan/Projects/CallMom/CallMomiOS/obj/iPhoneSimulator/Debug/CallMomiOS.exe
+/Users/belabursan/Projects/CallMom/CallMomiOS/obj/iPhoneSimulator/Debug/CallMomiOS.exe.mdb
+/Users/belabursan/Projects/CallMom/CallMomiOS/bin/iPhoneSimulator/Debug/CallMomCore.dll
+/Users/belabursan/Projects/CallMom/CallMomiOS/bin/iPhoneSimulator/Debug/CallMomCore.dll.mdb
