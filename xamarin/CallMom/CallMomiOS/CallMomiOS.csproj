@@ -92,6 +92,9 @@
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="Xamarin.iOS" />
+    <Reference Include="Autofac">
+      <HintPath>..\packages\Autofac.3.5.2\lib\portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\Autofac.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ImageAsset Include="Resources\Images.xcassets\AppIcons.appiconset\Contents.json" />
@@ -102,12 +105,13 @@
   <ItemGroup>
     <None Include="Info.plist" />
     <None Include="Entitlements.plist" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="CallMomiOSViewController.cs" />
-    <Compile Include="CallMomiOSViewController.designer.cs">
+    <Compile Include="Source\ViewController\CallMomiOSViewController.cs" />
+    <Compile Include="Source\ViewController\CallMomiOSViewController.designer.cs">
       <DependentUpon>CallMomiOSViewController.cs</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -123,5 +127,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Source\" />
+    <Folder Include="Source\ViewController\" />
   </ItemGroup>
 </Project>

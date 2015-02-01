@@ -3,3 +3,9 @@ System.dll
 System.Xml.dll
 System.Core.dll
 Mono.Dynamic.Interpreter.dll
+CallMomCore.dll
+Autofac.dll
+System.Runtime.dll
+System.ComponentModel.Composition.dll
+System.Diagnostics.Debug.dll
+System.Threading.Tasks.dll

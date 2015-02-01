@@ -68,6 +68,7 @@ public class MonoPackageManager {
 class MonoPackageManager_Resources {
 	public static final String[] Assemblies = new String[]{
 		"CallMomAndroid.dll",
+		"Autofac.dll",
 		"CallMomCore.dll",
 		"System.Collections.Concurrent.dll",
 		"System.Collections.dll",

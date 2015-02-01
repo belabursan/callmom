@@ -3,12 +3,17 @@ using System.Drawing;
 
 using Foundation;
 using UIKit;
+using CallMomCore;
+using Autofac;
+using System.Threading.Tasks;
 
 
 namespace CallMomiOS
 {
 	public partial class CallMomiOSViewController : UIViewController
 	{
+		CallMomCore.ICOController ioc;
+
 		public CallMomiOSViewController (IntPtr handle) : base (handle)
 		{
 		}
@@ -28,6 +33,8 @@ namespace CallMomiOS
 			base.ViewDidLoad ();
 			MomActivity.StopAnimating ();
 			MomLabel.Hidden = true;
+
+			ioc = new COController ();//App.Container.Resolve<ICOController> ();
 			
 			// Perform any additional setup after loading the view, typically from a nib.
 		}
@@ -57,11 +64,24 @@ namespace CallMomiOS
 		partial void UIButton13_TouchUpInside (UIButton sender)
 		{
 			MomActivity.StartAnimating ();
+			DoCall ();
+
 		}
 
 		partial void UIButton15_TouchUpInside (UIButton sender)
 		{
 			MomActivity.StopAnimating ();
+			DoCancel ();
+		}
+
+		private async Task DoCall ()
+		{
+			int click = await ioc.DoTheCallAsync ();
+		}
+
+		private async Task DoCancel ()
+		{
+			await ioc.CancelTheCall ();
 		}
 	}
 }

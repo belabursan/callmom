@@ -1,5 +1,5 @@
 # Version: 8.4.0.43 (840a925)
-# [first argument, ignore] # /Users/belabursan/Projects/CallMom/CallMomiOS/mtouch.exe
+# [first argument, ignore] # /Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomiOS/mtouch.exe
 /Library/Frameworks/Xamarin.iOS.framework/Versions/8.4.0.43/bin/mtouch \
 	--cache \
 	obj/iPhoneSimulator/Debug/mtouch-cache \
@@ -23,9 +23,11 @@
 	-r \
 	/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS/Xamarin.iOS.dll \
 	-r \
+	../packages/Autofac.3.5.2/lib/portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/Autofac.dll \
+	-r \
 	/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS/System.Core.dll \
 	-r \
-	/Users/belabursan/Projects/CallMom/CallMomCore/bin/Debug//CallMomCore.dll \
+	/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomCore/bin/Debug//CallMomCore.dll \
 	-r \
 	/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS/mscorlib.dll \
 	-r \
@@ -115,5 +117,7 @@
 	-r \
 	/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS/Facades/System.Xml.XmlSerializer.dll \
 	-r \
-	/Users/belabursan/Projects/CallMom/CallMomCore/bin/Debug//CallMomCore.dll \
-	/Users/belabursan/Projects/CallMom/CallMomiOS/bin/iPhoneSimulator/Debug//CallMomiOS.exe \
+	../packages/Autofac.3.5.2/lib/portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/Autofac.dll \
+	-r \
+	/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomCore/bin/Debug//CallMomCore.dll \
+	/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomiOS/bin/iPhoneSimulator/Debug//CallMomiOS.exe \

@@ -1,5 +1,6 @@
-/Users/belabursan/Projects/CallMom/CallMomAndroid/bin/Debug/CallMomAndroid.dll
-/Users/belabursan/Projects/CallMom/CallMomCore/bin/Debug/CallMomCore.dll
+/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomAndroid/bin/Debug/CallMomAndroid.dll
+/Users/belabursan/tmp/CallMom/xamarin/CallMom/packages/Autofac.3.5.2/lib/portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/Autofac.dll
+/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomCore/bin/Debug/CallMomCore.dll
 /Library/Frameworks/Mono.framework/External/xbuild-frameworks/MonoAndroid/v1.0/Facades/System.Collections.Concurrent.dll
 /Library/Frameworks/Mono.framework/External/xbuild-frameworks/MonoAndroid/v1.0/Facades/System.Collections.dll
 /Library/Frameworks/Mono.framework/External/xbuild-frameworks/MonoAndroid/v1.0/Facades/System.ComponentModel.Annotations.dll

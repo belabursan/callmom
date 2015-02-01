@@ -6,7 +6,7 @@
 	<dict>
 		<key>output-files</key>
 		<array>
-			<string>/Users/belabursan/Projects/CallMom/CallMomiOS/obj/iPhoneSimulator/Debug/actool/partial-info.plist</string>
+			<string>/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomiOS/obj/iPhoneSimulator/Debug/actool/partial-info.plist</string>
 		</array>
 	</dict>
 </dict>

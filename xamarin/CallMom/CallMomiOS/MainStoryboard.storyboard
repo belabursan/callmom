@@ -18,7 +18,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="13" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" selected="NO">
-                                <rect key="frame" x="80" y="165" width="161" height="30"/>
+                                <rect key="frame" x="80" y="237" width="161" height="30"/>
                                 <state key="normal" title="Call Mom" backgroundImage="Default-568h.png">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                     <color key="titleColor" colorSpace="calibratedRGB" red="1" green="1" blue="1" alpha="1"/>
@@ -28,7 +28,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="15" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO">
-                                <rect key="frame" x="122" y="248" width="75" height="30"/>
+                                <rect key="frame" x="122" y="320" width="75" height="30"/>
                                 <state key="normal" title="Cancel">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
@@ -36,11 +36,22 @@
                                     <action selector="UIButton15_TouchUpInside:" destination="vXZ-lx-hvc" id="17" eventType="touchUpInside"/>
                                 </connections>
                             </button>
-                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" style="gray" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="16" animating="YES" hidesWhenStopped="YES">
-                                <rect key="frame" x="142" y="203" width="37" height="37"/>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" style="gray" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="16" animating="YES" hidesWhenStopped="YES" tag="0" userInteractionEnabled="NO" hidden="YES">
+                                <rect key="frame" x="142" y="275" width="37" height="37"/>
                             </activityIndicatorView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" lineBreakMode="tailTruncation" minimumFontSize="10" id="27" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO">
+                                <rect key="frame" x="30" y="78" width="270" height="21"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                     </view>
+                    <connections>
+                        <outlet property="MomActivity" destination="16" id="name-outlet-16"/>
+                        <outlet property="MomLabel" destination="27" id="name-outlet-27"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
             </objects>
