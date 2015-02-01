@@ -2,9 +2,9 @@
 
 namespace CallMomCore
 {
-	public class MyClass
+	public class App
 	{
-		public MyClass ()
+		public App ()
 		{
 		}
 	}
