@@ -1,6 +1,7 @@
 package com.hiq.handset.callmom;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -47,6 +48,10 @@ public class MainActivity extends ActionBarActivity{
 
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
+
+        Intent optionsIntent = new Intent(this,OptionsListActivity.class);
+        if(optionsIntent.resolveActivity(getPackageManager()) != null)
+            startActivity(optionsIntent);
     }
 
     /** Called when the user touches the button */
