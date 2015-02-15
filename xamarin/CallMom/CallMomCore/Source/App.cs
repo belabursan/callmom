@@ -22,7 +22,9 @@ namespace CallMomCore
 
 		public static void Initialize (ContainerBuilder builder)
 		{
+			Debug.WriteLine ("[Init] - Initialize");
 			InitDependencies (builder);
+			SetDefaults ();
 		}
 
 		/**
@@ -31,6 +33,23 @@ namespace CallMomCore
 		private static void InitDependencies (ContainerBuilder builder)
 		{
 			builder.RegisterType<COController> ().As<ICOController> ();
+			builder.RegisterType<SQLiteLink> ().As<ISQLiteLink> ().SingleInstance ();
+			builder.RegisterType<SettingService> ().As<ISettingsService> ().SingleInstance ();
+			builder.RegisterType<StateService> ().As<IStateService> ().SingleInstance ();
+			builder.RegisterType<BroadcastService> ().As<IBroadcastService> ().SingleInstance ();
+			builder.RegisterType<NetworkLink> ().As<INetworkLink> ().SingleInstance ();
+
+			App.Container = builder.Build ();
+		}
+
+		private static void SetDefaults ()
+		{
+			Debug.WriteLine ("[Init] - setting defaults");
+			ISettingsService settings = App.Container.Resolve<ISettingsService> ();
+			settings.InsertCallTime (Defaults.CALLTIMEOUT);
+			settings.InsertIP (Defaults.IP);
+			settings.InsertPort (Defaults.PORT);
+			settings.InsertNetworkTimeoutSeconds (Defaults.NETTIMEOUT);
 		}
 
 	}

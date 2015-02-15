@@ -1,5 +1,7 @@
 /Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomAndroid/bin/Debug/CallMomAndroid.dll
 /Users/belabursan/tmp/CallMom/xamarin/CallMom/packages/Autofac.3.5.2/lib/portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/Autofac.dll
+/Users/belabursan/tmp/CallMom/xamarin/CallMom/packages/SQLite.Net-PCL.2.5.1/lib/portable-win8+net45+wp8+wpa81+MonoAndroid1+MonoTouch1/SQLite.Net.dll
+/Users/belabursan/tmp/CallMom/xamarin/CallMom/packages/SQLite.Net.Platform.XamarinAndroid.2.5.1/lib/MonoAndroid/SQLite.Net.Platform.XamarinAndroid.dll
 /Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomCore/bin/Debug/CallMomCore.dll
 /Library/Frameworks/Mono.framework/External/xbuild-frameworks/MonoAndroid/v1.0/Facades/System.Collections.Concurrent.dll
 /Library/Frameworks/Mono.framework/External/xbuild-frameworks/MonoAndroid/v1.0/Facades/System.Collections.dll

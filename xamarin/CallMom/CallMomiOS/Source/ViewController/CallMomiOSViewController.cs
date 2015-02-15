@@ -6,6 +6,7 @@ using UIKit;
 using CallMomCore;
 using Autofac;
 using System.Threading.Tasks;
+using System.Net;
 
 
 namespace CallMomiOS
@@ -13,6 +14,10 @@ namespace CallMomiOS
 	public partial class CallMomiOSViewController : UIViewController
 	{
 		CallMomCore.ICOController ioc;
+		private static object Lock = new object ();
+
+		private const string DefaultCallMomButtonTitle = "Call Mom";
+		private UIColor DefaultCallMomButtonColor = UIColor.LightGray;
 
 		public CallMomiOSViewController (IntPtr handle) : base (handle)
 		{
@@ -31,11 +36,13 @@ namespace CallMomiOS
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
+			DefaultCallMomButtonColor = CallMomButton.BackgroundColor;
 			MomActivity.StopAnimating ();
 			MomLabel.Hidden = true;
 
-			ioc = new COController ();//App.Container.Resolve<ICOController> ();
-			
+			//ioc = new COController ();//App.Container.Resolve<ICOController> ();
+			ioc = App.Container.Resolve<ICOController> ();
+
 			// Perform any additional setup after loading the view, typically from a nib.
 		}
 
@@ -63,26 +70,64 @@ namespace CallMomiOS
 
 		partial void UIButton13_TouchUpInside (UIButton sender)
 		{
-			MomActivity.StartAnimating ();
-			DoCall ();
-
+			InvokeOnMainThread (async  () => await DoCall ());
 		}
 
 		partial void UIButton15_TouchUpInside (UIButton sender)
 		{
-			MomActivity.StopAnimating ();
-			DoCancel ();
+			InvokeOnMainThread (async  () => await DoCancel ());
 		}
 
 		private async Task DoCall ()
 		{
+			MomActivity.StartAnimating ();
+			AnimateCallMomStart ();
+
 			int click = await ioc.DoTheCallAsync ();
+
+			if (click != ReturnValue.AlreadyRunning) {
+				MomActivity.StopAnimating ();
+			}
+
+			Console.WriteLine ("[GUI] - call ended with code {0}", click);
+			//todo handle returnvalue
 		}
 
 		private async Task DoCancel ()
 		{
-			await ioc.CancelTheCall ();
+			int ret = await ioc.CancelTheCall ();
+			if (ret == ReturnValue.Cancelled) {
+				AnimateCallMomCancel ();
+			}
+			// else ReturnValue.NotStarted
 		}
+
+		private void AnimateCallMomStart ()
+		{
+			AnimateCallMomButtonColor (UIColor.FromRGB (100, 175, 250), "Calling");
+		}
+
+		private void AnimateCallMomCancel ()
+		{
+			AnimateCallMomButtonColor (UIColor.Red, "Cancelling");
+		}
+
+		private void AnimateCallMomButtonColor (UIColor color, string title)
+		{
+			lock (Lock) {
+				CallMomButton.SetTitle (title, UIControlState.Normal);
+				UIView.Animate (1.0f, 0, UIViewAnimationOptions.CurveLinear,
+					() => {
+						this.CallMomButton.BackgroundColor = color;
+					},
+					() => {
+						this.CallMomButton.BackgroundColor = DefaultCallMomButtonColor;
+						CallMomButton.SetTitle (DefaultCallMomButtonTitle, UIControlState.Normal);
+					}
+				);
+			}
+		}
+			
 	}
 }
 

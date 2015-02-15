@@ -1,29 +1,12 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhone4s.8.1" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="CallMomiOS/Source/ViewController/CallMomiOSViewController.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.IPhone.IPhoneSimulatorTarget.IPhone5.8.1" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="CallMomCore/Source/Controller/ICOController.cs">
     <Files>
-      <File FileName="CallMomCore/Source/Controller/COController.cs" Line="27" Column="27" />
-      <File FileName="CallMomCore/Source/Controller/ICOController.cs" Line="25" Column="25" />
-      <File FileName="CallMomiOS/Source/ViewController/CallMomiOSViewController.cs" Line="31" Column="31" />
+      <File FileName="CallMomCore/Source/Controller/COController.cs" Line="1" Column="1" />
+      <File FileName="CallMomCore/Source/Call/Call.cs" Line="1" Column="1" />
+      <File FileName="CallMomCore/Source/App.cs" Line="1" Column="1" />
+      <File FileName="CallMomCore/Source/Controller/ICOController.cs" Line="1" Column="1" />
     </Files>
-    <Pads>
-      <Pad Id="ProjectPad">
-        <State expanded="True">
-          <Node name="CallMomCore" expanded="True">
-            <Node name="Source" expanded="True">
-              <Node name="Controller" expanded="True" />
-            </Node>
-          </Node>
-          <Node name="CallMomiOS" expanded="True">
-            <Node name="Source" expanded="True">
-              <Node name="ViewController" expanded="True">
-                <Node name="CallMomiOSViewController.cs" selected="True" />
-              </Node>
-            </Node>
-          </Node>
-        </State>
-      </Pad>
-    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

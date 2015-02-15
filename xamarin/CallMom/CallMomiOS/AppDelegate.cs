@@ -16,7 +16,8 @@ namespace CallMomiOS
 	public partial class AppDelegate : UIApplicationDelegate
 	{
 		// class-level declarations
-		
+		private const string DatabaseName = "mom.db";
+
 		public override UIWindow Window {
 			get;
 			set;
@@ -48,7 +49,10 @@ namespace CallMomiOS
 		public override bool FinishedLaunching (UIApplication application, NSDictionary launchOptions)
 		{
 			var builder = new ContainerBuilder ();
+			builder.Register (x => new SQLiteFactory (DatabaseName)).As<ISQLiteFactory> ();
+			//builder.Register (x => new NetworkFactory ()).As<INetworkFactory> ();
 			builder.RegisterType<COController> ().As<ICOController> ().SingleInstance ();
+			builder.RegisterType<NetworkFactory> ().As<INetworkFactory> ();
 			App.Initialize (builder);
 			return true;
 		}

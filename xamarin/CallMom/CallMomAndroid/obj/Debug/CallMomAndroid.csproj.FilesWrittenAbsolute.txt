@@ -12,5 +12,7 @@
 /Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomAndroid/obj/Debug/CallMomAndroid.dll
 /Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomAndroid/obj/Debug/CallMomAndroid.dll.mdb
 /Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomAndroid/bin/Debug/Autofac.dll
+/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomAndroid/bin/Debug/SQLite.Net.dll
+/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomAndroid/bin/Debug/SQLite.Net.Platform.XamarinAndroid.dll
 /Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomAndroid/bin/Debug/CallMomCore.dll
 /Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomAndroid/bin/Debug/CallMomCore.dll.mdb

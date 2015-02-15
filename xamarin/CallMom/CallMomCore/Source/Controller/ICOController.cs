@@ -7,7 +7,7 @@ namespace CallMomCore
 	{
 		Task<int> DoTheCallAsync ();
 
-		Task CancelTheCall ();
+		Task<int> CancelTheCall ();
 	}
 }
 

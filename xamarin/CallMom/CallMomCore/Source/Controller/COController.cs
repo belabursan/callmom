@@ -6,8 +6,11 @@ namespace CallMomCore
 {
 	public class COController : ICOController
 	{
+		private Call _call;
+
 		public COController ()
 		{
+			_call = null;
 		}
 
 		#region ICOController implementation
@@ -15,14 +18,26 @@ namespace CallMomCore
 		public async Task<int> DoTheCallAsync ()
 		{
 			Debug.WriteLine ("[Controller] - doing the call");
-			await Task.Delay (100);
-			return 1;
+			int returnValue = ReturnValue.AlreadyRunning;
+
+			if (_call == null) {
+				_call = new Call ();
+				returnValue = await _call.Execute ();
+				_call = null;
+			}
+
+			return returnValue;
 		}
 
-		public async Task CancelTheCall ()
+		public async Task<int> CancelTheCall ()
 		{
 			Debug.WriteLine ("[Controller] - canceling the call");
-			await Task.Delay (100);
+
+			if (_call != null) {
+				return await _call.Cancel ();
+			}
+
+			return ReturnValue.NotRunning;
 		}
 
 		#endregion

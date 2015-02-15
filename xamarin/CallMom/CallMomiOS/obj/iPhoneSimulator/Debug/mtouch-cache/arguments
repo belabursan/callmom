@@ -1,12 +1,12 @@
-# Version: 8.4.0.43 (840a925)
+# Version: 8.6.1.20 (3b3ef43)
 # [first argument, ignore] # /Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomiOS/mtouch.exe
-/Library/Frameworks/Xamarin.iOS.framework/Versions/8.4.0.43/bin/mtouch \
+/Library/Frameworks/Xamarin.iOS.framework/Versions/8.6.1.20/bin/mtouch-64 \
 	--cache \
-	obj/iPhoneSimulator/Debug/mtouch-cache \
-	--nomanifest \
-	--nosign \
+	/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomiOS/obj/iPhoneSimulator/Debug/mtouch-cache \
 	--sim \
-	bin/iPhoneSimulator/Debug/CallMomiOS.app \
+	/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomiOS/bin/iPhoneSimulator/Debug/CallMomiOS.app \
+	--executable \
+	CallMomiOS \
 	--debug \
 	--nolink \
 	--sdkroot \
@@ -24,6 +24,10 @@
 	/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS/Xamarin.iOS.dll \
 	-r \
 	../packages/Autofac.3.5.2/lib/portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/Autofac.dll \
+	-r \
+	../packages/SQLite.Net-PCL.2.5.1/lib/portable-win8+net45+wp8+wpa81+MonoAndroid1+MonoTouch1/SQLite.Net.dll \
+	-r \
+	../packages/SQLite.Net.Platform.XamarinIOS.2.5.1/lib/Xamarin.iOS10/SQLite.Net.Platform.XamarinIOS.Unified.dll \
 	-r \
 	/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS/System.Core.dll \
 	-r \
@@ -118,6 +122,10 @@
 	/Library/Frameworks/Xamarin.iOS.framework/Versions/Current/lib/mono/Xamarin.iOS/Facades/System.Xml.XmlSerializer.dll \
 	-r \
 	../packages/Autofac.3.5.2/lib/portable-net4+sl5+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1/Autofac.dll \
+	-r \
+	../packages/SQLite.Net-PCL.2.5.1/lib/portable-win8+net45+wp8+wpa81+MonoAndroid1+MonoTouch1/SQLite.Net.dll \
+	-r \
+	../packages/SQLite.Net.Platform.XamarinIOS.2.5.1/lib/Xamarin.iOS10/SQLite.Net.Platform.XamarinIOS.Unified.dll \
 	-r \
 	/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomCore/bin/Debug//CallMomCore.dll \
 	/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomiOS/bin/iPhoneSimulator/Debug//CallMomiOS.exe \
