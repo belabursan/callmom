@@ -1,2 +1,9 @@
 #ignore files and directories
-.DS*
+.DS_*
+syntax: glob
+_ReSharper.*/
+[Bb]in/
+[Oo]bj/
+*.user
+*.userprefs
+*.suo
