@@ -1,9 +1,19 @@
 #ignore files and directories
+
 .DS_*
-syntax: glob
-_ReSharper.*/
 [Bb]in/
 [Oo]bj/
 *.user
 *.userprefs
 *.suo
+obj
+bin
+test-results
+_UpgradeReport_Files
+UpgradeLog.*
+*.sln.cache
+*.usertasks
+*.pidb
+*.swp
+*.nib
+*.pfx
