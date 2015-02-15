@@ -1,7 +1,0 @@
-/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomCore/obj/Debug/.NETPortable,Version=v4.5,Profile=Profile78.AssemblyAttribute.cs
-/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomCore/bin/Debug/CallMomCore.dll.mdb
-/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomCore/bin/Debug/CallMomCore.dll
-/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomCore/obj/Debug/CallMomCore.dll
-/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomCore/obj/Debug/CallMomCore.dll.mdb
-/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomCore/bin/Debug/Autofac.dll
-/Users/belabursan/tmp/CallMom/xamarin/CallMom/CallMomCore/bin/Debug/SQLite.Net.dll
