@@ -9,6 +9,10 @@
         android:theme="@style/AppTheme" >
         <activity android:name=".OptionsListActivity"
         />
+        <activity android:name=".RegisterActivity"
+        />
+        <activity android:name=".UnregisterActivity"
+        />
         <activity
             android:theme="@style/Theme.AppCompat.Light"
             android:name=".MainActivity"
