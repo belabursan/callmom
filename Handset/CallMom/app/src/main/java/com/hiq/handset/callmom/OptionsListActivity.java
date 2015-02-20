@@ -1,6 +1,7 @@
 package com.hiq.handset.callmom;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -55,6 +56,17 @@ public class OptionsListActivity extends ListActivity {
     protected void onListItemClick(ListView parent, View v, int position, long id){
         String item = (String) getListAdapter().getItem(position);
         Toast.makeText(this, item + " selected", Toast.LENGTH_SHORT).show();
+
+        if(0 == position) {
+            Intent startRegisterActivityIntent = new Intent(this, RegisterActivity.class);
+            if (startRegisterActivityIntent.resolveActivity(getPackageManager()) != null)
+                startActivity(startRegisterActivityIntent);
+        }else if(1 == position){
+            Intent startUnregisterActivityIntent = new Intent(this, UnregisterActivity.class);
+            if (startUnregisterActivityIntent.resolveActivity(getPackageManager()) != null)
+                startActivity(startUnregisterActivityIntent);
+        }
+
     }
 }
 
