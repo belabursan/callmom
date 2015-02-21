@@ -10,6 +10,7 @@ namespace CallMomCore
 		private const int IP = 1;
 		private const int PORT = 2;
 		private const int NETWORKTIMEOUT = 3;
+		private const int CONNECTTIMEOUT = 4;
 
 		public SettingService (ISQLiteLink sql)
 		{
@@ -57,6 +58,16 @@ namespace CallMomCore
 		public int GetNetworkTimeoutSeconds ()
 		{
 			return ValueAsInteger (NETWORKTIMEOUT);
+		}
+
+		public void InsertConnectTimeOut (int timeout)
+		{
+			Insert (CONNECTTIMEOUT, timeout.ToString ());
+		}
+
+		public int GetConnectTimeOut ()
+		{
+			return ValueAsInteger (CONNECTTIMEOUT);
 		}
 
 		#endregion

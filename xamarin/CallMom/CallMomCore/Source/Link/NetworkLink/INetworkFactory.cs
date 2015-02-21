@@ -7,9 +7,7 @@ namespace CallMomCore
 {
 	public interface INetworkFactory
 	{
-		Task<Stream> Connect (NetworkArguments netArgs, CancellationToken token = default(CancellationToken));
-
-		void Disconnect ();
+		Task<IConnectedNetworkClient> Connect (NetworkArguments netArgs, CancellationToken token = default(CancellationToken));
 	}
 }
 

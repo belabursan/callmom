@@ -61,9 +61,10 @@ namespace CallMomCore
 			Debug.WriteLine ("[Call] -  running");
 			NetworkArguments netArgs = ValidateValues ();
 			INetworkLink _network = App.Container.Resolve<INetworkLink> ();
-			INetworkClient client = await _network.Connect (netArgs, token);
-			bool b = client.Disconnected ();
-			Debug.WriteLine ("[Call] -  running: dissconnected: " + b.ToString ());
+			var client = await _network.GetNewConnection (netArgs, token);
+			client.Send ("kkk", token);
+
+			//Debug.WriteLine ("[Call] -  running: dissconnected: " + b.ToString ());
 			await Task.Delay (8000, token);
 
 			return 7;
@@ -90,6 +91,7 @@ namespace CallMomCore
 				Enable = true,
 				Timeout = 1
 			};
+			netArg.ConnectTimeout = _settings.GetConnectTimeOut ();
 
 			return netArg;
 		}

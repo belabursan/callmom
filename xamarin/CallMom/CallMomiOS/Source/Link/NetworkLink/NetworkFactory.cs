@@ -10,74 +10,79 @@ namespace CallMomiOS
 {
 	public class NetworkFactory : INetworkFactory
 	{
-		private TcpClient _TCPClient;
-
 		public NetworkFactory ()
 		{
-			_TCPClient = null;
+			//TCPClient s;
+		}
+
+		private void ConnectCallBack (IAsyncResult asyn)
+		{
+			Console.WriteLine ("[NET-Factory] - 1e++++++++++++++++++");
+			TcpClient client = asyn.AsyncState as TcpClient;
+			if (client != null && client.Client != null) {
+				try {
+					client.EndConnect (asyn);
+				} catch (Exception ex) {
+					Console.WriteLine ("[NET-Factory] - 2e++++++++++++++++++");
+				}
+			}
 		}
 
 		#region INetworkFactory implementation
 
-		public async Task<Stream> Connect (NetworkArguments netArgs, CancellationToken token = default(CancellationToken))
+		public async Task<IConnectedNetworkClient> Connect (NetworkArguments netArgs, CancellationToken token = default(CancellationToken))
 		{
 			try {
-				if (_TCPClient != null) {
-					_TCPClient.Close ();
-					_TCPClient = null;
+				bool connected = true;
+				Socket socket = GetSocket (netArgs, token);	
+
+				await Task.Run (async () => {
+					IAsyncResult result = socket.BeginConnect (GetEndpoint (netArgs), new AsyncCallback (ConnectCallBack), socket);
+					connected = result.AsyncWaitHandle.WaitOne (netArgs.ConnectTimeout, true);
+				});
+					
+				if (!connected && socket != null && !socket.Connected) {
+					socket.Close ();
 				}
 
-				token.ThrowIfCancellationRequested ();
-				_TCPClient = new TcpClient ();
-				token.ThrowIfCancellationRequested ();
-
-				_TCPClient.NoDelay = netArgs.NoDelay;
-				_TCPClient.LingerState = ToLingerOption (netArgs);
-				_TCPClient.ReceiveTimeout = netArgs.ReceiveTimeout;
-				_TCPClient.SendTimeout = netArgs.SendTimeout;
-
-				token.ThrowIfCancellationRequested ();
-				//SocketAsyncEventArgs vv = new SocketAsyncEventArgs();
-				//_TCPClient.Client.c
-
-				await _TCPClient.ConnectAsync (ToIp (netArgs), netArgs.Port);
-				token.ThrowIfCancellationRequested ();
-
-				return _TCPClient.GetStream ();
+				return new ConnectedNetworkClient (new NetworkStream (socket));
+			
 			} catch (Exception ex) {
 				Console.WriteLine ("[NET-Factory] - exception when connecting ({0}:{1})", U.ExType (ex), U.InnerExMessage (ex));
-				Disconnect ();
 				throw;
 			}
-
 		}
 
-		public void Disconnect ()
-		{
-			if (_TCPClient != null) {
-				try {
-					_TCPClient.Close ();
-				} catch (Exception ex) {
-					Console.WriteLine ("[NET-Factory] - ignoring exception when closing({0}:{1})", U.ExType (ex), U.InnerExMessage (ex));
-					//ignore exception when closing client
-				} finally {
-					_TCPClient = null;
-				}
-			}
-		}
 
 		#endregion
 
 		private static LingerOption ToLingerOption (NetworkArguments netArgs)
 		{
-			return new LingerOption (netArgs.LingerArguments.Enable, netArgs.LingerArguments.Timeout);
+			//return new LingerOption (netArgs.LingerArguments.Enable, netArgs.LingerArguments.Timeout);
+			return new LingerOption (false, 0);
 		}
 
-		private static IPAddress ToIp (NetworkArguments netArgs)
+		private static Socket GetSocket (NetworkArguments netArgs, CancellationToken token = default(CancellationToken))
 		{
-			return IPAddress.Parse (netArgs.Ip);
+
+			var client = new Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+
+			client.ReceiveTimeout = netArgs.ReceiveTimeout;
+			client.SendTimeout = netArgs.SendTimeout;
+			client.LingerState = ToLingerOption (netArgs);
+			client.NoDelay = netArgs.NoDelay;
+			if (token != default(CancellationToken))
+				token.ThrowIfCancellationRequested ();
+
+			return client;
 		}
 
+		private static IPEndPoint GetEndpoint (NetworkArguments netArgs, CancellationToken token = default(CancellationToken))
+		{
+			if (token != default(CancellationToken))
+				token.ThrowIfCancellationRequested ();
+			return new IPEndPoint (IPAddress.Parse (netArgs.Ip), netArgs.Port);
+		}
 	}
 }
 

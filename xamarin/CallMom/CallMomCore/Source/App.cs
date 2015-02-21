@@ -50,6 +50,7 @@ namespace CallMomCore
 			settings.InsertIP (Defaults.IP);
 			settings.InsertPort (Defaults.PORT);
 			settings.InsertNetworkTimeoutSeconds (Defaults.NETTIMEOUT);
+			settings.InsertConnectTimeOut (Defaults.CONNECTTIMEOUT);
 		}
 
 	}

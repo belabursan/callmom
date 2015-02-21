@@ -19,6 +19,10 @@ namespace CallMomCore
 		void InsertNetworkTimeoutSeconds (int timeout);
 
 		int GetNetworkTimeoutSeconds ();
+
+		int GetConnectTimeOut ();
+
+		void InsertConnectTimeOut (int time);
 	}
 }
 

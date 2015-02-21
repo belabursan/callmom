@@ -27,6 +27,8 @@ namespace CallMomCore
 		public MomLinger LingerArguments{ get; set; }
 
 		public bool NoDelay { get; set; }
+
+		public int ConnectTimeout { get; set; }
 	}
 }
 

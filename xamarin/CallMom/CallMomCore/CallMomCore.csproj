@@ -56,9 +56,9 @@
     <Compile Include="Source\Link\NetworkLink\NetworkArguments.cs" />
     <Compile Include="Source\Exceptions\MomNetworkException.cs" />
     <Compile Include="Source\Exceptions\MomNotRegisteredException.cs" />
-    <Compile Include="Source\Link\NetworkLink\NetworkClient.cs" />
-    <Compile Include="Source\Link\NetworkLink\INetworkClient.cs" />
     <Compile Include="Source\Utils\Defaults.cs" />
+    <Compile Include="Source\Link\NetworkLink\IConnectedNetworkClient.cs" />
+    <Compile Include="Source\Link\NetworkLink\ConnectedNetworkClient.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>
