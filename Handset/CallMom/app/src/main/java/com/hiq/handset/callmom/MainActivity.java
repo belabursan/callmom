@@ -84,7 +84,7 @@ public class MainActivity extends ActionBarActivity{
                 dataOutputStream.writeUTF("Hello");  // The text to send.
             }catch(UnknownHostException e){
                 e.printStackTrace();
-            }catch(IOException e){
+            }catch(IOException e) {
                 e.printStackTrace();
             }finally{
                 if(socket != null){
