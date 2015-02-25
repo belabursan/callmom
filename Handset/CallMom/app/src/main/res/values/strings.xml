@@ -6,4 +6,7 @@
     <string name="button_text">Notify</string>
     <string name="register">Register Activity</string>
     <string name="unregister">Unregister Activity</string>
+    <string name="button_ok_text">OK</string>
+    <string name="edit_text">Password</string>
+    <string name="text_register">Enter a password to gain access to CallMom network then press, OK.</string>
 </resources>
