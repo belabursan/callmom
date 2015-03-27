@@ -17,3 +17,7 @@ UpgradeLog.*
 *.swp
 *.nib
 *.pfx
+.idea/
+__pycache__/
+*.pyc
+
