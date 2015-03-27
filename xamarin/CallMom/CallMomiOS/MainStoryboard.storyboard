@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6250" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="vXZ-lx-hvc">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+    </dependencies>
+    <scenes>
+        <!--Call MomiOS View Controller-->
+        <scene sceneID="ufC-wZ-h7g">
+            <objects>
+                <viewController id="vXZ-lx-hvc" customClass="CallMomiOSViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="3"/>
+                        <viewControllerLayoutGuide type="bottom" id="4"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="custom" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="13" colorLabel="IBBuiltInLabel-Blue" selected="NO" misplaced="YES" showsTouchWhenHighlighted="YES">
+                                <rect key="frame" x="79" y="237" width="160" height="30"/>
+                                <accessibility key="accessibilityConfiguration" hint="Click to start a call" label="Call_Mom"/>
+                                <color key="tintColor" colorSpace="calibratedRGB" red="0" green="0" blue="1" alpha="1"/>
+                                <color key="backgroundColor" colorSpace="calibratedRGB" red="0.11764705882352941" green="0.73333333333333328" blue="0.24705882352941178" alpha="0.807843137254902"/>
+                                <state key="normal" backgroundImage="" title="Call Mom">
+                                    <color key="titleColor" colorSpace="calibratedRGB" red="0.070588235294117646" green="0.15294117647058825" blue="0.58431372549019611" alpha="0.63921568627450975"/>
+                                    <color key="titleShadowColor" colorSpace="calibratedRGB" red="0.49803921568627452" green="0" blue="0.49803921568627452" alpha="1"/>
+                                </state>
+                                <connections>
+                                    <action selector="UIButton13_TouchUpInside:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="14"/>
+                                </connections>
+                                <constraints>
+                                    <constraint id="35" firstAttribute="width" constant="161"/>
+                                    <constraint id="36" firstAttribute="height" constant="30"/>
+                                </constraints>
+                                <state key="highlighted"/>
+                                <state key="selected"/>
+                                <state key="disabled"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="15" showsTouchWhenHighlighted="YES">
+                                <rect key="frame" x="122" y="320" width="75" height="30"/>
+                                <state key="normal" title="Cancel">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    <color key="titleColor" colorSpace="calibratedRGB" red="1" green="0" blue="0" alpha="1"/>
+                                </state>
+                                <connections>
+                                    <action selector="UIButton15_TouchUpInside:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="17"/>
+                                </connections>
+                            </button>
+                            <activityIndicatorView hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="16">
+                                <rect key="frame" x="142" y="275" width="37" height="37"/>
+                            </activityIndicatorView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" text="" lineBreakMode="tailTruncation" minimumFontSize="10" translatesAutoresizingMaskIntoConstraints="NO" id="27" fixedFrame="YES">
+                                <rect key="frame" x="30" y="78" width="270" height="21"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint id="39" firstItem="13" firstAttribute="top" secondItem="kh9-bI-dsS" secondAttribute="top" constant="237"/>
+                            <constraint id="40" constant="79" firstItem="kh9-bI-dsS" firstAttribute="trailing" secondItem="13" secondAttribute="trailing"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="MomActivity" destination="16" id="name-outlet-16"/>
+                        <outlet property="MomLabel" destination="27" id="name-outlet-27"/>
+                        <outlet property="CallMomButton" destination="13" id="name-outlet-13"/>
+                        <outlet property="CancelButton" destination="15" id="name-outlet-15"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="Default-568h.png" width="640" height="1136"/>
+    </resources>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4"/>
+    </simulatedMetricsContainer>
+    <color key="tintColor" red="0.0" green="0.0" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+</document>
