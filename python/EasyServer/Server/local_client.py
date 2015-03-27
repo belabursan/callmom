@@ -8,6 +8,9 @@ from protocol import Protocol
 
 
 class LocalClient(threading.Thread):
+    """
+    Local client, holds a connected socket and runs a protocol to communicate with the remote client
+    """
 
     def __init__(self, connection, working_queue, cleaner_queue, parameters):
         """
@@ -27,6 +30,7 @@ class LocalClient(threading.Thread):
 
     def run(self):
         """
+        Entry point for the client
         Function executed by a thread
         :return:
         """
@@ -34,7 +38,6 @@ class LocalClient(threading.Thread):
             logging.debug("LocalClient:run(): running client")
             protocol = Protocol(self._connection, self._params)
             protocol.execute()
-            self._end_message = "Client executed successfully"
         except:
             logging.error("LocalClient:run(): exception in client: " + str(sys.exc_info()[0]))
             pass
@@ -44,8 +47,8 @@ class LocalClient(threading.Thread):
 
     def end(self):
         """
-        Closes the client
-        This function should always be called from the server cleaner
+        Ends the client, removes this thread from the working queue and adds it to the cleaner queue.
+        Then the cleaner process in the Server will end it if not already done
         """
         try:
             logging.debug("LocalClient:end(): ending client")
@@ -57,7 +60,7 @@ class LocalClient(threading.Thread):
 
     def close(self):
         """
-        Closes the client
+        Closes the client socket
         """
         try:
             self._end_lock.acquire()

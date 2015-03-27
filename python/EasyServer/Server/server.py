@@ -39,6 +39,11 @@ class Server(Process):
         atexit.register(main.shut_down_hook, None, None)
 
     def run(self):
+        """
+        Entry point for the server
+        Runs the main server thread, creates a cleaner object, holds the server socket
+        and creates local clients to communicate with remote clients
+        """
         logging.debug("Server:run(): running server on port " + str(self._parameters.port))
         self._isAlive = True
         self._cleaner = Cleaner(self, self._cleaner_queue, self._working_list)
@@ -81,6 +86,10 @@ class Server(Process):
                 self._server_socket.close()
 
     def stop_server(self):
+        """
+        Stops the server, closes the cleaner
+        :return:
+        """
         self._isAlive = False
         self._lock.acquire()
         logging.debug("Server:stop_server(): ending server")
@@ -106,11 +115,12 @@ class Server(Process):
 
 
 class Cleaner(Process):
-
+    """
+    Cleaner, closes all local clients in the cleaner list
+    """
     def __init__(self, server, cleaner_queue, working_queue):
         """
         Constructor for the cleaner
-        :return:
         """
         super(Cleaner, self).__init__(group=None, name="CleanerProcess")
         self.daemon = True
@@ -121,14 +131,13 @@ class Cleaner(Process):
 
     def run(self):
         """
-        runs the cleaner
-        :return:
+        Entry point, runs the cleaner
         """
         logging.debug("Cleaner:run(): cleaner started")
         self._alive = True
         while self._alive:
             try:
-                client = self._cleaner_queue.get(True, 30)
+                client = self._cleaner_queue.get(True, 1200)
                 message = client.close()
                 client.join()
                 logging.debug("Cleaner:run(): " + str(message))
