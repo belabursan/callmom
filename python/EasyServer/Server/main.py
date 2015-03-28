@@ -112,8 +112,12 @@ def read_parameters():
     _parameters = Parameters()
     parser = configparser.RawConfigParser(allow_no_value=True)
     try:
-        config_ini = open("easy_config.ini", "r+")
-        parser.readfp(config_ini)
+        parser.readfp(open("easy_config.ini", "r+"))
+        _parameters.port = parser.getint("NETWORK", "port")
+        _parameters.noof_sockets = parser.getint("NETWORK", "noof_sockets")
+        _parameters.timeout_seconds = parser.getint("NETWORK", "timeout")
+        _parameters.debug = parser.getboolean("DEBUG", "debug")
+        _parameters.noof_threads = parser.getint("OTHER", "noof_threads")
 
         _parameters.password_hash = parser.get("ENCRYPTION", "password_hash")
         if not _parameters.password_hash:
@@ -130,11 +134,6 @@ def read_parameters():
                 print("Could not read password hash, ending server!")
                 return None
 
-        _parameters.port = parser.getint("NETWORK", "port")
-        _parameters.noof_sockets = parser.getint("NETWORK", "noof_sockets")
-        _parameters.timeout_seconds = parser.getint("NETWORK", "timeout")
-        _parameters.debug = parser.getboolean("DEBUG", "debug")
-        _parameters.noof_threads = parser.getint("OTHER", "noof_threads")
 
     except Exception as excp:
         print("Exception when reading parameters:" + str(excp))
