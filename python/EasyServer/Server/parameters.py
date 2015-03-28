@@ -19,7 +19,7 @@ class Parameters(object):
         self._timeout_seconds = 16
         self._noof_sockets = 10
         self._noof_threads = 10
-        self._crypt_key = "A2B3C4D5E6F7"
+        self._password_hash = None
 
     @property
     def port(self):
@@ -71,9 +71,9 @@ class Parameters(object):
         self._noof_threads = value
 
     @property
-    def crypt_key(self):
-        return self._crypt_key
+    def password_hash(self):
+        return self._password_hash
 
-    @crypt_key.setter
-    def crypt_key(self, value):
-        self._crypt_key = value
+    @password_hash.setter
+    def password_hash(self, value):
+        self._password_hash = value

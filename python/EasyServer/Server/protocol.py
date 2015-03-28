@@ -4,10 +4,10 @@
 import logging
 import time
 import sys
-from Crypto import PublicKey
+from crypto import BCrypt
 
 # send commands
-EXIT = "exit\n" # .encode()
+EXIT = "exit\n"
 WELCOME = "welcome\n"
 DONE = "done\n"
 
@@ -15,8 +15,10 @@ DONE = "done\n"
 HELLO = "hello"
 FLASH_LAMP = "flash_lamp"
 COMMAND = "command"
+REGISTER = "register"
 
 BUFFER_SIZE = 256
+
 
 class Protocol(object):
     """
@@ -30,6 +32,7 @@ class Protocol(object):
         """
         self._connection = connection
         self._parameter = parameter
+        self._crypter = BCrypt(parameter, padding='{', block_size=16)
 
     def read(self):
         return self._connection.recv(BUFFER_SIZE).decode('utf8').strip()
@@ -47,7 +50,7 @@ class Protocol(object):
             logging.info("Protocol:run(): handshake not successful")
             return
         logging.debug("Protocol:run(): handshake successful")
-        self.wait_for_command()
+        self.handle_commands()
 
         time.sleep(5)
         return
@@ -66,7 +69,7 @@ class Protocol(object):
             self.write(EXIT)
         return False
 
-    def wait_for_command(self):
+    def handle_commands(self):
         """
         Waits for a command or times out with exception
         :return: True if the commands was received and executed successfully, False otherwise
@@ -74,15 +77,16 @@ class Protocol(object):
         """
         data = self.read()
         try:
-            if data.startswith(COMMAND):
-                command = data.split(":")
-                # c = str(command[1])
+            command = data.split(":")
+            if command[0] == COMMAND:
                 if FLASH_LAMP == command[1]:
                     if self.do_flash_lamp(command[2], command[3], command[4]):
                         return True
                 else:
                     # handle other commands
                     pass
+            elif command[0] == REGISTER:
+                pass
             else:
                 # handle other messages
                 pass

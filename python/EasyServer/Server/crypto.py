@@ -7,6 +7,7 @@
 
 import os
 import logging
+import hashlib
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP, AES
 from base64 import b64decode, b64encode
@@ -16,17 +17,19 @@ class BCrypt(object):
     """
     Holds some functions to encrypt/decrypt strings
     """
-    def __init__(self, params):
+    def __init__(self, params, padding, block_size):
         """
         Constructor
-        :param: params - parameters from the applications ini file
+        :param params: - parameters from the applications ini file
+        :param padding: padding used for AES crypto
+        :param block_size: block size used by AES
         :return:
         """
-        self._padding = '{'
-        self._block_size = 16
+        self._padding = padding
+        self._block_size = block_size
         self._params = params
 
-    def create_random(self, length = None):
+    def create_random(self, length=None):
         """
         Creates a random
         :param length: length of the random
@@ -35,6 +38,14 @@ class BCrypt(object):
         if length is None:
             length = self._block_size
         return os.urandom(length)
+
+    def generate_hash(self, data):
+        """
+        Generates a sha256 hash of a text string
+        :param data: data to get the hash for
+        :return: the hash of the data in argument
+        """
+        return hashlib.sha256(data).hexdigest()
 
     def create_RSA_key(self, data):
         """
