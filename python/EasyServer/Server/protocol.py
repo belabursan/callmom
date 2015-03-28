@@ -4,6 +4,7 @@
 import logging
 import time
 import sys
+from Crypto import PublicKey
 
 # send commands
 EXIT = "exit\n" # .encode()
@@ -17,7 +18,6 @@ COMMAND = "command"
 
 BUFFER_SIZE = 256
 
-
 class Protocol(object):
     """
     Protocol implementation
@@ -30,6 +30,12 @@ class Protocol(object):
         """
         self._connection = connection
         self._parameter = parameter
+
+    def read(self):
+        return self._connection.recv(BUFFER_SIZE).decode('utf8').strip()
+
+    def write(self, data):
+        self._connection.sendall(data.encode('utf8'))
 
     def execute(self):
         """
@@ -52,12 +58,12 @@ class Protocol(object):
         :return: True if the handshake is ok, False otherwise
         :exception: throws Socket.timeout exception
         """
-        data = self._connection.recv(BUFFER_SIZE).strip()
+        data = self.read()
         if HELLO == data:
-            self._connection.sendall(WELCOME)
+            self.write(WELCOME)
             return True
         else:
-            self._connection.sendall(EXIT)
+            self.write(EXIT)
         return False
 
     def wait_for_command(self):
@@ -66,7 +72,7 @@ class Protocol(object):
         :return: True if the commands was received and executed successfully, False otherwise
         :exception: throws Socket.timeout exception
         """
-        data = self._connection.recv(BUFFER_SIZE).strip()
+        data = self.read()
         try:
             if data.startswith(COMMAND):
                 command = data.split(":")
@@ -84,7 +90,7 @@ class Protocol(object):
             logging.info("Protocol:wait_for_command(): error when executing command: " + sys.exc_info()[0])
             pass
 
-        self._connection.sendall(EXIT)
+        self.write(EXIT)
         return False
 
     def do_flash_lamp(self, flash_time, do_blink, interval_seconds):
@@ -98,5 +104,5 @@ class Protocol(object):
         """
         # todo - add tellstick code here
         logging.debug("Protocol:do_flash_lamp("+flash_time+", " + do_blink + ", " + interval_seconds + "): start")
-        self._connection.sendall(DONE)
+        self.write(DONE)
         return True
