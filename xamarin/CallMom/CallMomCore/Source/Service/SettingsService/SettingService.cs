@@ -11,6 +11,9 @@ namespace CallMomCore
 		private const int PORT = 2;
 		private const int NETWORKTIMEOUT = 3;
 		private const int CONNECTTIMEOUT = 4;
+		private const int BLINK = 5;
+		private const int INTERVALLTIME = 6;
+		private const int PUBLICKEY = 7;
 
 		public SettingService (ISQLiteLink sql)
 		{
@@ -70,11 +73,46 @@ namespace CallMomCore
 			return ValueAsInteger (CONNECTTIMEOUT);
 		}
 
+		public int GetIntervallTime ()
+		{
+			return ValueAsInteger (INTERVALLTIME);
+		}
+
+		public void InsertIntervallTime (int time)
+		{
+			Insert (INTERVALLTIME, time.ToString ());
+		}
+
+		public bool GetBlink ()
+		{
+			return ValueAsBoolean (BLINK);
+		}
+
+		public void InsertBlink (bool doBlink)
+		{
+			Insert (BLINK, doBlink.ToString ());
+		}
+
+		public string GetServerPublicKey ()
+		{
+			return ValueAsString (PUBLICKEY);
+		}
+
+		public void InsertServerPublicKey (string publicKey)
+		{
+			Insert (PUBLICKEY, publicKey);
+		}
+
 		#endregion
 
 		private int ValueAsInteger (int key)
 		{
 			return int.Parse (_sql.GetItemById<Settings> (key).Value);
+		}
+
+		private bool ValueAsBoolean (int key)
+		{
+			return Boolean.Parse (_sql.GetItemById<Settings> (key).Value);
 		}
 
 		private string ValueAsString (int key)
@@ -84,11 +122,10 @@ namespace CallMomCore
 
 		private void Insert (int key, string value)
 		{
-			Settings setting = new Settings {
+			_sql.InsertOrUpdateItem<Settings> (new Settings {
 				Key = key,
 				Value = value
-			};
-			_sql.InsertOrUpdateItem<Settings> (setting);
+			});
 		}
 	}
 }

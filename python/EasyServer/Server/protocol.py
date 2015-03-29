@@ -140,8 +140,10 @@ class Protocol(object):
     def do_handle_commands(self, crypto_command):
         """
         Handles commands
-        :param crypto_command: encrypted command line that should be decrypted with the private key
-        :return:
+        :param crypto_command: encrypted command line that should be decrypted with the private key.
+        The command is built up in several chunks separated with colon,
+        the last chunk is always a random sequence of characters
+        :return: true if the execution of the command was successful, false otherwise
         """
         logging.info("Protocol:do_handle_commands(): new command")
         success = False
@@ -152,7 +154,7 @@ class Protocol(object):
             command = self.do_split(command_line)
             if FLASH_LAMP == command[0]:
                 success = self.do_flash_lamp(command[1], command[2], command[3])
-            # add more commands here
+            # todo - add more commands here
             else:
                 logging.warning("Protocol:do_handle_commands() received unrecognized command: " + str(command[0]))
         except Exception as ex:
