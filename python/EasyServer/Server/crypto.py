@@ -28,6 +28,7 @@ class BCrypt(object):
         self._padding = padding
         self._block_size = block_size
         self._params = params
+        self._aes_salt = "bursanbelalaszlo"
 
     def create_random(self, length=None):
         """
@@ -45,7 +46,7 @@ class BCrypt(object):
         :param data: data to get the hash for
         :return: the hash of the data in argument
         """
-        return hashlib.sha256(data).hexdigest()
+        return hashlib.md5(data).hexdigest()
 
     def create_RSA_key(self, data):
         """
@@ -83,7 +84,7 @@ class BCrypt(object):
         """
         logging.debug("BCrypt:decrypt_AES(): decrypting")
         decoder = lambda cipher, in_data: cipher.decrypt(b64decode(in_data)).rstrip(self._padding)
-        return decoder(AES.new(str.encode(aes_key)), data)
+        return decoder(AES.new(aes_key, AES.MODE_CBC, self._aes_salt), data)
 
     def encrypt_AES(self, aes_key, data):
         """
@@ -96,4 +97,4 @@ class BCrypt(object):
         pad = lambda x: x + (self._block_size - len(x) % self._block_size) * self._padding
         encoder = lambda cipher, in_data: b64encode(cipher.encrypt(pad(in_data)))
 
-        return encoder(AES.new(aes_key), data)
+        return encoder(AES.new(aes_key, AES.MODE_CBC, self._aes_salt), data)
