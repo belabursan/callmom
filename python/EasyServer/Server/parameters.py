@@ -20,6 +20,24 @@ class Parameters(object):
         self._noof_sockets = 10
         self._noof_threads = 10
         self._password_hash = None
+        self._public_key_path = None
+        self._private_key_path = None
+
+    @property
+    def public_key_path(self):
+        return self._public_key_path
+
+    @public_key_path.setter
+    def public_key_path(self, value):
+        self._public_key_path = value
+
+    @property
+    def private_key_path(self):
+        return self._private_key_path
+
+    @private_key_path.setter
+    def private_key_path(self, value):
+        self._private_key_path = value
 
     @property
     def port(self):

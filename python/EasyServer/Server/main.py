@@ -118,6 +118,11 @@ def read_parameters():
         _parameters.timeout_seconds = parser.getint("NETWORK", "timeout")
         _parameters.debug = parser.getboolean("DEBUG", "debug")
         _parameters.noof_threads = parser.getint("OTHER", "noof_threads")
+        _parameters.public_key_path = parser.get("ENCRYPTION", "public_key_path")
+        _parameters.private_key_path = parser.get("ENCRYPTION", "private_key_path")
+        if not _parameters.private_key_path or not _parameters.public_key_path:
+            print("ERROR: No key path found, please set it in the config.ini!\n Ending server!")
+            return None
 
         _parameters.password_hash = parser.get("ENCRYPTION", "password_hash")
         if not _parameters.password_hash:

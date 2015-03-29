@@ -17,7 +17,7 @@ FLASH_LAMP = "flash_lamp"
 COMMAND = "command"
 REGISTER = "register"
 
-BUFFER_SIZE = 256
+BUFFER_SIZE = 512
 
 
 class Protocol(object):
@@ -86,6 +86,7 @@ class Protocol(object):
                     # handle other commands
                     pass
             elif command[0] == REGISTER:
+                self.do_register(command[1])
                 pass
             else:
                 # handle other messages
@@ -96,6 +97,22 @@ class Protocol(object):
 
         self.write(EXIT)
         return False
+
+    def do_register(self, register):
+        """
+        Registers an app, if password verification is ok the public key is returned as answer
+        :param register: takes a parameterwith two parts separated with colon:
+        first is the hash of the password the server needs to compare with its own hash,
+        second part is a random number
+        :return:
+        """
+        data = self._crypter.decrypt_AES(self._parameter.password_hash, register)
+        data_list = data.split(":")
+        if data_list[0] == self._parameter.password_hash:
+            # password is ok, send the public key
+            public_key = open(self._parameter.publik_key_path, "r")
+            self.write(public_key.read(BUFFER_SIZE))
+        pass
 
     def do_flash_lamp(self, flash_time, do_blink, interval_seconds):
         """
