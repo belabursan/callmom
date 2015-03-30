@@ -35,7 +35,7 @@ class Protocol(object):
         """
         self._connection = connection
         self._parameter = parameter
-        self._crypter = BCrypt(parameter, padding='{', block_size=16)
+        self._crypter = BCrypt(parameter, padding='0', block_size=16)
 
     def read(self):
         return self._connection.recv(BUFFER_SIZE).decode('utf8').strip()

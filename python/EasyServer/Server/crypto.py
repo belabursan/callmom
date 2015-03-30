@@ -84,6 +84,7 @@ class BCrypt(object):
         """
         logging.debug("BCrypt:decrypt_AES(): decrypting")
         decoder = lambda cipher, in_data: cipher.decrypt(b64decode(in_data)).rstrip(self._padding)
+
         return decoder(AES.new(aes_key, AES.MODE_CBC, self._aes_salt), data)
 
     def encrypt_AES(self, aes_key, data):

@@ -25,6 +25,16 @@ namespace CallMomCore
 				throw;
 			}
 		}
+
+		public static string AsBase64String (this byte[] data)
+		{
+			try {
+				return Convert.ToBase64String (data);
+			} catch (Exception ex) {
+				Debug.WriteLine ("exception in AsString extension");
+				throw;
+			}
+		}
 	}
 }
 
