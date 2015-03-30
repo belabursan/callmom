@@ -52,7 +52,7 @@ class Server(Process):
 
         try:
             server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            server_socket.bind(('localhost', self._parameters.port))
+            server_socket.bind(('', self._parameters.port))
             logging.info("Server:run(): Socket bind complete")
             server_socket.listen(self._parameters.noof_sockets)
             logging.info("Server:run(): Socket now listening")
