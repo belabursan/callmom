@@ -35,9 +35,9 @@ namespace CallMomCore
 			builder.RegisterType<COController> ().As<ICOController> ();
 			builder.RegisterType<SQLiteLink> ().As<ISQLiteLink> ().SingleInstance ();
 			builder.RegisterType<SettingService> ().As<ISettingsService> ().SingleInstance ();
-			builder.RegisterType<StateService> ().As<IStateService> ().SingleInstance ();
 			builder.RegisterType<BroadcastService> ().As<IBroadcastService> ().SingleInstance ();
 			builder.RegisterType<NetworkLink> ().As<INetworkLink> ().SingleInstance ();
+			builder.RegisterType<CryptoService> ().As<ICryptoService> ().SingleInstance ();
 
 			App.Container = builder.Build ();
 		}

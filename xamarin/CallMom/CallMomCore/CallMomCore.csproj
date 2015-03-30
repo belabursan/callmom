@@ -36,8 +36,6 @@
     <Compile Include="Source\App.cs" />
     <Compile Include="Source\Link\NetworkLink\INetworkLink.cs" />
     <Compile Include="Source\Link\NetworkLink\NetworkLink.cs" />
-    <Compile Include="Source\Service\StateService\IStateService.cs" />
-    <Compile Include="Source\Service\StateService\StateService.cs" />
     <Compile Include="Source\Call\Call.cs" />
     <Compile Include="Source\Link\SqlLink\ISQLiteFactory.cs" />
     <Compile Include="Source\Link\SqlLink\ISQLiteLink.cs" />
@@ -59,6 +57,9 @@
     <Compile Include="Source\Utils\Defaults.cs" />
     <Compile Include="Source\Link\NetworkLink\IConnectedNetworkClient.cs" />
     <Compile Include="Source\Link\NetworkLink\ConnectedNetworkClient.cs" />
+    <Compile Include="Source\Crypo\ICryptoFactory.cs" />
+    <Compile Include="Source\Crypo\ICryptoService.cs" />
+    <Compile Include="Source\Crypo\CryptoService.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>
@@ -79,11 +80,11 @@
     <Folder Include="Source\Link\" />
     <Folder Include="Source\Link\NetworkLink\" />
     <Folder Include="Source\Link\SqlLink\" />
-    <Folder Include="Source\Service\StateService\" />
     <Folder Include="Source\Call\" />
     <Folder Include="Source\Service\SettingsService\" />
     <Folder Include="Source\Service\BroadcastService\" />
     <Folder Include="Source\Utils\" />
     <Folder Include="Source\Exceptions\" />
+    <Folder Include="Source\Crypo\" />
   </ItemGroup>
 </Project>

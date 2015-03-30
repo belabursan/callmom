@@ -9,14 +9,12 @@ namespace CallMomCore
 	public class Call
 	{
 		private readonly ISettingsService _settings;
-		private readonly IStateService _stateMachine;
 		private readonly CancellationTokenSource _cancelation;
 
 
 		public Call ()
 		{
 			_settings = App.Container.Resolve<ISettingsService> ();
-			_stateMachine = App.Container.Resolve<IStateService> ();
 			_cancelation = new CancellationTokenSource ();
 		}
 
@@ -37,8 +35,6 @@ namespace CallMomCore
 			} catch (Exception ex) {
 				Debug.WriteLine ("[Call] - exception {0}({1})", U.ExType (ex), U.InnerExMessage (ex));
 				return ReturnValue.Error;
-			} finally {
-				_stateMachine.Reset ();
 			}
 
 		}
@@ -62,12 +58,41 @@ namespace CallMomCore
 			NetworkArguments netArgs = ValidateValues ();
 			INetworkLink _network = App.Container.Resolve<INetworkLink> ();
 			var client = await _network.GetNewConnection (netArgs, token);
-			client.Send ("kkk", token);
+			client.Send ("hello", token);
+			string answer = await client.Receive (token);
+			var answerList = answer.Split (':');
 
-			//Debug.WriteLine ("[Call] -  running: dissconnected: " + b.ToString ());
+			Debug.WriteLine ("[Call] -  received: " + answerList [0]);
+			if ("welcome".Equals (answerList [0].Trim ())) {
+				var protocol = answerList [1];
+				//todo - handle different protocols later...
+				var x = BuildFlashCommand ();
+				client.Send (x);
+			}
+
+
 			await Task.Delay (8000, token);
 
 			return 7;
+		}
+
+		private string BuildFlashCommand ()
+		{
+			ICryptoService crypto = App.Container.Resolve<ICryptoService> ();
+			Debug.WriteLine ("[Call] -  bulding command");
+			int flash_time = _settings.GetCallTime ();
+			int intervall_time = _settings.GetIntervallTime ();
+			bool blink = _settings.GetBlink ();
+			if (blink == false) {
+				intervall_time = 0;
+			}
+			string random = crypto.GetRandomString ();
+
+			string flash_command = String.Format ("{0}:{1}:{2}:{3}", flash_time, blink, intervall_time, random);
+			string crypto_command = crypto.EncodeRSA (_settings.GetServerPublicKey (), flash_command);
+			string command = String.Format ("command:{0}", crypto_command);
+
+			return command;
 		}
 
 		private NetworkArguments ValidateValues ()
