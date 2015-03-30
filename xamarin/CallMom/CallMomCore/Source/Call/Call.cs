@@ -78,7 +78,7 @@ namespace CallMomCore
 
 		private string BuildFlashCommand ()
 		{
-			Crypto crypto = new Crypto ();
+			ICryptoService crypto = App.Container.Resolve<ICryptoService> ();
 			Debug.WriteLine ("[Call] -  bulding command");
 			int flash_time = _settings.GetCallTime ();
 			int intervall_time = _settings.GetIntervallTime ();
