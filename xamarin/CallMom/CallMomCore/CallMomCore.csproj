@@ -40,7 +40,6 @@
     <Compile Include="Source\Link\SqlLink\ISQLiteFactory.cs" />
     <Compile Include="Source\Link\SqlLink\ISQLiteLink.cs" />
     <Compile Include="Source\Link\SqlLink\SQLiteLink.cs" />
-    <Compile Include="Source\Link\SqlLink\MomSqlException.cs" />
     <Compile Include="Source\Service\SettingsService\ISettingsService.cs" />
     <Compile Include="Source\Service\SettingsService\SettingService.cs" />
     <Compile Include="Source\Service\SettingsService\Settings.cs" />
@@ -60,6 +59,9 @@
     <Compile Include="Source\Crypo\ICryptoFactory.cs" />
     <Compile Include="Source\Crypo\ICryptoService.cs" />
     <Compile Include="Source\Crypo\CryptoService.cs" />
+    <Compile Include="Source\Exceptions\MomSqlException.cs" />
+    <Compile Include="Source\Utils\Extensions.cs" />
+    <Compile Include="Source\Exceptions\MomException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>

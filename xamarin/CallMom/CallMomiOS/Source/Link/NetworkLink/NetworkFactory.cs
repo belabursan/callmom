@@ -12,12 +12,11 @@ namespace CallMomiOS
 	{
 		public NetworkFactory ()
 		{
-			//TCPClient s;
 		}
 
 		private void ConnectCallBack (IAsyncResult asyn)
 		{
-			Console.WriteLine ("[NET-Factory] - 1e++++++++++++++++++");
+			//Console.WriteLine ("[NET-Factory] - 1e++++++++++++++++++");
 			TcpClient client = asyn.AsyncState as TcpClient;
 			if (client != null && client.Client != null) {
 				try {
@@ -45,7 +44,7 @@ namespace CallMomiOS
 					socket.Close ();
 				}
 
-				return new ConnectedNetworkClient (new NetworkStream (socket));
+				return new ConnectedNetworkClient (new NetworkStream (socket, FileAccess.ReadWrite, true));
 			
 			} catch (Exception ex) {
 				Console.WriteLine ("[NET-Factory] - exception when connecting ({0}:{1})", U.ExType (ex), U.InnerExMessage (ex));
@@ -56,8 +55,9 @@ namespace CallMomiOS
 
 		#endregion
 
-		private static LingerOption ToLingerOption (NetworkArguments netArgs)
+		private static LingerOption ToLingerOption (NetworkArguments netArgs, CancellationToken token)
 		{
+			ThrowIfCancelled (token);
 			//return new LingerOption (netArgs.LingerArguments.Enable, netArgs.LingerArguments.Timeout);
 			return new LingerOption (false, 0);
 		}
@@ -69,19 +69,24 @@ namespace CallMomiOS
 
 			client.ReceiveTimeout = netArgs.ReceiveTimeout;
 			client.SendTimeout = netArgs.SendTimeout;
-			client.LingerState = ToLingerOption (netArgs);
+			client.LingerState = ToLingerOption (netArgs, token);
 			client.NoDelay = netArgs.NoDelay;
-			if (token != default(CancellationToken))
-				token.ThrowIfCancellationRequested ();
+			ThrowIfCancelled (token);
 
 			return client;
 		}
 
 		private static IPEndPoint GetEndpoint (NetworkArguments netArgs, CancellationToken token = default(CancellationToken))
 		{
-			if (token != default(CancellationToken))
-				token.ThrowIfCancellationRequested ();
+			ThrowIfCancelled (token);
 			return new IPEndPoint (IPAddress.Parse (netArgs.Ip), netArgs.Port);
+		}
+
+		private static void ThrowIfCancelled (CancellationToken token)
+		{
+			if (token != default(CancellationToken)) {
+				token.ThrowIfCancellationRequested ();
+			}
 		}
 	}
 }

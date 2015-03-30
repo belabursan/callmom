@@ -78,6 +78,18 @@ namespace CallMomCore
 			return ValueAsInteger (INTERVALLTIME);
 		}
 
+		public int GetIntervallTimeOrDefault (int defaultValue = 0)
+		{
+			try {
+				return GetIntervallTime ();
+			} catch (MomSqlException ex) {
+				if (ex.ErrorCode == MomSqlException.NOT_FOUND) {
+					return defaultValue;
+				}
+				throw ex;
+			}
+		}
+
 		public void InsertIntervallTime (int time)
 		{
 			Insert (INTERVALLTIME, time.ToString ());
@@ -86,6 +98,18 @@ namespace CallMomCore
 		public bool GetBlink ()
 		{
 			return ValueAsBoolean (BLINK);
+		}
+
+		public bool GetBlinkOrDefault (bool defaultValue = false)
+		{
+			try {
+				return GetBlink ();
+			} catch (MomSqlException ex) {
+				if (ex.ErrorCode == MomSqlException.NOT_FOUND) {
+					return defaultValue;
+				}
+				throw ex;
+			}
 		}
 
 		public void InsertBlink (bool doBlink)

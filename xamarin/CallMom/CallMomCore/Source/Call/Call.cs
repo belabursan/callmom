@@ -10,11 +10,13 @@ namespace CallMomCore
 	{
 		private readonly ISettingsService _settings;
 		private readonly CancellationTokenSource _cancelation;
+		private readonly ICryptoService _cryptoService;
 
 
 		public Call ()
 		{
 			_settings = App.Container.Resolve<ISettingsService> ();
+			_cryptoService = App.Container.Resolve<ICryptoService> ();
 			_cancelation = new CancellationTokenSource ();
 		}
 
@@ -58,41 +60,74 @@ namespace CallMomCore
 			NetworkArguments netArgs = ValidateValues ();
 			INetworkLink _network = App.Container.Resolve<INetworkLink> ();
 			var client = await _network.GetNewConnection (netArgs, token);
-			client.Send ("hello", token);
+
+			var version = await DoHandshake (client, token);
+			Debug.WriteLine ("handshace version: " + version);
+			//later - fix different versions of protocol
+			var flashCommand = BuildRegisterCommand ("1234");//BuildFlashCommand ();
+			Debug.WriteLine ("flashcommand: " + flashCommand);
+			await client.Send (flashCommand);
+			Debug.WriteLine ("after send ");
+			var publicKey = await client.Receive (token);
+			Debug.WriteLine ("public key: " + publicKey);
+			return 0;
+		}
+
+		private async Task<string> DoHandshake (IConnectedNetworkClient client, CancellationToken token)
+		{
+			Debug.WriteLine ("[Call] - doing the handshake");
+
+			await client.Send ("hello", token);
 			string answer = await client.Receive (token);
 			var answerList = answer.Split (':');
 
-			Debug.WriteLine ("[Call] -  received: " + answerList [0]);
-			if ("welcome".Equals (answerList [0].Trim ())) {
-				var protocol = answerList [1];
-				//todo - handle different protocols later...
-				var x = BuildFlashCommand ();
-				client.Send (x);
+			Debug.WriteLine ("[Call] -  received: " + answerList [0] + ":" + answerList [1]);
+
+			if (!"welcome".Equals (answerList [0].Trim ())) {
+				throw new MomException ("Not welcome!");
 			}
-
-
-			await Task.Delay (8000, token);
-
-			return 7;
+			return answerList [1];
 		}
 
 		private string BuildFlashCommand ()
 		{
-			ICryptoService crypto = App.Container.Resolve<ICryptoService> ();
 			Debug.WriteLine ("[Call] -  bulding command");
 			int flash_time = _settings.GetCallTime ();
-			int intervall_time = _settings.GetIntervallTime ();
-			bool blink = _settings.GetBlink ();
-			if (blink == false) {
-				intervall_time = 0;
-			}
-			string random = crypto.GetRandomString ();
+			bool blink = _settings.GetBlinkOrDefault ();
+			int intervall_time = blink == false ? 0 : _settings.GetIntervallTimeOrDefault ();
+			string random = _cryptoService.GetRandomString ();
 
 			string flash_command = String.Format ("{0}:{1}:{2}:{3}", flash_time, blink, intervall_time, random);
-			string crypto_command = crypto.EncodeRSA (_settings.GetServerPublicKey (), flash_command);
+			string crypto_command;
+			try {
+				crypto_command = _cryptoService.EncodeRSA (_settings.GetServerPublicKey (), flash_command);
+			} catch (MomSqlException ex) {
+				if (ex.ErrorCode == MomSqlException.NOT_FOUND) {
+					// public key not found, throw register exception
+					var x = BuildRegisterCommand ("1234");
+					throw new MomNotRegisteredException ("App not registered", ex);
+
+				}
+				Debug.WriteLine ("Something is wrong with the DB: " + ex.Message);
+				throw ex;
+			}
+
 			string command = String.Format ("command:{0}", crypto_command);
 
 			return command;
+		}
+
+		private string BuildRegisterCommand (string password)
+		{
+			//1234
+			//81dc9bdb52d04dc20036dbd8313ed055
+			var md5sum = _cryptoService.GenerateHash (password);
+			Debug.WriteLine ("register 1: " + md5sum);
+			var command = String.Format ("{0}:{1}", md5sum, _cryptoService.GetRandomString ());
+			Debug.WriteLine ("register 2: " + command);
+			var crypto_command = _cryptoService.EncodeAES (md5sum, command, Defaults.BLOCKSIZE, Defaults.PADDING);
+			Debug.WriteLine ("register 3: " + crypto_command);
+			return String.Format ("register:{0}", crypto_command);
 		}
 
 		private NetworkArguments ValidateValues ()

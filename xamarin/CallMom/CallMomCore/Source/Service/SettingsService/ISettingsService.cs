@@ -26,9 +26,13 @@ namespace CallMomCore
 
 		int GetIntervallTime ();
 
+		int GetIntervallTimeOrDefault (int defaultValue = 0);
+
 		void InsertIntervallTime (int time);
 
 		bool GetBlink ();
+
+		bool GetBlinkOrDefault (bool defaultValue = false);
 
 		void InsertBlink (bool doBlink);
 

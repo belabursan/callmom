@@ -45,7 +45,7 @@ namespace CallMomCore
 
 		public string EncodeAES (string key, string data, int blockSize, string padding)
 		{
-			throw new NotImplementedException ();
+			return _factory.EncodeAES (key, data, blockSize, padding);
 		}
 
 		public string DecodeAES (string key, string data)
