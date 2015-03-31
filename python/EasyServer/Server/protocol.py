@@ -129,12 +129,12 @@ class Protocol(object):
                 public_key = open(self._parameter.public_key_path, "r")
                 self.write(public_key.read(BUFFER_SIZE))
                 success = True
+                self.write(DONE)
         except Exception as ex:
             logging.warning("Protocol:do_register(): got "
                             + str(sys.exc_info()[0])
                             + " when executing registering: "
                             + str(ex.message))
-        self.write(EXIT)
         return success
 
     def do_handle_commands(self, crypto_command):

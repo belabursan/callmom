@@ -28,7 +28,8 @@ class BCrypt(object):
         self._padding = padding
         self._block_size = block_size
         self._params = params
-        self._aes_salt = "bursanbelalaszlo"
+        self._aes_iv = "bursanbelalaszlo"
+        self._aes_mode = AES.MODE_CBC
 
     def create_random(self, length=None):
         """
@@ -75,22 +76,22 @@ class BCrypt(object):
         logging.debug("BCrypt:decrypt_RSA(): decrypting data")
         return rsa_key.decrypt(b64decode(package))
 
-    def decrypt_AES(self, aes_key, data):
+    def decrypt_AES(self, clear_key, data):
         """
         Decrypts a string encrypted with AES
         :param data: string to decrypt
-        :param aes_key: key to decrypt with
+        :param clear_key: key to decrypt with
         :return: the decrypted string
         """
         logging.debug("BCrypt:decrypt_AES(): decrypting")
         decoder = lambda cipher, in_data: cipher.decrypt(b64decode(in_data)).rstrip(self._padding)
 
-        return decoder(AES.new(aes_key, AES.MODE_CBC, self._aes_salt), data)
+        return decoder(self.make_aes_key(clear_key), data)
 
-    def encrypt_AES(self, aes_key, data):
+    def encrypt_AES(self, clear_key, data):
         """
         Encrypts a string with AES
-        :param aes_key: key to encrypt with
+        :param clear_key: key to encrypt with
         :param data: data to encrypt
         :return: the encrypted string
         """
@@ -98,4 +99,13 @@ class BCrypt(object):
         pad = lambda x: x + (self._block_size - len(x) % self._block_size) * self._padding
         encoder = lambda cipher, in_data: b64encode(cipher.encrypt(pad(in_data)))
 
-        return encoder(AES.new(aes_key, AES.MODE_CBC, self._aes_salt), data)
+        return encoder(self.make_aes_key(clear_key), data)
+
+    def make_aes_key(self, aes_key):
+        """
+        Creates an aes key
+        :param aes_key: clear text string to transform to an aes key
+        :return: aes key
+        """
+        key = AES.new(aes_key, self._aes_mode, self._aes_iv.encode("utf8"))
+        return key
