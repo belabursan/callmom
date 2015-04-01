@@ -6,21 +6,9 @@ using System.Threading;
 
 namespace CallMomCore
 {
-	public class Call
+	public class Call : CommandBase
 	{
-		private readonly ISettingsService _settings;
-		private readonly CancellationTokenSource _cancelation;
-		private readonly ICryptoService _cryptoService;
-
-
-		public Call ()
-		{
-			_settings = App.Container.Resolve<ISettingsService> ();
-			_cryptoService = App.Container.Resolve<ICryptoService> ();
-			_cancelation = new CancellationTokenSource ();
-		}
-
-		public async Task<int> Execute ()
+		public override async Task<int> ExecuteAsync ()
 		{
 			Debug.WriteLine ("[Call] - executing call");
 			try {
@@ -28,12 +16,12 @@ namespace CallMomCore
 			} catch (OperationCanceledException ocex) {
 				Debug.WriteLine ("[Call] - cancelled (got OperationCanceledException:{0})", U.InnerExMessage (ocex));
 				return ReturnValue.Cancelled;
-			} catch (MomNotRegisteredException nrex) {
-				Debug.WriteLine ("[Call] - not registered (got NotRegisteredException:{0})", U.InnerExMessage (nrex));
-				return ReturnValue.NotRegistered;
 			} catch (MomNetworkException neex) {
 				Debug.WriteLine ("[Call] - network error (got MomNetworkException:{0})", U.InnerExMessage (neex));
 				return ReturnValue.NetworkError;
+			} catch (MomNotRegisteredException nrex) {
+				Debug.WriteLine ("[Call] - not registered (got NotRegisteredException:{0})", U.InnerExMessage (nrex));
+				return ReturnValue.NotRegistered;
 			} catch (Exception ex) {
 				Debug.WriteLine ("[Call] - exception {0}({1})", U.ExType (ex), U.InnerExMessage (ex));
 				return ReturnValue.Error;
@@ -41,20 +29,10 @@ namespace CallMomCore
 
 		}
 
-		public async Task<int> Cancel ()
-		{
-			Debug.WriteLine ("[Call] - cancelling the call");
-
-			await Task.Run (() => {
-				_cancelation.Cancel ();
-				Debug.WriteLine ("[Call] - cancelled");
-			});
-
-			return ReturnValue.Cancelled;
-		}
+		#region implemented abstract members of CommandBase
 
 
-		private async Task<int> Run (CancellationToken token)
+		protected override async Task<int> Run (CancellationToken token)
 		{
 			Debug.WriteLine ("[Call] -  running");
 			NetworkArguments netArgs = ValidateValues ();
@@ -72,6 +50,8 @@ namespace CallMomCore
 			Debug.WriteLine ("public key: " + publicKey);
 			return 0;
 		}
+
+		#endregion
 
 		private async Task<string> DoHandshake (IConnectedNetworkClient client, CancellationToken token)
 		{

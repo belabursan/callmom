@@ -75,7 +75,7 @@ namespace CallMomiOS
 
 		partial void UIButton15_TouchUpInside (UIButton sender)
 		{
-			InvokeOnMainThread (async  () => await DoCancel ());
+			DoCancel ();
 		}
 
 		private async Task DoCall ()
@@ -93,9 +93,9 @@ namespace CallMomiOS
 			//todo handle returnvalue
 		}
 
-		private async Task DoCancel ()
+		private void DoCancel ()
 		{
-			int ret = await ioc.CancelTheCall ();
+			int ret = ioc.CancelTheCall ();
 			if (ret == ReturnValue.Cancelled) {
 				AnimateCallMomCancel ();
 			}

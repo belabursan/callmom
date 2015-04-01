@@ -107,5 +107,6 @@ class BCrypt(object):
         :param aes_key: clear text string to transform to an aes key
         :return: aes key
         """
+        var = self._aes_iv.encode("utf8")
         key = AES.new(aes_key, self._aes_mode, self._aes_iv.encode("utf8"))
         return key

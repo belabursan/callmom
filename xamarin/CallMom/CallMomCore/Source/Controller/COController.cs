@@ -6,7 +6,7 @@ namespace CallMomCore
 {
 	public class COController : ICOController
 	{
-		private Call _call;
+		private ICommand _call;
 
 		public COController ()
 		{
@@ -22,22 +22,19 @@ namespace CallMomCore
 
 			if (_call == null) {
 				_call = new Call ();
-				returnValue = await _call.Execute ();
+				returnValue = await _call.ExecuteAsync ();
 				_call = null;
 			}
 
 			return returnValue;
 		}
 
-		public async Task<int> CancelTheCall ()
+		public int CancelTheCall ()
 		{
 			Debug.WriteLine ("[Controller] - canceling the call");
 
-			if (_call != null) {
-				return await _call.Cancel ();
-			}
+			return _call != null ? _call.Cancel () : ReturnValue.NotRunning;
 
-			return ReturnValue.NotRunning;
 		}
 
 		#endregion
