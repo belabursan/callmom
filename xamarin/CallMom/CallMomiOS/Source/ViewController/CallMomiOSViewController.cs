@@ -13,7 +13,7 @@ namespace CallMomiOS
 {
 	public partial class CallMomiOSViewController : UIViewController
 	{
-		CallMomCore.ICOController ioc;
+		private readonly ICOController _callController;
 		private static object Lock = new object ();
 
 		private const string DefaultCallMomButtonTitle = "Call Mom";
@@ -21,6 +21,7 @@ namespace CallMomiOS
 
 		public CallMomiOSViewController (IntPtr handle) : base (handle)
 		{
+			_callController = App.Container.Resolve<ICOController> ();
 		}
 
 		public override void DidReceiveMemoryWarning ()
@@ -40,8 +41,6 @@ namespace CallMomiOS
 			MomActivity.StopAnimating ();
 			MomLabel.Hidden = true;
 
-			//ioc = new COController ();//App.Container.Resolve<ICOController> ();
-			ioc = App.Container.Resolve<ICOController> ();
 
 			// Perform any additional setup after loading the view, typically from a nib.
 		}
@@ -70,7 +69,7 @@ namespace CallMomiOS
 
 		partial void UIButton13_TouchUpInside (UIButton sender)
 		{
-			InvokeOnMainThread (async  () => await DoCall ());
+			InvokeOnMainThread (async () => await DoCall ());
 		}
 
 		partial void UIButton15_TouchUpInside (UIButton sender)
@@ -83,23 +82,33 @@ namespace CallMomiOS
 			MomActivity.StartAnimating ();
 			AnimateCallMomStart ();
 
-			int click = await ioc.DoTheCallAsync ();
+			int click = await _callController.DoTheCallAsync ();
+			Console.WriteLine ("[GUI] - call ended with code {0}", click);
 
 			if (click != ReturnValue.AlreadyRunning) {
 				MomActivity.StopAnimating ();
 			}
+			switch (click) {
+			case ReturnValue.NotRegistered:
+				AnimateNotRegistered ();
+				break;
+			}
 
-			Console.WriteLine ("[GUI] - call ended with code {0}", click);
 			//todo handle returnvalue
 		}
 
 		private void DoCancel ()
 		{
-			int ret = ioc.CancelTheCall ();
+			int ret = _callController.CancelTheCall ();
 			if (ret == ReturnValue.Cancelled) {
 				AnimateCallMomCancel ();
 			}
 			// else ReturnValue.NotStarted
+		}
+
+		void AnimateNotRegistered ()
+		{
+			throw new NotImplementedException ();
 		}
 
 		private void AnimateCallMomStart ()
