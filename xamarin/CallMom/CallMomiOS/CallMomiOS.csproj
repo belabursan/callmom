@@ -123,6 +123,7 @@
     <Compile Include="Source\Link\SqlLink\SQLiteFactory.cs" />
     <Compile Include="Source\Link\NetworkLink\NetworkFactory.cs" />
     <Compile Include="Source\Crypto\CryptoFactory.cs" />
+    <Compile Include="Source\Link\FileLink\FileFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainStoryboard.storyboard" />
@@ -141,5 +142,6 @@
     <Folder Include="Source\Link\SqlLink\" />
     <Folder Include="Source\Link\NetworkLink\" />
     <Folder Include="Source\Crypto\" />
+    <Folder Include="Source\Link\FileLink\" />
   </ItemGroup>
 </Project>

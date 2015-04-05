@@ -54,6 +54,8 @@ namespace CallMomiOS
 			builder.RegisterType<COController> ().As<ICOController> ().SingleInstance ();
 			builder.RegisterType<NetworkFactory> ().As<INetworkFactory> ();
 			builder.RegisterType<CryptoFactory> ().As<ICryptoFactory> ();
+			builder.RegisterType<FileFactory> ().As<IFileFactory> ();
+
 			App.Initialize (builder);
 			return true;
 		}

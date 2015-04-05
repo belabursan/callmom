@@ -66,6 +66,9 @@
     <Compile Include="Source\Call\CommandBase.cs" />
     <Compile Include="Source\Call\ICommand.cs" />
     <Compile Include="Source\Exceptions\MomProtocolException.cs" />
+    <Compile Include="Source\Service\FileService\IFileService.cs" />
+    <Compile Include="Source\Service\FileService\FileService.cs" />
+    <Compile Include="Source\Service\FileService\IFileFactory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>
@@ -92,5 +95,6 @@
     <Folder Include="Source\Utils\" />
     <Folder Include="Source\Exceptions\" />
     <Folder Include="Source\Crypo\" />
+    <Folder Include="Source\Service\FileService\" />
   </ItemGroup>
 </Project>

@@ -38,6 +38,7 @@ namespace CallMomCore
 			builder.RegisterType<BroadcastService> ().As<IBroadcastService> ().SingleInstance ();
 			builder.RegisterType<NetworkLink> ().As<INetworkLink> ().SingleInstance ();
 			builder.RegisterType<CryptoService> ().As<ICryptoService> ().SingleInstance ();
+			builder.RegisterType<FileService> ().As<IFileService> ().SingleInstance ();
 
 			App.Container = builder.Build ();
 		}
