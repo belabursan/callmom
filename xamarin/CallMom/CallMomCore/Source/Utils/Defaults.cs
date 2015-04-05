@@ -13,7 +13,10 @@ namespace CallMomCore
 		public const int BLOCKSIZE = 16;
 		public const int KEYSIZE = 32;
 		public const string PADDING = "{";
-		public const string SALT = "bursanbelalaszlo";
+		public static readonly byte[] AESIV = new byte[] {
+			0x42, 0x75, 0x72, 0x73, 0x61, 0x6e, 0x42, 0x65,
+			0x6c, 0x61, 0x4c, 0x61, 0x73, 0x7a, 0x6c, 0x6f
+		};
 	}
 }
 

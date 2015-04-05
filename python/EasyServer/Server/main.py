@@ -56,7 +56,6 @@ class Main(object):
 
         except socket.error as ex:
             logging.warning("Main:run(): Got socket exception : " + str(ex))
-            pass
         finally:
             self.server.stop_server()
         return 0
@@ -127,10 +126,10 @@ def read_parameters():
         _parameters.password_hash = parser.get("ENCRYPTION", "password_hash")
         if not _parameters.password_hash:
             from crypto import BCrypt
-            crypt = BCrypt(None, None, 0)
+            crypt = BCrypt(None)
             password = getpass.getpass("\nA password not seems to be set or is wrong!\n"
                                        "Please set a new hash by typing a password:\n")
-            password_hash = crypt.generate_hash(password)
+            password_hash = crypt.get_hash_as_string(password)
             parser.set("ENCRYPTION", "password_hash", password_hash)
             parser.write(open("easy_config.ini", "w"))
 
@@ -160,8 +159,8 @@ if __name__ == '__main__':
         print("      - append    : logs are appended to existing logfile")
         print("")
         print("    Return values are:")
-        print("      - 0 : interrupted by user")
-        print("      - 1 : in case of error")
+        print("      0 : interrupted by user")
+        print("      1 : in case of error")
         print("")
 
         time.sleep(0.2)

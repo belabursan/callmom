@@ -4,9 +4,11 @@ namespace CallMomCore
 {
 	public interface ICryptoService
 	{
-		string GetRandomString (int lengt = Defaults.BLOCKSIZE);
+		string GetRandomString (int length = Defaults.BLOCKSIZE);
 
-		string GenerateHash (string data);
+		string GetRandomString (int minLength = Defaults.BLOCKSIZE, int maxLength = Defaults.KEYSIZE);
+
+		byte[] GetSha256Hash (string data);
 
 		string CreateRSAKey (string data, int blockSize, string padding);
 
@@ -14,7 +16,7 @@ namespace CallMomCore
 
 		string DecodeRSA (string key, string data);
 
-		string EncodeAES (string key, string data, int blockSize, string padding);
+		string EncodeAES (byte[] key, string data);
 
 		string DecodeAES (string key, string data);
 	}

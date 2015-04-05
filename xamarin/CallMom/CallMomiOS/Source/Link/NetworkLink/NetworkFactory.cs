@@ -22,7 +22,7 @@ namespace CallMomiOS
 				try {
 					client.EndConnect (asyn);
 				} catch (Exception ex) {
-					Console.WriteLine ("[NET-Factory] - 2e++++++++++++++++++");
+					Console.WriteLine ("[NET-Factory] - ex: {0}", ex.Message);
 				}
 			}
 		}
@@ -35,7 +35,7 @@ namespace CallMomiOS
 				bool connected = true;
 				Socket socket = GetSocket (netArgs, token);	
 
-				await Task.Run (async () => {
+				await Task.Run (() => {
 					IAsyncResult result = socket.BeginConnect (GetEndpoint (netArgs), new AsyncCallback (ConnectCallBack), socket);
 					connected = result.AsyncWaitHandle.WaitOne (netArgs.ConnectTimeout, true);
 				});

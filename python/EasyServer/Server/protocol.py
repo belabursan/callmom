@@ -2,14 +2,16 @@
 # Bela Bursan<burszan@gmail.com> - 2015-03-27
 #
 import logging
+import base64
 import time
 import sys
 from crypto import BCrypt
 
 # send commands
-EXIT = "exit\n"
-WELCOME = "welcome\n"
-DONE = "done\n"
+END = "exit"
+WELCOME = "welcome"
+SUCCESS = "success"
+FAILED = "failed"
 
 # receive commands
 HELLO = "hello"
@@ -35,13 +37,14 @@ class Protocol(object):
         """
         self._connection = connection
         self._parameter = parameter
-        self._crypter = BCrypt(parameter, padding='0', block_size=16)
+        self._crypter = BCrypt(parameter)
 
     def read(self):
-        return self._connection.recv(BUFFER_SIZE).decode('utf8').strip()
+        return self._connection.recv(BUFFER_SIZE).decode('utf-8').strip()
 
     def write(self, data):
-        self._connection.sendall(data.encode('utf8'))
+        d = (data + LINE_END).encode('utf-8')
+        self._connection.sendall(d)
 
     def do_split(self, data):
         """
@@ -60,12 +63,14 @@ class Protocol(object):
         :return:
         """
         logging.debug("Protocol:run(): running the protocol")
-        if not self.handshake():
-            logging.info("Protocol:run(): handshake not successful")
-            return
-        logging.debug("Protocol:run(): handshake successful")
-        self.handle_messages()
 
+        if self.handshake():
+            if self.handle_messages():
+                self.write(SUCCESS)
+            else:
+                self.write(FAILED)
+
+        self.write(END)
         time.sleep(5)
         return
 
@@ -77,10 +82,10 @@ class Protocol(object):
         """
         data = self.read()
         if HELLO == data:
-            self.write(WELCOME + SPLITTER + VERSION + LINE_END)
+            self.write(WELCOME + SPLITTER + VERSION)
+            logging.info("Protocol:handshake(): handshake successful")
             return True
-        else:
-            self.write(EXIT)
+        logging.warning("Protocol:handshake(): handshake failed")
         return False
 
     def handle_messages(self):
@@ -89,6 +94,8 @@ class Protocol(object):
         :return: True if the messages was received and executed successfully, False otherwise
         :exception: throws Socket.timeout exception
         """
+        logging.debug("Protocol:handle_messages(): new message")
+
         data = self.read()
         success = False
         try:
@@ -97,7 +104,6 @@ class Protocol(object):
                 success = self.do_handle_commands(message[1])
             elif message[0] == REGISTER:
                 success = self.do_register(message[1])
-                pass
             else:
                 # handle other messages
                 pass
@@ -107,7 +113,6 @@ class Protocol(object):
                             + " when executing message: "
                             + ex.message)
 
-        self.write(EXIT)
         return success
 
     def do_register(self, crypto_command):
@@ -119,7 +124,7 @@ class Protocol(object):
         :return: true if registered successfully, false otherwise
         """
         success = False
-        logging.info("Protocol:do_register(): registering new user")
+        logging.debug("Protocol:do_register(): registering new user")
 
         try:
             command_line = self._crypter.decrypt_AES(self._parameter.password_hash, crypto_command)
@@ -129,7 +134,6 @@ class Protocol(object):
                 public_key = open(self._parameter.public_key_path, "r")
                 self.write(public_key.read(BUFFER_SIZE))
                 success = True
-                self.write(DONE)
         except Exception as ex:
             logging.warning("Protocol:do_register(): got "
                             + str(sys.exc_info()[0])

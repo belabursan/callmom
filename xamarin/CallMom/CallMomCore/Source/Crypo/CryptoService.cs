@@ -6,7 +6,7 @@ namespace CallMomCore
 {
 	public class CryptoService : ICryptoService
 	{
-		private const string _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		private const string _chars = "abcdefghijklmnopqrstuvwxyz0123456789";
 		private static Random _random;
 		private readonly ICryptoFactory _factory;
 
@@ -16,16 +16,21 @@ namespace CallMomCore
 			_random = new Random ((int)DateTime.Now.Ticks);
 		}
 
-		public string GetRandomString (int lengt = Defaults.BLOCKSIZE)
+		public string GetRandomString (int length = Defaults.BLOCKSIZE)
 		{
 			return new string (
-				Enumerable.Repeat (_chars, lengt).Select (s => s [_random.Next (s.Length)]).ToArray ()
+				Enumerable.Repeat (_chars, length).Select (s => s [_random.Next (s.Length)]).ToArray ()
 			);
 		}
 
-		public string GenerateHash (string data)
+		public string GetRandomString (int minLength = Defaults.BLOCKSIZE, int maxLength = Defaults.KEYSIZE)
 		{
-			return _factory.GetMD5Hash (data);
+			return GetRandomString (_random.Next (minLength, maxLength));
+		}
+
+		public byte[] GetSha256Hash (string data)
+		{
+			return _factory.GetSha256Hash (data);
 		}
 
 		public string EncodeRSA (string key, string data)
@@ -43,9 +48,9 @@ namespace CallMomCore
 			throw new NotImplementedException ();
 		}
 
-		public string EncodeAES (string key, string data, int blockSize, string padding)
+		public string EncodeAES (byte[] key, string data)
 		{
-			return _factory.EncodeAES (key, data, blockSize, padding);
+			return _factory.EncodeAES (key, data);
 		}
 
 		public string DecodeAES (string key, string data)

@@ -2,7 +2,7 @@
 
 namespace CallMomCore
 {
-	public class MomNetworkException : Exception
+	public class MomNetworkException : MomException
 	{
 		public MomNetworkException (
 			string message = default(String),

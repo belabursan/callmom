@@ -10,6 +10,8 @@ import logging
 import hashlib
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP, AES
+import binascii
+import StringIO
 from base64 import b64decode, b64encode
 
 
@@ -17,18 +19,16 @@ class BCrypt(object):
     """
     Holds some functions to encrypt/decrypt strings
     """
-    def __init__(self, params, padding, block_size):
+    def __init__(self, params, block_size=16):
         """
         Constructor
         :param params: - parameters from the applications ini file
-        :param padding: padding used for AES crypto
         :param block_size: block size used by AES
         :return:
         """
-        self._padding = padding
         self._block_size = block_size
         self._params = params
-        self._aes_iv = "bursanbelalaszlo"
+        self._aes_iv = '\x42\x75\x72\x73\x61\x6e\x42\x65\x6c\x61\x4c\x61\x73\x7a\x6c\x6f'
         self._aes_mode = AES.MODE_CBC
 
     def create_random(self, length=None):
@@ -41,13 +41,21 @@ class BCrypt(object):
             length = self._block_size
         return os.urandom(length)
 
-    def generate_hash(self, data):
+    def get_hash_as_string(self, data):
         """
         Generates a sha256 hash of a text string
         :param data: data to get the hash for
-        :return: the hash of the data in argument
+        :return: the hash of the data in argument as string
         """
-        return hashlib.md5(data).hexdigest()
+        return hashlib.sha256(data).hexdigest()
+
+    def get_hash_as_bytes(self, data):
+        """
+        Generates a sha256 hash of a text string
+        :param data: data to get the hash for
+        :return: the hash of the data in argument as bytes
+        """
+        return hashlib.sha256(data).digest()
 
     def create_RSA_key(self, data):
         """
@@ -76,17 +84,18 @@ class BCrypt(object):
         logging.debug("BCrypt:decrypt_RSA(): decrypting data")
         return rsa_key.decrypt(b64decode(package))
 
-    def decrypt_AES(self, clear_key, data):
+    def decrypt_AES(self, key, data):
         """
         Decrypts a string encrypted with AES
         :param data: string to decrypt
-        :param clear_key: key to decrypt with
+        :param key: key to decrypt with, must be a hex-string with proper length(16-24-32)
         :return: the decrypted string
         """
         logging.debug("BCrypt:decrypt_AES(): decrypting")
-        decoder = lambda cipher, in_data: cipher.decrypt(b64decode(in_data)).rstrip(self._padding)
 
-        return decoder(self.make_aes_key(clear_key), data)
+        decrypted = self.make_aes_key(key).decrypt(b64decode(str(data)))
+        return decrypted[:(len(decrypted) - int(binascii.hexlify(decrypted[-1]), 16))]
+
 
     def encrypt_AES(self, clear_key, data):
         """
@@ -96,10 +105,10 @@ class BCrypt(object):
         :return: the encrypted string
         """
         logging.debug("BCrypt:encrypt_AES(): encrypting")
-        pad = lambda x: x + (self._block_size - len(x) % self._block_size) * self._padding
-        encoder = lambda cipher, in_data: b64encode(cipher.encrypt(pad(in_data)))
+        # pad = lambda x: x + (self._block_size - len(x) % self._block_size) * self._padding
+        # encoder = lambda cipher, in_data: b64encode(cipher.encrypt(pad(in_data)))
 
-        return encoder(self.make_aes_key(clear_key), data)
+        # return encoder(self.make_aes_key(clear_key), data)
 
     def make_aes_key(self, aes_key):
         """
@@ -107,6 +116,13 @@ class BCrypt(object):
         :param aes_key: clear text string to transform to an aes key
         :return: aes key
         """
-        var = self._aes_iv.encode("utf8")
-        key = AES.new(aes_key, self._aes_mode, self._aes_iv.encode("utf8"))
+        key = AES.new(aes_key.decode("hex"), self._aes_mode, self._aes_iv)
         return key
+
+    def pad_PKCS7(self, text):
+        l = len(text)
+        output = StringIO.StringIO()
+        val = self._block_size - (l % self._block_size)
+        for _ in xrange(val):
+            output.write('%02x' % val)
+        return text + binascii.unhexlify(output.getvalue())

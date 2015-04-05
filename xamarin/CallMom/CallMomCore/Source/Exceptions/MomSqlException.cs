@@ -2,7 +2,7 @@
 
 namespace CallMomCore
 {
-	public class MomSqlException : Exception
+	public class MomSqlException : MomException
 	{
 		public static int UNKNOWN = 0;
 		public static int NOT_FOUND = -1;

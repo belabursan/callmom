@@ -4,85 +4,80 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Linq;
 using System.IO;
+using System.Diagnostics;
 
 namespace CallMomiOS
 {
 	public class CryptoFactory : ICryptoFactory
 	{
-		private readonly MD5 _md5Hasher;
+		private readonly SHA256 _sha256Hasher;
+		private int _blockSize;
 
-		public CryptoFactory ()
+		public CryptoFactory (int blockSize = Defaults.BLOCKSIZE)
 		{
-			_md5Hasher = MD5.Create ();
+			_blockSize = blockSize;
+			_sha256Hasher = SHA256.Create ();
 		}
 
 		#region ICryptoFactory implementation
 
-		public string GetMD5Hash (string data)
+		public byte[] GetSha256Hash (string data)
 		{
-			return ToHex (_md5Hasher.ComputeHash (Encoding.UTF8.GetBytes (data)));
+			return _sha256Hasher.ComputeHash (data.AsBytes ());
 		}
 
-		public string EncodeAES (string keyStr, string data, int blockSize, string padding)
+		public string EncodeAES (byte[] key, string data)
 		{
-			byte[] encryptedBytes = null;
+			byte[] dataBytes = Pad (data, _blockSize);
 
-			using (AesCryptoServiceProvider aesAlg = new AesCryptoServiceProvider ()) {
-				aesAlg.Key = keyStr.AsBytes ();
-				aesAlg.IV = Defaults.SALT.AsBytes ();
-				aesAlg.BlockSize = Defaults.BLOCKSIZE * 8;
-				aesAlg.KeySize = Defaults.KEYSIZE * 8;
-				aesAlg.Mode = CipherMode.CBC;
-				aesAlg.Padding = PaddingMode.Zeros;
+			using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider ()) {
+				aes.BlockSize = _blockSize * 8;
+				aes.KeySize = Defaults.KEYSIZE * 8;
 
-				// Create a decrytor to perform the stream transform.
-				ICryptoTransform encryptor = aesAlg.CreateEncryptor (aesAlg.Key, aesAlg.IV);
+				aes.Key = key;
+				aes.IV = Defaults.AESIV;
 
-				// Create the streams used for encryption. 
-				using (MemoryStream msEncrypt = new MemoryStream ()) {
-					using (CryptoStream csEncrypt = new CryptoStream (msEncrypt, encryptor, CryptoStreamMode.Write)) {
-						using (StreamWriter swEncrypt = new StreamWriter (csEncrypt)) {
+				aes.Mode = CipherMode.CBC;
+				aes.Padding = PaddingMode.None;
 
-							//Write all data to the stream.
-							swEncrypt.Write (data);
+				using (ICryptoTransform encryptor = aes.CreateEncryptor ()) {
+					using (MemoryStream memoStream = new MemoryStream ()) {
+						using (CryptoStream cryptoStream = new CryptoStream (memoStream, encryptor, CryptoStreamMode.Write)) {
+							cryptoStream.Write (dataBytes, 0, dataBytes.Length);
+							cryptoStream.FlushFinalBlock ();
+							return memoStream.ToArray ().AsBase64String ();
 						}
-						encryptedBytes = msEncrypt.ToArray ();
 					}
 				}
-
 			}
-			return encryptedBytes.AsBase64String ();
-			/*
-			using (MemoryStream memoryStream = new MemoryStream ()) {
-				using (RijndaelManaged AES = new RijndaelManaged ()) {
-					Rfc2898DeriveBytes key = new Rfc2898DeriveBytes (keyStr, Defaults.SALT.AsBytes ());
-
-					AES.KeySize = Defaults.KEYSIZE * 8;
-					AES.BlockSize = Defaults.BLOCKSIZE * 8;
-					AES.Key = key.GetBytes (Defaults.KEYSIZE);
-					AES.IV = Defaults.SALT.AsBytes ();
-					AES.Mode = CipherMode.CBC;
-					AES.Padding = PaddingMode.Zeros;
-					//var key = new Rfc2898DeriveBytes (keyStr.AsBytes (), Defaults.SALT.AsBytes (), 0);
-					//AES.Key = key.GetBytes (AES.KeySize / 8);
-
-					using (var cs = new CryptoStream (memoryStream, AES.CreateEncryptor (), CryptoStreamMode.Write)) {
-						cs.Write (dataBytes, 0, dataBytes.Length);
-						cs.Close ();
-					}
-					encryptedBytes = memoryStream.ToArray ();
-				}
-			}
-			return encryptedBytes.AsBase64String ();
-			*/
 		}
 
 		#endregion
 
-		public static string ToHex (byte[] bytes)
+		private byte[] Pad (string data, int blockSize)
 		{
-			return String.Concat (bytes.Select (b => string.Format ("{0:x2}", b)));
+			byte[] dataBytes = data.AsBytes ();
+			int dataLength = dataBytes.Length;
+			int padLength = blockSize;
+
+			if (dataLength < blockSize) {
+				padLength -= dataLength;
+			} else {
+				int modulus = dataLength % blockSize;
+				if (modulus != 0) {
+					padLength -= modulus;
+				}
+			}
+			int newLength = dataLength + padLength;
+			Array.Resize<byte> (ref dataBytes, newLength);
+			byte pad = (byte)(0x0F & (byte)padLength);
+
+			for (; dataLength < newLength;) {
+				dataBytes [dataLength++] = pad;
+			}
+			return dataBytes;
 		}
+
 	}
 }
 

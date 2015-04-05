@@ -74,11 +74,9 @@ class Server(Process):
 
         except KeyboardInterrupt:
             logging.debug("Server:run(): Got KeyboardInterrupt in Server")
-            # pass this to main and end everything
             pass
         except Exception as ex:
             logging.exception("Server:run(): Exception: " + str(ex))
-            pass
         finally:
             if connection:
                 connection.close()

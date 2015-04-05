@@ -10,7 +10,6 @@ namespace CallMomCore
 	{
 		public override async Task<int> ExecuteAsync ()
 		{
-			Debug.WriteLine ("[Call] - executing call");
 			try {
 				return await Run (_cancelation.Token);	
 			} catch (OperationCanceledException ocex) {
@@ -40,12 +39,13 @@ namespace CallMomCore
 			var client = await _network.GetNewConnection (netArgs, token);
 
 			var version = await DoHandshake (client, token);
-			Debug.WriteLine ("handshace version: " + version);
+			Debug.WriteLine ("Protocol version: " + version);
 			//later - fix different versions of protocol
+
+			// todo remove 
 			var flashCommand = BuildRegisterCommand ("1234");//BuildFlashCommand ();
 			Debug.WriteLine ("flashcommand: " + flashCommand);
 			await client.Send (flashCommand);
-			Debug.WriteLine ("after send ");
 			var publicKey = await client.Receive (token);
 			Debug.WriteLine ("public key: " + publicKey);
 			return 0;
@@ -55,17 +55,28 @@ namespace CallMomCore
 
 		private async Task<string> DoHandshake (IConnectedNetworkClient client, CancellationToken token)
 		{
-			Debug.WriteLine ("[Call] - doing the handshake");
+			Debug.WriteLine ("[Call] - starting handshake");
 
 			await client.Send ("hello", token);
 			string answer = await client.Receive (token);
 			var answerList = answer.Split (':');
 
-			Debug.WriteLine ("[Call] -  received: " + answerList [0] + ":" + answerList [1]);
-
-			if (!"welcome".Equals (answerList [0].Trim ())) {
-				throw new MomException ("Not welcome!");
+			if (answerList != null && answerList.Length != 2) {
+				throw new MomProtocolException ("Not welcome!");
 			}
+			//Debug.WriteLine ("[Call] -  received: " + answerList [0] + ":" + answerList [1].Trim ());
+
+			var answerHeader = answerList [0].Trim ();
+			if (!"welcome".Equals (answerHeader)) {
+				string message = String.Empty;
+				if ("failed".Equals (answerHeader)) {
+					message = " Server returned \"failed\". Did I sent the right command?";
+				} else {
+					message = String.Format ("Server returned {0}", answerHeader);
+				}
+				throw new MomProtocolException (String.Format ("Not welcome!{0}", message));
+			}
+			Debug.WriteLine ("[Call] - handshake: {0}", answerHeader);
 			return answerList [1];
 		}
 
@@ -75,7 +86,7 @@ namespace CallMomCore
 			int flash_time = _settings.GetCallTime ();
 			bool blink = _settings.GetBlinkOrDefault ();
 			int intervall_time = blink == false ? 0 : _settings.GetIntervallTimeOrDefault ();
-			string random = _cryptoService.GetRandomString ();
+			string random = _cryptoService.GetRandomString (20, 40);
 
 			string flash_command = String.Format ("{0}:{1}:{2}:{3}", flash_time, blink, intervall_time, random);
 			string crypto_command;
@@ -84,7 +95,6 @@ namespace CallMomCore
 			} catch (MomSqlException ex) {
 				if (ex.ErrorCode == MomSqlException.NOT_FOUND) {
 					// public key not found, throw register exception
-					var x = BuildRegisterCommand ("1234");
 					throw new MomNotRegisteredException ("App not registered", ex);
 
 				}
@@ -99,14 +109,14 @@ namespace CallMomCore
 
 		private string BuildRegisterCommand (string password)
 		{
-			//1234
-			//81dc9bdb52d04dc20036dbd8313ed055
-			var md5sum = _cryptoService.GenerateHash (password);
-			Debug.WriteLine ("register 1: " + md5sum);
-			var command = String.Format ("{0}:{1}", md5sum, _cryptoService.GetRandomString ());
-			Debug.WriteLine ("register 2: " + command);
-			var crypto_command = _cryptoService.EncodeAES (md5sum, command, Defaults.BLOCKSIZE, Defaults.PADDING);
-			Debug.WriteLine ("register 3: " + crypto_command);
+			Debug.WriteLine ("[Call] - building register command");
+			var sha256Hash = _cryptoService.GetSha256Hash (password);
+			string random = _cryptoService.GetRandomString (32, 64);
+			//Debug.WriteLine ("random: " + random);
+
+			var command = String.Format ("{0}:{1}", sha256Hash.AsHexString (), random);
+			var crypto_command = _cryptoService.EncodeAES (sha256Hash, command);
+
 			return String.Format ("register:{0}", crypto_command);
 		}
 

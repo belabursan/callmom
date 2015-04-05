@@ -8,7 +8,7 @@ namespace CallMomCore
 {
 	public class ConnectedNetworkClient : IConnectedNetworkClient
 	{
-		private Stream _stream;
+		private readonly Stream _stream;
 
 		public ConnectedNetworkClient (Stream stream)
 		{
@@ -19,7 +19,7 @@ namespace CallMomCore
 
 		public async Task Send (string data, CancellationToken token = default(CancellationToken))
 		{
-			byte[] b = Encoding.UTF8.GetBytes (data);
+			byte[] b = data.AsBytes ();
 			
 			await _stream.WriteAsync (b, 0, b.Length);
 		}
@@ -27,9 +27,9 @@ namespace CallMomCore
 
 		public async Task<string> Receive (CancellationToken token = default(CancellationToken))
 		{
-			byte[] buffer = new byte[512];
+			byte[] buffer = new byte[1024];
 			int dataReaded = await _stream.ReadAsync (buffer, 0, buffer.Length);
-			return Encoding.UTF8.GetString (buffer, 0, dataReaded);
+			return buffer.AsString (0, dataReaded);
 		}
 
 		#endregion
