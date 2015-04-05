@@ -12,7 +12,7 @@ namespace CallMomCore
 		/// Execute this instance.
 		/// </summary>
 		/// <returns>ReturnValue.Success or error code</returns>
-		Task<int> ExecuteAsync ();
+		Task<int> ExecuteAsync (string value = default(string));
 
 		/// <summary>
 		/// Cancels a command, finishing the execution

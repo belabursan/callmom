@@ -8,12 +8,10 @@ namespace CallMomCore
 	{
 		private readonly IFileFactory _fileFactory;
 		private const string _KeyFileName = "server.pub";
-		private byte[] _buffer;
 
 		public FileService (IFileFactory fileFactory)
 		{
 			_fileFactory = fileFactory;
-			_buffer = new byte[8192];
 		}
 
 
@@ -23,14 +21,16 @@ namespace CallMomCore
 		{
 			if (file == null || file.Length < 1)
 				throw new ArgumentNullException ("file", "file is null or empty");
+
 			await _fileFactory.FileStream (name).WriteAsync (file, 0, file.Length, token);
 		}
 
 		public async Task<byte[]> GetFileAsync (string name, CancellationToken token = default(CancellationToken))
 		{
-			int readed = await _fileFactory.FileStream (name).ReadAsync (_buffer, 0, _buffer.Length, token);
+			byte[] buffer = new byte[8192];
+			int readed = await _fileFactory.FileStream (name).ReadAsync (buffer, 0, buffer.Length, token);
 			byte[] file = new byte[readed];
-			Array.Copy (_buffer, file, readed);
+			Array.Copy (buffer, file, readed);
 			return file;
 		}
 

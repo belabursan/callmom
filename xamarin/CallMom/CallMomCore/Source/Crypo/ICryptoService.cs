@@ -12,7 +12,7 @@ namespace CallMomCore
 
 		string CreateRSAKey (string data, int blockSize, string padding);
 
-		string EncodeRSA (string key, string data);
+		string EncodeRSA (byte[] key, string data);
 
 		string DecodeRSA (string key, string data);
 

@@ -36,9 +36,9 @@ namespace CallMomCore
 
 		void InsertBlink (bool doBlink);
 
-		string GetServerPublicKey ();
+		byte[] GetServerPublicKey ();
 
-		void InsertServerPublicKey (string publicKey);
+		void InsertServerPublicKey (byte[] publicKey);
 	}
 }
 

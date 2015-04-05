@@ -117,14 +117,14 @@ namespace CallMomCore
 			Insert (BLINK, doBlink.ToString ());
 		}
 
-		public string GetServerPublicKey ()
+		public byte[] GetServerPublicKey ()
 		{
-			return ValueAsString (PUBLICKEY);
+			return ValueAsString (PUBLICKEY).AsBytes ();
 		}
 
-		public void InsertServerPublicKey (string publicKey)
+		public void InsertServerPublicKey (byte[] publicKey)
 		{
-			Insert (PUBLICKEY, publicKey);
+			Insert (PUBLICKEY, publicKey.AsString (0, publicKey.Length));
 		}
 
 		#endregion

@@ -33,7 +33,7 @@ namespace CallMomCore
 			return _factory.GetSha256Hash (data);
 		}
 
-		public string EncodeRSA (string key, string data)
+		public string EncodeRSA (byte[] key, string data)
 		{
 			return "todo - using System.Security.Cryptography must be used in ios and android, implement sevice";
 		}
