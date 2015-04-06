@@ -110,6 +110,21 @@ namespace CallMomCore
 				throw;
 			}
 		}
+
+		/// <summary>
+		/// Converts a string to integer.
+		/// </summary>
+		/// <returns>Integer value of the string.</returns>
+		/// <param name="value">string to convert.</param>
+		public static int AsInteger (this string value)
+		{
+			try {
+				return int.Parse (value);
+			} catch (Exception ex) {
+				Debug.WriteLine ("Exception in AsInteger extension: {0}", ex.Message);
+				throw;
+			}
+		}
 	}
 }
 
