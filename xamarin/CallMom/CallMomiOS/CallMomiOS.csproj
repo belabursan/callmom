@@ -125,6 +125,10 @@
       <DependentUpon>CallMomiOSViewController.cs</DependentUpon>
     </Compile>
     <Compile Include="Source\Link\Crypto\CryptoFactory.cs" />
+    <Compile Include="Source\ViewController\SettingsViewController.cs" />
+    <Compile Include="Source\ViewController\SettingsViewController.designer.cs">
+      <DependentUpon>SettingsViewController.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainStoryboard.storyboard" />

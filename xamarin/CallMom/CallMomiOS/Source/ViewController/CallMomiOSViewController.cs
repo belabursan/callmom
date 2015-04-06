@@ -24,6 +24,7 @@ namespace CallMomiOS
 		public CallMomiOSViewController (IntPtr handle) : base (handle)
 		{
 			_callController = App.Container.Resolve<ICOController> ();
+			_settingsViewController = null;
 		}
 
 		public override void DidReceiveMemoryWarning ()
@@ -43,19 +44,7 @@ namespace CallMomiOS
 			base.ViewDidLoad ();
 			SetupBall ();
 			SetupInfo ();
-			UIStoryboard storyBoard = UIStoryboard.FromName ("MainStoryboard", null);
-			//_settingsViewController = board.InstantiateViewController ("SettingsViewController") as SettingsViewController;
-
-			settingsButton = new UIBarButtonItem (
-				UIImage.FromFile ("settings@2x.png"),
-				UIBarButtonItemStyle.Plain,
-				(s, e) => {
-					//this.NavigationController.PushViewController (_settingsViewController, true);
-					System.Diagnostics.Debug.WriteLine ("++button tapped");
-				}
-			);
-
-			NavigationItem.RightBarButtonItem = settingsButton;
+			SetupNavigationButton ();
 		}
 
 		public override void ViewWillAppear (bool animated)
@@ -92,6 +81,22 @@ namespace CallMomiOS
 			CallMomButton.Layer.BorderWidth = 10;
 			CallMomButton.Layer.BorderColor = UIColor.Gray.CGColor;
 			DefaultCallMomButtonColor = CallMomButton.BackgroundColor;
+		}
+
+		void SetupNavigationButton ()
+		{
+			settingsButton = new UIBarButtonItem (
+				UIImage.FromFile ("settings@2x.png"),
+				UIBarButtonItemStyle.Plain,
+				(s, e) => {
+					if (_settingsViewController == null) {
+						_settingsViewController = this.Storyboard.InstantiateViewController ("CallSettingsViewController") as SettingsViewController;
+					}
+					this.NavigationController.PushViewController (_settingsViewController, true);
+				}
+			);
+
+			NavigationItem.RightBarButtonItem = settingsButton;
 		}
 
 		partial void UIButton13_TouchUpInside (UIButton sender)
@@ -163,13 +168,16 @@ namespace CallMomiOS
 		private void AnimateCallMomButtonColor (UIColor color, string title)
 		{
 			lock (Lock) {
+				nfloat bowi = this.CallMomButton.Layer.BorderWidth;
 				CallMomButton.SetTitle (title, UIControlState.Normal);
 				UIView.Animate (1.0f, 0, UIViewAnimationOptions.CurveLinear,
 					() => {
 						this.CallMomButton.BackgroundColor = color;
+						this.CallMomButton.Layer.BorderWidth = (bowi + 2);
 					},
 					() => {
 						this.CallMomButton.BackgroundColor = DefaultCallMomButtonColor;
+						this.CallMomButton.Layer.BorderWidth = bowi;
 						CallMomButton.SetTitle (DefaultCallMomButtonTitle, UIControlState.Normal);
 					}
 				);
