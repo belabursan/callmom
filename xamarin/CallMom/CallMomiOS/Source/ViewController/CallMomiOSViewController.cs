@@ -29,28 +29,35 @@ namespace CallMomiOS
 
 		public override void ViewDidLoad ()
 		{
-			_defaultCallMomButtonColor = CallMomButton.BackgroundColor;
-			this.NavigationController.NavigationBar.Translucent = true;
+			//this.NavigationController.NavigationBar.Translucent = true;
 			base.ViewDidLoad ();
-			SetupBall ();
-			SetupInfo ();
+			SetupCallBall ();
+			SetupCancelBall ();
+			SetupInfoBall ();
 			SetupNavigationButton ();
 		}
 
 		#endregion
 
-		private void SetupInfo ()
+		private void SetupCallBall ()
+		{
+			CallMomButton.Layer.CornerRadius = CallMomButton.Frame.Size.Height / 2;
+			CallMomButton.Layer.BorderWidth = 8;
+			CallMomButton.Layer.BorderColor = UIColor.Gray.CGColor;
+			_defaultCallMomButtonColor = CallMomButton.BackgroundColor;
+		}
+
+		private void SetupCancelBall ()
+		{
+			CancelButton.Layer.CornerRadius = CancelButton.Frame.Size.Height / 2;
+			CancelButton.Layer.BorderWidth = 3;
+			CancelButton.Layer.BorderColor = UIColor.Gray.CGColor;
+		}
+
+		private void SetupInfoBall ()
 		{
 			Info.Layer.CornerRadius = Info.Frame.Size.Height / 2;
 			Info.Layer.BorderWidth = 0;
-		}
-
-		private void SetupBall ()
-		{
-			CallMomButton.Layer.CornerRadius = CallMomButton.Frame.Size.Height / 2;
-			CallMomButton.Layer.BorderWidth = 10;
-			CallMomButton.Layer.BorderColor = UIColor.Gray.CGColor;
-			_defaultCallMomButtonColor = CallMomButton.BackgroundColor;
 		}
 
 		private void SetupNavigationButton ()
@@ -114,9 +121,9 @@ namespace CallMomiOS
 		void AnimateInfo (string info)
 		{
 			Info.SetTitle (info, UIControlState.Normal);
-			UIView.Animate (2.0f, 1, UIViewAnimationOptions.CurveLinear,
+			UIView.Animate (3.0f, 1, UIViewAnimationOptions.CurveLinear,
 				() => {
-					this.Info.BackgroundColor = UIColor.Gray;
+					this.Info.BackgroundColor = UIColor.Orange;
 				},
 				() => {
 					this.Info.BackgroundColor = UIColor.White;
