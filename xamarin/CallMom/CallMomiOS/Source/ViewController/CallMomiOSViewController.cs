@@ -38,9 +38,6 @@ namespace CallMomiOS
 		{
 			base.ViewDidLoad ();
 			DefaultCallMomButtonColor = CallMomButton.BackgroundColor;
-			MomActivity.StopAnimating ();
-			MomLabel.Hidden = true;
-
 
 			// Perform any additional setup after loading the view, typically from a nib.
 		}
@@ -79,22 +76,25 @@ namespace CallMomiOS
 
 		private async Task DoCall ()
 		{
-			MomActivity.StartAnimating ();
 			AnimateCallMomStart ();
 
 			int click = await _callController.DoTheCallAsync ();
 			Console.WriteLine ("[GUI] - call ended with code {0}", click);
 
-			if (click != ReturnValue.AlreadyRunning) {
-				MomActivity.StopAnimating ();
-			}
 			switch (click) {
 			case ReturnValue.NotRegistered:
-				AnimateNotRegistered ();
+				AnimateInfo ("Not Registered");
+				break;
+			case ReturnValue.Cancelled:
+				AnimateInfo ("Cancelled");
+				break;
+			case ReturnValue.NetworkError:
+				AnimateInfo ("Network Error");
+				break;
+			case ReturnValue.Success:
+				AnimateInfo ("Success");
 				break;
 			}
-
-			//todo handle returnvalue
 		}
 
 		private void DoCancel ()
@@ -106,9 +106,18 @@ namespace CallMomiOS
 			// else ReturnValue.NotStarted
 		}
 
-		void AnimateNotRegistered ()
+		void AnimateInfo (string info)
 		{
-			throw new NotImplementedException ();
+			Info.SetTitle (info, UIControlState.Normal);
+			UIView.Animate (2.0f, 1, UIViewAnimationOptions.CurveLinear,
+				() => {
+					this.Info.BackgroundColor = UIColor.Black;
+				},
+				() => {
+					this.Info.BackgroundColor = UIColor.White;
+					Info.SetTitle ("", UIControlState.Normal);
+				}
+			);
 		}
 
 		private void AnimateCallMomStart ()

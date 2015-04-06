@@ -24,15 +24,7 @@ namespace CallMomiOS
 
 		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
-		UIActivityIndicatorView MomActivity { get; set; }
-
-		[Outlet]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		UILabel MomLabel { get; set; }
-
-		[Action ("CallMomButton_TouchUpInside:")]
-		[GeneratedCode ("iOS Designer", "1.0")]
-		partial void CallMomButton_TouchUpInside (UIButton sender);
+		UIButton Info { get; set; }
 
 		[Action ("UIButton13_TouchUpInside:")]
 		[GeneratedCode ("iOS Designer", "1.0")]
@@ -52,13 +44,9 @@ namespace CallMomiOS
 				CancelButton.Dispose ();
 				CancelButton = null;
 			}
-			if (MomActivity != null) {
-				MomActivity.Dispose ();
-				MomActivity = null;
-			}
-			if (MomLabel != null) {
-				MomLabel.Dispose ();
-				MomLabel = null;
+			if (Info != null) {
+				Info.Dispose ();
+				Info = null;
 			}
 		}
 	}
