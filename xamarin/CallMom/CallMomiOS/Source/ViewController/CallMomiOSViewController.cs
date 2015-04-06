@@ -15,9 +15,11 @@ namespace CallMomiOS
 	{
 		private readonly ICOController _callController;
 		private static object Lock = new object ();
+		UIBarButtonItem settingsButton;
+		UIViewController _settingsViewController;
 
 		private const string DefaultCallMomButtonTitle = "Call Mom";
-		private UIColor DefaultCallMomButtonColor = UIColor.LightGray;
+		private UIColor DefaultCallMomButtonColor;
 
 		public CallMomiOSViewController (IntPtr handle) : base (handle)
 		{
@@ -36,10 +38,22 @@ namespace CallMomiOS
 
 		public override void ViewDidLoad ()
 		{
+			DefaultCallMomButtonColor = CallMomButton.BackgroundColor;
+			this.NavigationController.NavigationBar.Translucent = true;
 			base.ViewDidLoad ();
 			DefaultCallMomButtonColor = CallMomButton.BackgroundColor;
+			//_settingsViewController = this.Storyboard.InstantiateViewController ("SettingsViewController") as SettingsViewController;
 
-			// Perform any additional setup after loading the view, typically from a nib.
+			settingsButton = new UIBarButtonItem (
+				UIImage.FromFile ("settings@2x.png"),
+				UIBarButtonItemStyle.Plain,
+				(s, e) => {
+					//this.NavigationController.PushViewController (_settingsViewController, true);
+					System.Diagnostics.Debug.WriteLine ("++button tapped");
+				}
+			);
+
+			NavigationItem.RightBarButtonItem = settingsButton;
 		}
 
 		public override void ViewWillAppear (bool animated)
