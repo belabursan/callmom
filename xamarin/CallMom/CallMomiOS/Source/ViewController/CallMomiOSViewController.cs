@@ -1,25 +1,22 @@
 ﻿using System;
-using System.Drawing;
-
-using Foundation;
 using UIKit;
 using CallMomCore;
 using Autofac;
 using System.Threading.Tasks;
-using System.Net;
 
 
 namespace CallMomiOS
 {
 	public partial class CallMomiOSViewController : UIViewController
 	{
+		private static object _lock = new object ();
 		private readonly ICOController _callController;
-		private static object Lock = new object ();
-		UIBarButtonItem settingsButton;
-		UIViewController _settingsViewController;
+		private UIBarButtonItem _settingsButton;
+		private UIViewController _settingsViewController;
 
-		private const string DefaultCallMomButtonTitle = "Call Mom";
-		private UIColor DefaultCallMomButtonColor;
+		private const string _defaultCallMomButtonTitle = "Call Mom";
+		private UIColor _defaultCallMomButtonColor;
+
 
 		public CallMomiOSViewController (IntPtr handle) : base (handle)
 		{
@@ -27,19 +24,12 @@ namespace CallMomiOS
 			_settingsViewController = null;
 		}
 
-		public override void DidReceiveMemoryWarning ()
-		{
-			// Releases the view if it doesn't have a superview.
-			base.DidReceiveMemoryWarning ();
-			
-			// Release any cached data, images, etc that aren't in use.
-		}
 
 		#region View lifecycle
 
 		public override void ViewDidLoad ()
 		{
-			DefaultCallMomButtonColor = CallMomButton.BackgroundColor;
+			_defaultCallMomButtonColor = CallMomButton.BackgroundColor;
 			this.NavigationController.NavigationBar.Translucent = true;
 			base.ViewDidLoad ();
 			SetupBall ();
@@ -47,45 +37,25 @@ namespace CallMomiOS
 			SetupNavigationButton ();
 		}
 
-		public override void ViewWillAppear (bool animated)
-		{
-			base.ViewWillAppear (animated);
-		}
-
-		public override void ViewDidAppear (bool animated)
-		{
-			base.ViewDidAppear (animated);
-		}
-
-		public override void ViewWillDisappear (bool animated)
-		{
-			base.ViewWillDisappear (animated);
-		}
-
-		public override void ViewDidDisappear (bool animated)
-		{
-			base.ViewDidDisappear (animated);
-		}
-
 		#endregion
 
-		void SetupInfo ()
+		private void SetupInfo ()
 		{
 			Info.Layer.CornerRadius = Info.Frame.Size.Height / 2;
 			Info.Layer.BorderWidth = 0;
 		}
 
-		void SetupBall ()
+		private void SetupBall ()
 		{
 			CallMomButton.Layer.CornerRadius = CallMomButton.Frame.Size.Height / 2;
 			CallMomButton.Layer.BorderWidth = 10;
 			CallMomButton.Layer.BorderColor = UIColor.Gray.CGColor;
-			DefaultCallMomButtonColor = CallMomButton.BackgroundColor;
+			_defaultCallMomButtonColor = CallMomButton.BackgroundColor;
 		}
 
-		void SetupNavigationButton ()
+		private void SetupNavigationButton ()
 		{
-			settingsButton = new UIBarButtonItem (
+			_settingsButton = new UIBarButtonItem (
 				UIImage.FromFile ("settings@2x.png"),
 				UIBarButtonItemStyle.Plain,
 				(s, e) => {
@@ -96,7 +66,7 @@ namespace CallMomiOS
 				}
 			);
 
-			NavigationItem.RightBarButtonItem = settingsButton;
+			NavigationItem.RightBarButtonItem = _settingsButton;
 		}
 
 		partial void UIButton13_TouchUpInside (UIButton sender)
@@ -167,7 +137,7 @@ namespace CallMomiOS
 
 		private void AnimateCallMomButtonColor (UIColor color, string title)
 		{
-			lock (Lock) {
+			lock (_lock) {
 				nfloat bowi = this.CallMomButton.Layer.BorderWidth;
 				CallMomButton.SetTitle (title, UIControlState.Normal);
 				UIView.Animate (1.0f, 0, UIViewAnimationOptions.CurveLinear,
@@ -176,9 +146,9 @@ namespace CallMomiOS
 						this.CallMomButton.Layer.BorderWidth = (bowi + 2);
 					},
 					() => {
-						this.CallMomButton.BackgroundColor = DefaultCallMomButtonColor;
+						this.CallMomButton.BackgroundColor = _defaultCallMomButtonColor;
 						this.CallMomButton.Layer.BorderWidth = bowi;
-						CallMomButton.SetTitle (DefaultCallMomButtonTitle, UIControlState.Normal);
+						CallMomButton.SetTitle (_defaultCallMomButtonTitle, UIControlState.Normal);
 					}
 				);
 			}
