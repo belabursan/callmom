@@ -41,8 +41,10 @@ namespace CallMomiOS
 			DefaultCallMomButtonColor = CallMomButton.BackgroundColor;
 			this.NavigationController.NavigationBar.Translucent = true;
 			base.ViewDidLoad ();
-			DefaultCallMomButtonColor = CallMomButton.BackgroundColor;
-			//_settingsViewController = this.Storyboard.InstantiateViewController ("SettingsViewController") as SettingsViewController;
+			SetupBall ();
+			SetupInfo ();
+			UIStoryboard storyBoard = UIStoryboard.FromName ("MainStoryboard", null);
+			//_settingsViewController = board.InstantiateViewController ("SettingsViewController") as SettingsViewController;
 
 			settingsButton = new UIBarButtonItem (
 				UIImage.FromFile ("settings@2x.png"),
@@ -77,6 +79,20 @@ namespace CallMomiOS
 		}
 
 		#endregion
+
+		void SetupInfo ()
+		{
+			Info.Layer.CornerRadius = Info.Frame.Size.Height / 2;
+			Info.Layer.BorderWidth = 0;
+		}
+
+		void SetupBall ()
+		{
+			CallMomButton.Layer.CornerRadius = CallMomButton.Frame.Size.Height / 2;
+			CallMomButton.Layer.BorderWidth = 10;
+			CallMomButton.Layer.BorderColor = UIColor.Gray.CGColor;
+			DefaultCallMomButtonColor = CallMomButton.BackgroundColor;
+		}
 
 		partial void UIButton13_TouchUpInside (UIButton sender)
 		{
@@ -125,7 +141,7 @@ namespace CallMomiOS
 			Info.SetTitle (info, UIControlState.Normal);
 			UIView.Animate (2.0f, 1, UIViewAnimationOptions.CurveLinear,
 				() => {
-					this.Info.BackgroundColor = UIColor.Black;
+					this.Info.BackgroundColor = UIColor.Gray;
 				},
 				() => {
 					this.Info.BackgroundColor = UIColor.White;
