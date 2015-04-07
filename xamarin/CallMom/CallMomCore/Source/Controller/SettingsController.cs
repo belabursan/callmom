@@ -24,25 +24,26 @@ namespace CallMomCore
 			throw new NotImplementedException ();
 		}
 
-		public NetworkArguments GetSettings ()
+		public SettingsData GetSettings ()
 		{
-			NetworkArguments args = new NetworkArguments ();
-			args.Ip = _settingsService.GetIP ();
-			args.Port = _settingsService.GetPort ();
-			args.ConnectTimeout = _settingsService.GetConnectTimeOut () / 1000;
-			return args;
+			SettingsData settings = new SettingsData ();
+			settings.IP = _settingsService.GetIP ();
+			settings.Port = _settingsService.GetPort ();
+			settings.TimeoutSec = _settingsService.GetConnectTimeOut () / 1000;
+			return settings;
 		}
 
-		public void SetSettings (NetworkArguments arguments)
+		public void SetSettings (SettingsData settings)
 		{
-			_settingsService.InsertIP (arguments.Ip);
-			_settingsService.InsertPort (arguments.Port);
-			_settingsService.InsertConnectTimeOut (arguments.ConnectTimeout);
+			_settingsService.InsertIP (settings.IP);
+			_settingsService.InsertPort (settings.Port);
+			_settingsService.InsertConnectTimeOut (settings.TimeoutSec);
 		}
 
 		public bool IsRegistered ()
 		{
-			return false;
+			byte[] key = _settingsService.GetServerPublicKey ();
+			return (key != null && key.Length > 10);
 		}
 
 		public string GetAbout ()

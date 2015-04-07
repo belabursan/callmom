@@ -9,9 +9,9 @@ namespace CallMomCore
 
 		void DoReset ();
 
-		NetworkArguments GetSettings ();
+		SettingsData GetSettings ();
 
-		void SetSettings (NetworkArguments arguments);
+		void SetSettings (SettingsData arguments);
 
 		bool IsRegistered ();
 

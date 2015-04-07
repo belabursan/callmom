@@ -71,6 +71,8 @@
     <Compile Include="Source\Service\FileService\IFileFactory.cs" />
     <Compile Include="Source\Controller\ISettingsController.cs" />
     <Compile Include="Source\Controller\SettingsController.cs" />
+    <Compile Include="Source\Controller\Containers\SettingsData.cs" />
+    <Compile Include="Source\Exceptions\MomArgumentException.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>
