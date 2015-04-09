@@ -14,7 +14,7 @@ namespace CallMomCore
 
 		#region ISettingsController implementation
 
-		public async Task DoRegister ()
+		public async Task<int> DoRegister ()
 		{
 			throw new NotImplementedException ();
 		}
@@ -29,7 +29,7 @@ namespace CallMomCore
 			SettingsData settings = new SettingsData ();
 			settings.IP = _settingsService.GetIP ();
 			settings.Port = _settingsService.GetPort ();
-			settings.TimeoutSec = _settingsService.GetConnectTimeOut () / 1000;
+			settings.TimeoutSec = _settingsService.GetConnectTimeOut ();
 			return settings;
 		}
 
@@ -42,8 +42,15 @@ namespace CallMomCore
 
 		public bool IsRegistered ()
 		{
-			byte[] key = _settingsService.GetServerPublicKey ();
-			return (key != null && key.Length > 10);
+			try {
+				byte[] key = _settingsService.GetServerPublicKey ();
+				return (key != null && key.Length > 10);
+			} catch (MomSqlException mox) {
+				if (mox.ErrorCode == MomSqlException.NOT_FOUND) {
+					return false;
+				}
+				throw mox;
+			}
 		}
 
 		public string GetAbout ()

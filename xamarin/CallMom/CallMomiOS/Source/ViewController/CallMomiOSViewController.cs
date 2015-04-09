@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CallMomiOS
 {
-	public partial class CallMomiOSViewController : UIViewController
+	public partial class CallMomiOSViewController : MomBaseViewController
 	{
 		private static object _lock = new object ();
 		private readonly ICOController _callController;
@@ -29,7 +29,6 @@ namespace CallMomiOS
 
 		public override void ViewDidLoad ()
 		{
-			//this.NavigationController.NavigationBar.Translucent = true;
 			base.ViewDidLoad ();
 			SetupCallBall ();
 			SetupCancelBall ();
@@ -92,21 +91,7 @@ namespace CallMomiOS
 
 			int click = await _callController.DoTheCallAsync ();
 			Console.WriteLine ("[GUI] - call ended with code {0}", click);
-
-			switch (click) {
-			case ReturnValue.NotRegistered:
-				AnimateInfo ("Not Registered");
-				break;
-			case ReturnValue.Cancelled:
-				AnimateInfo ("Cancelled");
-				break;
-			case ReturnValue.NetworkError:
-				AnimateInfo ("Network Error");
-				break;
-			case ReturnValue.Success:
-				AnimateInfo ("Success");
-				break;
-			}
+			AnimateInfo (HandleResult (click));
 		}
 
 		private void DoCancel ()
@@ -120,6 +105,7 @@ namespace CallMomiOS
 
 		void AnimateInfo (string info)
 		{
+			Console.WriteLine ("--- setting title: " + info);
 			Info.SetTitle (info, UIControlState.Normal);
 			UIView.Animate (3.0f, 1, UIViewAnimationOptions.CurveLinear,
 				() => {

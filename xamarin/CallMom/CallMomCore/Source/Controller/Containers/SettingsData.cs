@@ -14,7 +14,7 @@ namespace CallMomCore
 		{
 		}
 
-		public SettingsData (string ip, string port, string timeout)
+		public SettingsData (string ip, string port, float timeoutSec)
 		{
 			IP = ip;
 			try {
@@ -22,11 +22,7 @@ namespace CallMomCore
 			} catch (Exception ex) {
 				Port = -1;
 			}
-			try {
-				TimeoutSec = timeout.AsInteger ();
-			} catch (Exception ex) {
-				TimeoutSec = -1;
-			}
+			TimeoutSec = (int)timeoutSec;
 			int isValid = (int)Validate ();
 			if (CORRECT != isValid) {
 				throw new MomArgumentException (isValid, "Invalid argument(s)", null);

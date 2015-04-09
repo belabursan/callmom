@@ -5,7 +5,7 @@ namespace CallMomCore
 {
 	public interface ISettingsController
 	{
-		Task DoRegister ();
+		Task<int> DoRegister ();
 
 		void DoReset ();
 

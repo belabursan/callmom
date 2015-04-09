@@ -7,7 +7,7 @@ using Autofac;
 
 namespace CallMomiOS
 {
-	partial class SettingsViewController : UIViewController
+	partial class SettingsViewController : MomBaseViewController
 	{
 		private readonly ISettingsController _settingsController;
 
@@ -73,31 +73,47 @@ namespace CallMomiOS
 
 		void SaveValues ()
 		{
-			//todo validate values!!!!
-			NetworkArguments values = new NetworkArguments ();
-			values.Ip = this.IPTextField.Text;
-			values.Port = this.PortTextField.Text.AsInteger ();
-			values.ConnectTimeout = ((int)this.TimeoutSlider.Value) * 1000;
-			_settingsController.SetSettings (values);
+			try {
+				_settingsController.SetSettings (new SettingsData (
+					IPTextField.Text,
+					PortTextField.Text,
+					TimeoutSlider.Value
+				));
+			} catch (MomException mox) {
+				HandleMomError (mox);
+			}
 		}
 
 		void ShowValues ()
 		{
-			NetworkArguments values = _settingsController.GetSettings ();
+			try {
+				SettingsData values = _settingsController.GetSettings ();
 
-			this.IPTextField.Text = values.Ip;
-			this.PortTextField.Text = values.Port.ToString ();
-			this.TimeoutSlider.SetValue (values.ConnectTimeout, true);
+				this.IPTextField.Text = values.IP;
+				this.PortTextField.Text = values.Port.ToString ();
+				this.TimeoutSlider.SetValue (values.TimeoutSec, true);
+			} catch (MomException mox) {
+				HandleMomError (mox);
+			}
+		}
+
+		private void HandleMomError (MomException ex)
+		{
+			Console.WriteLine ("ERROR - todo-> handle, show ball?: " + ex.Message);
 		}
 
 		partial void AboutButton_TouchUpInside (UIButton sender)
 		{
 			Console.WriteLine ("about");
+			var aboutText = _settingsController.GetAbout ();
 		}
 
 		partial void RegisterButton_TouchUpInside (UIButton sender)
 		{
-			Console.WriteLine (" register");
+			int result;
+			InvokeOnMainThread (async () => {
+				result = await _settingsController.DoRegister ();
+			});
 		}
 
 		partial void ResetButton_TouchUpInside (UIButton sender)
