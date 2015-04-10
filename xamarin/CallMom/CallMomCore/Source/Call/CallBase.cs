@@ -6,7 +6,7 @@ using Autofac;
 
 namespace CallMomCore
 {
-	public abstract class CommandBase : ICommand
+	public abstract class CallBase : ICommand
 	{
 		protected readonly ISettingsService _settings;
 		protected readonly ICryptoService _cryptoService;
@@ -14,7 +14,7 @@ namespace CallMomCore
 		private readonly INetworkLink _network;
 		protected readonly CancellationTokenSource _cancelation;
 
-		protected CommandBase ()
+		protected CallBase ()
 		{
 			_settings = App.Container.Resolve<ISettingsService> ();
 			_cryptoService = App.Container.Resolve<ICryptoService> ();
@@ -86,9 +86,9 @@ namespace CallMomCore
 
 		private NetworkArguments ValidateValues (CancellationToken token)
 		{
-			#if DEVEL
-			if (_settings.GetIP ().Equals (App.DefaultIp) == true) {
-			throw new MomNotRegisteredException (String.Format ("IP is no valid ({0}", App.DefaultIp));
+			#if !DEVEL
+			if (_settings.GetIP ().Equals (Defaults.IP) == true) {
+				throw new MomNotRegisteredException (String.Format ("IP is no valid ({0}", Defaults.IP));
 			}
 			#endif
 
@@ -97,14 +97,24 @@ namespace CallMomCore
 			token.ThrowIfCancellationRequested ();
 			netArg.Ip = _settings.GetIP ();
 			netArg.Port = _settings.GetPort ();
-			netArg.ReceiveTimeout = _settings.GetNetworkTimeoutSeconds ();
-			netArg.SendTimeout = _settings.GetNetworkTimeoutSeconds ();
+
+			int connectTimeout = _settings.GetConnectTimeOut ();
+			int netTimeout = _settings.GetNetworkTimeoutSeconds ();
+
+			if (connectTimeout > netTimeout) {
+				netArg.ReceiveTimeoutSeconds = netTimeout;
+				netArg.SendTimeoutSeconds = netTimeout;
+			} else {
+				netArg.ReceiveTimeoutSeconds = connectTimeout;
+				netArg.SendTimeoutSeconds = connectTimeout;
+			}
+
 			netArg.NoDelay = true;
 			netArg.LingerArguments = new MomLinger {
-				Enable = true,
-				Timeout = 1
+				Enable = false,
+				Timeout = 0
 			};
-			netArg.ConnectTimeout = _settings.GetConnectTimeOut ();
+			netArg.ConnectTimeoutSeconds = _settings.GetConnectTimeOut ();
 
 			return netArg;
 		}

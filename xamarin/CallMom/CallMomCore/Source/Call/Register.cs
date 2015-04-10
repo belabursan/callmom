@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace CallMomCore
 {
-	public class Register : CommandBase
+	public class Register : CallBase
 	{
 
 		#region implemented abstract members of CommandBase

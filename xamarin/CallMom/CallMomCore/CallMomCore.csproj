@@ -16,7 +16,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>DEBUG; DEVEL;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -63,7 +63,6 @@
     <Compile Include="Source\Utils\Extensions.cs" />
     <Compile Include="Source\Exceptions\MomException.cs" />
     <Compile Include="Source\Call\Register.cs" />
-    <Compile Include="Source\Call\CommandBase.cs" />
     <Compile Include="Source\Call\ICommand.cs" />
     <Compile Include="Source\Exceptions\MomProtocolException.cs" />
     <Compile Include="Source\Service\FileService\IFileService.cs" />
@@ -73,6 +72,7 @@
     <Compile Include="Source\Controller\SettingsController.cs" />
     <Compile Include="Source\Controller\Containers\SettingsData.cs" />
     <Compile Include="Source\Exceptions\MomArgumentException.cs" />
+    <Compile Include="Source\Call\CallBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>

@@ -10,9 +10,6 @@ namespace CallMomiOS
 {
 	public class NetworkFactory : INetworkFactory
 	{
-		public NetworkFactory ()
-		{
-		}
 
 		private void ConnectCallBack (IAsyncResult asyn)
 		{
@@ -37,7 +34,7 @@ namespace CallMomiOS
 
 				await Task.Run (() => {
 					IAsyncResult result = socket.BeginConnect (GetEndpoint (netArgs), new AsyncCallback (ConnectCallBack), socket);
-					connected = result.AsyncWaitHandle.WaitOne (netArgs.ConnectTimeout, true);
+					connected = result.AsyncWaitHandle.WaitOne (netArgs.ConnectTimeoutSeconds * 1000, true);
 				});
 					
 				if (!connected && socket != null && !socket.Connected) {
@@ -55,21 +52,14 @@ namespace CallMomiOS
 
 		#endregion
 
-		private static LingerOption ToLingerOption (NetworkArguments netArgs, CancellationToken token)
-		{
-			ThrowIfCancelled (token);
-			//return new LingerOption (netArgs.LingerArguments.Enable, netArgs.LingerArguments.Timeout);
-			return new LingerOption (false, 0);
-		}
-
 		private static Socket GetSocket (NetworkArguments netArgs, CancellationToken token = default(CancellationToken))
 		{
 
 			var client = new Socket (AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-			client.ReceiveTimeout = netArgs.ReceiveTimeout;
-			client.SendTimeout = netArgs.SendTimeout;
-			client.LingerState = ToLingerOption (netArgs, token);
+			client.ReceiveTimeout = netArgs.ReceiveTimeoutSeconds;
+			client.SendTimeout = netArgs.SendTimeoutSeconds;
+			client.LingerState = new LingerOption (netArgs.LingerArguments.Enable, netArgs.LingerArguments.Timeout);
 			client.NoDelay = netArgs.NoDelay;
 			ThrowIfCancelled (token);
 

@@ -113,9 +113,9 @@ namespace CallMomiOS
 				},
 				() => {
 					this.Info.BackgroundColor = UIColor.White;
-					Info.SetTitle ("", UIControlState.Normal);
 				}
 			);
+			Info.SetTitle ("", UIControlState.Normal);
 		}
 
 		private void AnimateCallMomStart ()

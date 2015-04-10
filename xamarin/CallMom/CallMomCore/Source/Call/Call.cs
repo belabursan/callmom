@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace CallMomCore
 {
-	public class Call : CommandBase
+	public class Call : CallBase
 	{
 		public override async Task<int> ExecuteAsync (string value = default(string))
 		{
