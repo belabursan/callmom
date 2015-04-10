@@ -106,16 +106,21 @@ namespace CallMomiOS
 		void AnimateInfo (string info)
 		{
 			Console.WriteLine ("--- setting title: " + info);
+			Info.Enabled = false;
 			Info.SetTitle (info, UIControlState.Normal);
+			Info.Enabled = true;
 			UIView.Animate (3.0f, 1, UIViewAnimationOptions.CurveLinear,
 				() => {
 					this.Info.BackgroundColor = UIColor.Orange;
 				},
 				() => {
 					this.Info.BackgroundColor = UIColor.White;
+					Info.Enabled = false;
+					Info.SetTitle (String.Empty, UIControlState.Normal);
+					Info.Enabled = true;
 				}
 			);
-			Info.SetTitle ("", UIControlState.Normal);
+
 		}
 
 		private void AnimateCallMomStart ()
