@@ -45,7 +45,7 @@ namespace CallMomiOS
 			
 			} catch (Exception ex) {
 				//Console.WriteLine ("[NET-Factory] - exception when connecting ({0}:{1})", U.ExType (ex), U.InnerExMessage (ex));
-				throw MomNetworkException.ToMomException (ex, "Connect");
+				throw MomNetworkException.ToMomException (ex, "[NET-Factory] - Connect");
 			}
 		}
 

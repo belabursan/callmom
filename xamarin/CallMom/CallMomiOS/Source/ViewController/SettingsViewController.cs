@@ -4,13 +4,13 @@ using System.CodeDom.Compiler;
 using UIKit;
 using CallMomCore;
 using Autofac;
+using CoreAnimation;
 
 namespace CallMomiOS
 {
 	partial class SettingsViewController : MomBaseViewController
 	{
 		private readonly ISettingsController _settingsController;
-
 
 		public SettingsViewController (IntPtr handle) : base (handle)
 		{
@@ -22,6 +22,7 @@ namespace CallMomiOS
 			base.ViewDidLoad ();
 			SetupRegisterBall ();
 			SetupResetBall ();
+			SetupInfo ();
 			SetupAboutBall ();
 
 			this.PortTextField.ShouldReturn += (textField) => {
@@ -70,6 +71,19 @@ namespace CallMomiOS
 			ResetButton.Layer.BorderWidth = 3;
 		}
 
+		private void SetupInfo ()
+		{
+			SettingsInfoText.Enabled = false;
+			SettingsInfoText.Layer.CornerRadius = SettingsInfoText.Frame.Size.Height / 2;
+			SettingsInfoText.Layer.BackgroundColor = UIColor.White.CGColor;
+			SettingsInfoText.Layer.BorderWidth = 2;
+			SettingsInfoText.SetTitleColor (UIColor.White, UIControlState.Normal);
+			SettingsInfoText.BackgroundColor = UIColor.White;
+			SettingsInfoText.Layer.BorderColor = UIColor.White.CGColor;
+
+			SettingsInfoText.SetTitle (String.Empty, UIControlState.Normal);
+		}
+
 		private void SetupAboutBall ()
 		{
 			AboutButton.Layer.CornerRadius = AboutButton.Frame.Size.Height / 2;
@@ -88,6 +102,30 @@ namespace CallMomiOS
 			RegisterButton.Layer.BorderColor = show ? UIColor.White.CGColor : UIColor.DarkGray.CGColor;
 			RegisterButton.BackgroundColor = show ? UIColor.White : UIColor.Gray;
 			RegisterButton.Enabled = !show;
+		}
+
+		private void ShowInfo (string info)
+		{
+			SettingsInfoText.Enabled = false;
+			SettingsInfoText.SetTitle (info, UIControlState.Normal);
+			SettingsInfoText.Enabled = true;
+			UIView.Animate (3.0f, 1, UIViewAnimationOptions.CurveLinear,
+				() => {
+					this.SettingsInfoText.SetTitleColor (UIColor.Black, UIControlState.Normal);
+					this.SettingsInfoText.BackgroundColor = UIColor.Orange;
+					this.SettingsInfoText.Layer.BorderColor = UIColor.Red.CGColor;
+				},
+				() => {
+					SettingsInfoText.Enabled = false;
+					this.SettingsInfoText.SetTitleColor (UIColor.White, UIControlState.Normal);
+					this.SettingsInfoText.BackgroundColor = UIColor.White;
+					this.SettingsInfoText.Layer.BorderColor = UIColor.White.CGColor;
+
+					SettingsInfoText.SetTitle (String.Empty, UIControlState.Normal);
+					SettingsInfoText.Enabled = true;
+				}
+			);
+
 		}
 
 		async void ShowAbout ()
@@ -129,6 +167,7 @@ namespace CallMomiOS
 		private void HandleMomError (MomException ex)
 		{
 			Console.WriteLine ("ERROR - todo-> handle, show ball?: " + ex.Message);
+			ShowInfo ("ERROR");
 		}
 
 		partial void AboutButton_TouchUpInside (UIButton sender)
@@ -146,7 +185,12 @@ namespace CallMomiOS
 			alert.Clicked += (object s, UIButtonEventArgs ev) => {
 				if (ev.ButtonIndex == 0) {
 					InvokeOnMainThread (async () => {
-						int result = await _settingsController.DoRegister (alert.GetTextField (0).Text);
+						string psswd = alert.GetTextField (0).Text;
+						if (String.IsNullOrEmpty (psswd) || psswd.Length < 4) {
+							ShowInfo ("Bad Password");
+							return;
+						}
+						int result = await _settingsController.DoRegister (psswd);
 						HandleRegisterResult (result);
 					});
 				} else {
@@ -158,8 +202,11 @@ namespace CallMomiOS
 
 		void HandleRegisterResult (int result)
 		{
-			string s = HandleResult (result);
-			Console.WriteLine ("RESULT = " + s);
+			if (result == ReturnValue.Success) {
+				this.View.ReloadInputViews ();
+			} else {
+				ShowInfo (HandleResult (result));
+			}
 		}
 
 		partial void ResetButton_TouchUpInside (UIButton sender)

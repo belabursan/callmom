@@ -19,16 +19,6 @@ namespace CallMomCore
 			ErrorCode = errorCode;
 		}
 
-		public static Exception Throw (string method, Exception ex)
-		{
-			return new MomNetworkException (
-				String.Format ("Exception in {0}(): {1}", method, U.InnerExMessage (ex)),
-				U.InnerEx (ex)
-			);
-		}
-
-
-
 		public static MomNetworkException ToMomException (Exception ex, string method = default(string))
 		{
 			string message = U.InnerExMessage (ex);

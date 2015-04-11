@@ -36,6 +36,10 @@ namespace CallMomiOS
 
 		[Outlet]
 		[GeneratedCode ("iOS Designer", "1.0")]
+		UIButton SettingsInfoText { get; set; }
+
+		[Outlet]
+		[GeneratedCode ("iOS Designer", "1.0")]
 		UISlider TimeoutSlider { get; set; }
 
 		[Action ("AboutButton_TouchUpInside:")]
@@ -79,6 +83,10 @@ namespace CallMomiOS
 			if (ResetButton != null) {
 				ResetButton.Dispose ();
 				ResetButton = null;
+			}
+			if (SettingsInfoText != null) {
+				SettingsInfoText.Dispose ();
+				SettingsInfoText = null;
 			}
 			if (TimeoutSlider != null) {
 				TimeoutSlider.Dispose ();

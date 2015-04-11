@@ -56,8 +56,11 @@ namespace CallMomiOS
 
 		private void SetupInfoBall ()
 		{
+			Info.Enabled = false;
 			Info.Layer.CornerRadius = Info.Frame.Size.Height / 2;
-			Info.Layer.BorderWidth = 0;
+			Info.Layer.BorderWidth = 2;
+			Info.Layer.BorderColor = UIColor.White.CGColor;
+
 		}
 
 		private void SetupNavigationButton ()
@@ -106,17 +109,21 @@ namespace CallMomiOS
 
 		void AnimateInfo (string info)
 		{
-			Console.WriteLine ("--- setting title: " + info);
 			Info.Enabled = false;
 			Info.SetTitle (info, UIControlState.Normal);
 			Info.Enabled = true;
 			UIView.Animate (3.0f, 1, UIViewAnimationOptions.CurveLinear,
 				() => {
+					this.Info.Layer.BorderColor = UIColor.Red.CGColor;
+					this.Info.SetTitleColor (UIColor.Black, UIControlState.Normal);
 					this.Info.BackgroundColor = UIColor.Orange;
 				},
 				() => {
-					this.Info.BackgroundColor = UIColor.White;
 					Info.Enabled = false;
+					this.Info.SetTitleColor (UIColor.White, UIControlState.Normal);
+					this.Info.Layer.BorderColor = UIColor.White.CGColor;
+					this.Info.BackgroundColor = UIColor.White;
+
 					Info.SetTitle (String.Empty, UIControlState.Normal);
 					Info.Enabled = true;
 				}
@@ -137,18 +144,18 @@ namespace CallMomiOS
 		private void AnimateCallMomButtonColor (UIColor color, string title)
 		{
 			lock (_lock) {
-				nfloat bowi = this.CallMomButton.Layer.BorderWidth;
+				nfloat borderwidht = this.CallMomButton.Layer.BorderWidth;
 				CallMomButton.Enabled = false;
 				CallMomButton.SetTitle (title, UIControlState.Normal);
 				CallMomButton.Enabled = true;
 				UIView.Animate (1.0f, 0, UIViewAnimationOptions.CurveLinear,
 					() => {
 						this.CallMomButton.BackgroundColor = color;
-						this.CallMomButton.Layer.BorderWidth = (bowi + 2);
+						this.CallMomButton.Layer.BorderWidth = (borderwidht + 2);
 					},
 					() => {
 						this.CallMomButton.BackgroundColor = _defaultCallMomButtonColor;
-						this.CallMomButton.Layer.BorderWidth = bowi;
+						this.CallMomButton.Layer.BorderWidth = borderwidht;
 						CallMomButton.Enabled = false;
 						CallMomButton.SetTitle (_defaultCallMomButtonTitle, UIControlState.Normal);
 						CallMomButton.Enabled = true;

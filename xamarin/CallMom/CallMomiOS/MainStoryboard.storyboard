@@ -106,7 +106,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="1221" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO">
-                                <rect key="frame" x="149" y="292" width="100" height="100"/>
+                                <rect key="frame" x="150" y="364" width="90" height="86"/>
                                 <color key="backgroundColor" colorSpace="calibratedWhite" white="1" alpha="1"/>
                                 <color key="tintColor" colorSpace="calibratedWhite" white="1" alpha="1"/>
                                 <state key="normal" title="Reset">
@@ -156,7 +156,7 @@
                             </label>
                             <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="8" minValue="1" maxValue="60" id="1218" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO">
                                 <rect key="frame" x="150" y="197" width="150" height="31"/>
-                                <color key="tintColor" colorSpace="calibratedRGB" red="0" green="1" blue="0" alpha="1"/>
+                                <color key="tintColor" colorSpace="calibratedRGB" red="1" green="0.49803921568627452" blue="0" alpha="1"/>
                             </slider>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="1248" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO">
                                 <rect key="frame" x="76" y="385" width="65" height="65"/>
@@ -169,6 +169,15 @@
                                     <action selector="AboutButton_TouchUpInside:" destination="1066" id="1260" eventType="touchUpInside"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="1380" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO">
+                                <rect key="frame" x="168" y="243" width="113" height="113"/>
+                                <color key="backgroundColor" colorSpace="calibratedWhite" white="1" alpha="1"/>
+                                <color key="tintColor" colorSpace="calibratedWhite" white="1" alpha="1"/>
+                                <state key="normal">
+                                    <color key="titleShadowColor" colorSpace="calibratedWhite" white="1" alpha="1"/>
+                                    <color key="titleColor" colorSpace="calibratedWhite" white="0.333333333333333" alpha="1"/>
+                                </state>
+                            </button>
                         </subviews>
                     </view>
                     <connections>
@@ -178,6 +187,7 @@
                         <outlet property="IPTextField" destination="1148" id="name-outlet-1148"/>
                         <outlet property="PortTextField" destination="1216" id="name-outlet-1216"/>
                         <outlet property="TimeoutSlider" destination="1218" id="name-outlet-1218"/>
+                        <outlet property="SettingsInfoText" destination="1380" id="name-outlet-1380"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="1068" userLabel="First Responder" sceneMemberID="firstResponder"/>
