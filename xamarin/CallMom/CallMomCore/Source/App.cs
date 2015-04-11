@@ -55,11 +55,7 @@ namespace CallMomCore
 		{
 			Debug.WriteLine ("[Init] - setting defaults");
 			ISettingsService settings = App.Container.Resolve<ISettingsService> ();
-			settings.InsertCallTime (Defaults.CALLTIMEOUT);
-			settings.InsertIP (Defaults.IP);
-			settings.InsertPort (Defaults.PORT);
-			settings.InsertNetworkTimeoutSeconds (Defaults.NETTIMEOUT);
-			settings.InsertConnectTimeOut (Defaults.CONNECTTIMEOUT);
+			settings.ResetTODefaults ();
 		}
 
 	}

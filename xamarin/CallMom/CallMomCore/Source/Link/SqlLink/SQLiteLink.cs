@@ -85,7 +85,8 @@ namespace CallMomCore
 		{
 			lock (SqlLock) {
 				try {
-
+					ResetTable<Settings> ();
+					//add more tables here
 				} catch (Exception ex) {
 					throw MomSqlException.ToMomException (ex, "CleanupDB");
 				}

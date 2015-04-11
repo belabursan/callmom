@@ -5,7 +5,7 @@ namespace CallMomCore
 {
 	public interface ISettingsController
 	{
-		Task<int> DoRegister ();
+		Task<int> DoRegister (string passw);
 
 		void DoReset ();
 
@@ -16,5 +16,7 @@ namespace CallMomCore
 		bool IsRegistered ();
 
 		string GetAbout ();
+
+		int Cancel ();
 	}
 }

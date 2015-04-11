@@ -6,23 +6,41 @@ namespace CallMomCore
 	public class SettingsController : ISettingsController
 	{
 		private readonly ISettingsService _settingsService;
+		private ICommand _register;
 
 		public SettingsController (ISettingsService settingsService)
 		{
 			_settingsService = settingsService;
+			_register = null;
 		}
 
 		#region ISettingsController implementation
 
-		public async Task<int> DoRegister ()
+		public async Task<int> DoRegister (string passw)
 		{
-			throw new NotImplementedException ();
+			int retv = ReturnValue.AlreadyRunning;
+			if (_register == null) {
+				_register = new Register ();
+				retv = await _register.ExecuteAsync (passw);
+				_register = null;
+			}
+			return retv;
 		}
 
 		public void DoReset ()
 		{
-			throw new NotImplementedException ();
+			if (_register != null) {
+				Cancel ();
+			}
+
+			_settingsService.ResetTODefaults ();
 		}
+
+		public int Cancel ()
+		{
+			return _register != null ? _register.Cancel () : ReturnValue.NotRunning;
+		}
+
 
 		public SettingsData GetSettings ()
 		{

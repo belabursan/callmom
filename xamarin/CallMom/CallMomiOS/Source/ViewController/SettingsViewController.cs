@@ -138,10 +138,28 @@ namespace CallMomiOS
 
 		partial void RegisterButton_TouchUpInside (UIButton sender)
 		{
-			int result;
-			InvokeOnMainThread (async () => {
-				result = await _settingsController.DoRegister ();
-			});
+			UIAlertView alert = new UIAlertView ();
+			alert.Title = "Enter Password";
+			alert.AddButton ("Register");
+			alert.AddButton ("Cancel");
+			alert.AlertViewStyle = UIAlertViewStyle.SecureTextInput;
+			alert.Clicked += (object s, UIButtonEventArgs ev) => {
+				if (ev.ButtonIndex == 0) {
+					InvokeOnMainThread (async () => {
+						int result = await _settingsController.DoRegister (alert.GetTextField (0).Text);
+						HandleRegisterResult (result);
+					});
+				} else {
+					return;
+				}
+			};
+			alert.Show ();
+		}
+
+		void HandleRegisterResult (int result)
+		{
+			string s = HandleResult (result);
+			Console.WriteLine ("RESULT = " + s);
 		}
 
 		partial void ResetButton_TouchUpInside (UIButton sender)

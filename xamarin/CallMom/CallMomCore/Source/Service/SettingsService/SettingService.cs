@@ -23,6 +23,16 @@ namespace CallMomCore
 
 		#region ISettingsService implementation
 
+		public void ResetTODefaults ()
+		{
+			_sql.CleanupDB ();
+			InsertCallTime (Defaults.CALLTIMEOUT);
+			InsertIP (Defaults.IP);
+			InsertPort (Defaults.PORT);
+			InsertNetworkTimeoutSeconds (Defaults.NETTIMEOUT);
+			InsertConnectTimeOut (Defaults.CONNECTTIMEOUT);
+		}
+
 		public void InsertCallTime (int time)
 		{
 			Insert (CALLTIME, time.ToString ());

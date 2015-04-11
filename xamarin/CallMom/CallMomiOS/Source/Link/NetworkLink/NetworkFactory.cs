@@ -44,8 +44,8 @@ namespace CallMomiOS
 				return new ConnectedNetworkClient (new NetworkStream (socket, FileAccess.ReadWrite, true));
 			
 			} catch (Exception ex) {
-				Console.WriteLine ("[NET-Factory] - exception when connecting ({0}:{1})", U.ExType (ex), U.InnerExMessage (ex));
-				throw;
+				//Console.WriteLine ("[NET-Factory] - exception when connecting ({0}:{1})", U.ExType (ex), U.InnerExMessage (ex));
+				throw MomNetworkException.ToMomException (ex, "Connect");
 			}
 		}
 
