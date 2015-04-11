@@ -30,6 +30,7 @@ namespace CallMomCore
 			settings.IP = _settingsService.GetIP ();
 			settings.Port = _settingsService.GetPort ();
 			settings.TimeoutSec = _settingsService.GetConnectTimeOut ();
+			settings.IsRegistred = IsRegistered ();
 			return settings;
 		}
 

@@ -30,6 +30,7 @@ namespace CallMomiOS
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
+			this.NavigationController.NavigationBar.TintColor = UIColor.Orange;
 			SetupCallBall ();
 			SetupCancelBall ();
 			SetupInfoBall ();
@@ -137,7 +138,9 @@ namespace CallMomiOS
 		{
 			lock (_lock) {
 				nfloat bowi = this.CallMomButton.Layer.BorderWidth;
+				CallMomButton.Enabled = false;
 				CallMomButton.SetTitle (title, UIControlState.Normal);
+				CallMomButton.Enabled = true;
 				UIView.Animate (1.0f, 0, UIViewAnimationOptions.CurveLinear,
 					() => {
 						this.CallMomButton.BackgroundColor = color;
@@ -146,7 +149,9 @@ namespace CallMomiOS
 					() => {
 						this.CallMomButton.BackgroundColor = _defaultCallMomButtonColor;
 						this.CallMomButton.Layer.BorderWidth = bowi;
+						CallMomButton.Enabled = false;
 						CallMomButton.SetTitle (_defaultCallMomButtonTitle, UIControlState.Normal);
+						CallMomButton.Enabled = true;
 					}
 				);
 			}

@@ -29,13 +29,6 @@ namespace CallMomCore
 			}
 		}
 
-		public SettingsData (string ip, int port, int timeout)
-		{
-			IP = ip;
-			Port = port;
-			TimeoutSec = timeout;
-		}
-
 		/// <summary>
 		/// Validates the values to fit the requirements fro ip port and timeout
 		/// </summary>
@@ -62,6 +55,8 @@ namespace CallMomCore
 		public int Port { get; set; }
 
 		public int TimeoutSec { get; set; }
+
+		public bool IsRegistred { get; set; }
 
 		private static bool ValidateIp (string ip)
 		{

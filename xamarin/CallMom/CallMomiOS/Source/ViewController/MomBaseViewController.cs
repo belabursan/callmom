@@ -10,6 +10,21 @@ namespace CallMomiOS
 		{
 		}
 
+		public override void ViewDidAppear (bool animated)
+		{
+			base.ViewDidAppear (animated);
+		}
+
+		public override void ViewWillDisappear (bool animated)
+		{
+			base.ViewWillDisappear (animated);
+		}
+
+		public override void ViewDidLoad ()
+		{
+			base.ViewDidLoad ();
+		}
+
 		protected string HandleResult (int click)
 		{
 			switch (click) {

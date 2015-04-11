@@ -42,6 +42,14 @@ namespace CallMomiOS
 		[GeneratedCode ("iOS Designer", "1.0")]
 		partial void AboutButton_TouchUpInside (UIButton sender);
 
+		[Action ("IPTextFieldClicked:")]
+		[GeneratedCode ("iOS Designer", "1.0")]
+		partial void IPTextFieldClicked (UITextField sender);
+
+		[Action ("PortTexFieldClicked:")]
+		[GeneratedCode ("iOS Designer", "1.0")]
+		partial void PortTexFieldClicked (UITextField sender);
+
 		[Action ("RegisterButton_TouchUpInside:")]
 		[GeneratedCode ("iOS Designer", "1.0")]
 		partial void RegisterButton_TouchUpInside (UIButton sender);
