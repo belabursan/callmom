@@ -15,7 +15,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
+    <DefineConstants>DEBUG; DEVEL;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
@@ -50,6 +50,8 @@
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
+    <IpaPackageName>
+    </IpaPackageName>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>full</DebugType>
@@ -61,6 +63,9 @@
     <MtouchArch>ARMv7, ARM64</MtouchArch>
     <ConsolePause>false</ConsolePause>
     <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchUseRefCounting>true</MtouchUseRefCounting>
+    <MtouchI18n>
+    </MtouchI18n>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Ad-Hoc|iPhone' ">
     <DebugType>full</DebugType>
@@ -107,6 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="Resources\Default-568h%402x.png" />
+    <BundleResource Include="Resources\settings%402x.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Info.plist" />
@@ -117,11 +123,18 @@
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <Compile Include="Source\ViewController\CallMomiOSViewController.cs" />
+    <Compile Include="Source\Link\SqlLink\SQLiteFactory.cs" />
+    <Compile Include="Source\Link\NetworkLink\NetworkFactory.cs" />
+    <Compile Include="Source\Link\FileLink\FileFactory.cs" />
     <Compile Include="Source\ViewController\CallMomiOSViewController.designer.cs">
       <DependentUpon>CallMomiOSViewController.cs</DependentUpon>
     </Compile>
-    <Compile Include="Source\Link\SqlLink\SQLiteFactory.cs" />
-    <Compile Include="Source\Link\NetworkLink\NetworkFactory.cs" />
+    <Compile Include="Source\Link\Crypto\CryptoFactory.cs" />
+    <Compile Include="Source\ViewController\SettingsViewController.cs" />
+    <Compile Include="Source\ViewController\SettingsViewController.designer.cs">
+      <DependentUpon>SettingsViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Source\ViewController\MomBaseViewController.cs" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="MainStoryboard.storyboard" />
@@ -139,5 +152,6 @@
     <Folder Include="Source\Link\" />
     <Folder Include="Source\Link\SqlLink\" />
     <Folder Include="Source\Link\NetworkLink\" />
+    <Folder Include="Source\Link\FileLink\" />
   </ItemGroup>
 </Project>

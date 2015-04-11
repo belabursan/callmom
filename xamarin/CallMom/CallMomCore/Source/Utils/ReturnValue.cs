@@ -4,19 +4,19 @@ namespace CallMomCore
 {
 	public static class ReturnValue
 	{
-		public static int Success { get { return 0; } }
+		public const int Success = 0;
 
-		public static int NotRegistered { get { return 1; } }
+		public const int NotRegistered = 1;
 
-		public static int AlreadyRunning { get { return 2; } }
+		public const int AlreadyRunning = 2;
 
-		public static int Cancelled { get { return 3; } }
+		public const int Cancelled = 3;
 
-		public static int Error { get { return 4; } }
+		public const int Error = 4;
 
-		public static int NotRunning { get { return 5; } }
+		public const int NotRunning = 5;
 
-		public static int NetworkError { get { return 6; } }
+		public const int NetworkError = 6;
 	}
 }
 

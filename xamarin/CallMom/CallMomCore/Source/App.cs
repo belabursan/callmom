@@ -32,12 +32,21 @@ namespace CallMomCore
 		 */
 		private static void InitDependencies (ContainerBuilder builder)
 		{
+			//controllers
 			builder.RegisterType<COController> ().As<ICOController> ();
+			builder.RegisterType<SettingsController> ().As<ISettingsController> ();
+
+			//links
 			builder.RegisterType<SQLiteLink> ().As<ISQLiteLink> ().SingleInstance ();
-			builder.RegisterType<SettingService> ().As<ISettingsService> ().SingleInstance ();
-			builder.RegisterType<StateService> ().As<IStateService> ().SingleInstance ();
-			builder.RegisterType<BroadcastService> ().As<IBroadcastService> ().SingleInstance ();
 			builder.RegisterType<NetworkLink> ().As<INetworkLink> ().SingleInstance ();
+
+			//services
+			builder.RegisterType<SettingService> ().As<ISettingsService> ().SingleInstance ();
+			builder.RegisterType<BroadcastService> ().As<IBroadcastService> ().SingleInstance ();
+			builder.RegisterType<CryptoService> ().As<ICryptoService> ().SingleInstance ();
+			builder.RegisterType<FileService> ().As<IFileService> ().SingleInstance ();
+
+
 
 			App.Container = builder.Build ();
 		}

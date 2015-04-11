@@ -2,7 +2,7 @@
 
 namespace CallMomCore
 {
-	public class MomNotRegisteredException : Exception
+	public class MomNotRegisteredException : MomException
 	{
 		public MomNotRegisteredException (
 			string message = default(String),

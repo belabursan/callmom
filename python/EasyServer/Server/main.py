@@ -10,6 +10,7 @@ import atexit
 import logging
 import time
 import socket
+import getpass
 from parameters import Parameters
 from server import Server
 try:
@@ -55,7 +56,6 @@ class Main(object):
 
         except socket.error as ex:
             logging.warning("Main:run(): Got socket exception : " + str(ex))
-            pass
         finally:
             self.server.stop_server()
         return 0
@@ -101,7 +101,6 @@ def setup_logging(arguments, force_debug):
     logging.warning("Started ("+str(logging.getLevelName(loglevel)) +
                     ")\n---------------------------------------------------------------------------------")
 
-
 def read_parameters():
     """
     Reads parameters from a file located in the current running directory
@@ -110,16 +109,39 @@ def read_parameters():
     """
     # print("reading parameters from configuration file")
     _parameters = Parameters()
-    parser = configparser.RawConfigParser()
+    parser = configparser.RawConfigParser(allow_no_value=True)
     try:
-        parser.read("easy_config.ini")
+        parser.readfp(open("easy_config.ini", "r+"))
         _parameters.port = parser.getint("NETWORK", "port")
         _parameters.noof_sockets = parser.getint("NETWORK", "noof_sockets")
         _parameters.timeout_seconds = parser.getint("NETWORK", "timeout")
         _parameters.debug = parser.getboolean("DEBUG", "debug")
         _parameters.noof_threads = parser.getint("OTHER", "noof_threads")
+        _parameters.public_key_path = parser.get("ENCRYPTION", "public_key_path")
+        _parameters.private_key_path = parser.get("ENCRYPTION", "private_key_path")
+        if not _parameters.private_key_path or not _parameters.public_key_path:
+            print("ERROR: No key path found, please set it in the config.ini!\n Ending server!")
+            return None
+
+        _parameters.password_hash = parser.get("ENCRYPTION", "password_hash")
+        if not _parameters.password_hash:
+            from crypto import BCrypt
+            crypt = BCrypt(None)
+            password = getpass.getpass("\nA password not seems to be set or is wrong!\n"
+                                       "Please set a new hash by typing a password:\n")
+            password_hash = crypt.get_hash_as_string(password)
+            parser.set("ENCRYPTION", "password_hash", password_hash)
+            parser.write(open("easy_config.ini", "w"))
+
+            _parameters.password_hash = parser.get("ENCRYPTION", "password_hash")
+            if not _parameters.password_hash:
+                print("Could not read password hash, ending server!")
+                return None
+
+
     except Exception as excp:
         print("Exception when reading parameters:" + str(excp))
+        return None
     return _parameters
 
 
@@ -137,15 +159,18 @@ if __name__ == '__main__':
         print("      - append    : logs are appended to existing logfile")
         print("")
         print("    Return values are:")
-        print("      - 0 : interrupted by user")
-        print("      - 1 : in case of error")
+        print("      0 : interrupted by user")
+        print("      1 : in case of error")
         print("")
 
         time.sleep(0.2)
         params = read_parameters()
-        setup_logging(sys.argv[1:], params.debug)
-        main = Main(params)
-        os._exit(main.run())
+        if params:
+            setup_logging(sys.argv[1:], params.debug)
+            main = Main(params)
+            os._exit(main.run())
+        else:
+            os._exit(1)
     except BaseException as ex:  # catch everything
         logging.exception("\nMain:main(): [ERROR ] - Unhandled Exception - [ERROR ]:\n")
         traceback.print_exc(file=sys.stdout)

@@ -19,6 +19,25 @@ class Parameters(object):
         self._timeout_seconds = 16
         self._noof_sockets = 10
         self._noof_threads = 10
+        self._password_hash = None
+        self._public_key_path = None
+        self._private_key_path = None
+
+    @property
+    def public_key_path(self):
+        return self._public_key_path
+
+    @public_key_path.setter
+    def public_key_path(self, value):
+        self._public_key_path = value
+
+    @property
+    def private_key_path(self):
+        return self._private_key_path
+
+    @private_key_path.setter
+    def private_key_path(self, value):
+        self._private_key_path = value
 
     @property
     def port(self):
@@ -69,3 +88,10 @@ class Parameters(object):
     def noof_threads(self, value):
         self._noof_threads = value
 
+    @property
+    def password_hash(self):
+        return self._password_hash
+
+    @password_hash.setter
+    def password_hash(self, value):
+        self._password_hash = value

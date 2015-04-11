@@ -23,6 +23,22 @@ namespace CallMomCore
 		int GetConnectTimeOut ();
 
 		void InsertConnectTimeOut (int time);
+
+		int GetIntervallTime ();
+
+		int GetIntervallTimeOrDefault (int defaultValue = 0);
+
+		void InsertIntervallTime (int time);
+
+		bool GetBlink ();
+
+		bool GetBlinkOrDefault (bool defaultValue = false);
+
+		void InsertBlink (bool doBlink);
+
+		byte[] GetServerPublicKey ();
+
+		void InsertServerPublicKey (byte[] publicKey);
 	}
 }
 

@@ -52,7 +52,7 @@ class Server(Process):
 
         try:
             server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            server_socket.bind(('localhost', self._parameters.port))
+            server_socket.bind(('', self._parameters.port))
             logging.info("Server:run(): Socket bind complete")
             server_socket.listen(self._parameters.noof_sockets)
             logging.info("Server:run(): Socket now listening")
@@ -74,11 +74,9 @@ class Server(Process):
 
         except KeyboardInterrupt:
             logging.debug("Server:run(): Got KeyboardInterrupt in Server")
-            # pass this to main and end everything
             pass
         except Exception as ex:
             logging.exception("Server:run(): Exception: " + str(ex))
-            pass
         finally:
             if connection:
                 connection.close()

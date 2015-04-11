@@ -20,15 +20,15 @@ namespace CallMomCore
 
 		public int Port { get; set; }
 
-		public int SendTimeout { get; set; }
+		public int SendTimeoutSeconds { get; set; }
 
-		public int ReceiveTimeout { get; set; }
+		public int ReceiveTimeoutSeconds { get; set; }
 
 		public MomLinger LingerArguments{ get; set; }
 
 		public bool NoDelay { get; set; }
 
-		public int ConnectTimeout { get; set; }
+		public int ConnectTimeoutSeconds { get; set; }
 	}
 }
 

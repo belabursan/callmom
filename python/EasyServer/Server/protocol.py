@@ -2,20 +2,27 @@
 # Bela Bursan<burszan@gmail.com> - 2015-03-27
 #
 import logging
+import base64
 import time
 import sys
+from crypto import BCrypt
 
 # send commands
-EXIT = "exit\n" # .encode()
-WELCOME = "welcome\n"
-DONE = "done\n"
+END = "exit"
+WELCOME = "welcome"
+SUCCESS = "success"
+FAILED = "failed"
 
 # receive commands
 HELLO = "hello"
 FLASH_LAMP = "flash_lamp"
 COMMAND = "command"
+REGISTER = "register"
 
-BUFFER_SIZE = 256
+BUFFER_SIZE = 512
+VERSION = "v0.1"
+SPLITTER = ":"
+LINE_END = "\n"
 
 
 class Protocol(object):
@@ -30,6 +37,25 @@ class Protocol(object):
         """
         self._connection = connection
         self._parameter = parameter
+        self._crypter = BCrypt(parameter)
+
+    def read(self):
+        return self._connection.recv(BUFFER_SIZE).decode('utf-8').strip()
+
+    def write(self, data):
+        d = (data + LINE_END).encode('utf-8')
+        self._connection.sendall(d)
+
+    def do_split(self, data):
+        """
+        Splits a command with the SPLITTER and returns an array with the parts
+        :param data: data to split
+        :return: array of strings
+        :except: if there is no SPLITTER
+        """
+        if SPLITTER in data:
+            return data.split(SPLITTER)
+        raise ValueError("Data is unsplittable")
 
     def execute(self):
         """
@@ -37,12 +63,14 @@ class Protocol(object):
         :return:
         """
         logging.debug("Protocol:run(): running the protocol")
-        if not self.handshake():
-            logging.info("Protocol:run(): handshake not successful")
-            return
-        logging.debug("Protocol:run(): handshake successful")
-        self.wait_for_command()
 
+        if self.handshake():
+            if self.handle_messages():
+                self.write(SUCCESS)
+            else:
+                self.write(FAILED)
+
+        self.write(END)
         time.sleep(5)
         return
 
@@ -52,40 +80,90 @@ class Protocol(object):
         :return: True if the handshake is ok, False otherwise
         :exception: throws Socket.timeout exception
         """
-        data = self._connection.recv(BUFFER_SIZE).strip()
+        data = self.read()
         if HELLO == data:
-            self._connection.sendall(WELCOME)
+            self.write(WELCOME + SPLITTER + VERSION)
+            logging.info("Protocol:handshake(): handshake successful")
             return True
-        else:
-            self._connection.sendall(EXIT)
+        logging.warning("Protocol:handshake(): handshake failed")
         return False
 
-    def wait_for_command(self):
+    def handle_messages(self):
         """
-        Waits for a command or times out with exception
-        :return: True if the commands was received and executed successfully, False otherwise
+        Waits for a message or times out with exception
+        :return: True if the messages was received and executed successfully, False otherwise
         :exception: throws Socket.timeout exception
         """
-        data = self._connection.recv(BUFFER_SIZE).strip()
+        logging.debug("Protocol:handle_messages(): new message")
+
+        data = self.read()
+        success = False
         try:
-            if data.startswith(COMMAND):
-                command = data.split(":")
-                # c = str(command[1])
-                if FLASH_LAMP == command[1]:
-                    if self.do_flash_lamp(command[2], command[3], command[4]):
-                        return True
-                else:
-                    # handle other commands
-                    pass
+            message = self.do_split(data)
+            if message[0] == COMMAND:
+                success = self.do_handle_commands(message[1])
+            elif message[0] == REGISTER:
+                success = self.do_register(message[1])
             else:
                 # handle other messages
                 pass
-        except:
-            logging.info("Protocol:wait_for_command(): error when executing command: " + sys.exc_info()[0])
-            pass
+        except Exception as ex:
+            logging.warning("Protocol:handle_messages(): got "
+                            + str(sys.exc_info()[0])
+                            + " when executing message: "
+                            + ex.message)
 
-        self._connection.sendall(EXIT)
-        return False
+        return success
+
+    def do_register(self, crypto_command):
+        """
+        Registers an app, if password verification is ok the public key is returned as answer
+        :param crypto_command: takes a parameter with two parts separated with colon:
+        first is the hash of the password the server needs to compare with its own hash,
+        second part is a random number
+        :return: true if registered successfully, false otherwise
+        """
+        success = False
+        logging.debug("Protocol:do_register(): registering new user")
+
+        try:
+            command_line = self._crypter.decrypt_AES(self._parameter.password_hash, crypto_command)
+            command = self.do_split(command_line)
+            if command[0] == self._parameter.password_hash:
+                # password is ok, send the public key
+                public_key = open(self._parameter.public_key_path, "r")
+                self.write(public_key.read(BUFFER_SIZE))
+                success = True
+        except Exception as ex:
+            logging.warning("Protocol:do_register(): got "
+                            + str(sys.exc_info()[0])
+                            + " when executing registering: "
+                            + str(ex.message))
+        return success
+
+    def do_handle_commands(self, crypto_command):
+        """
+        Handles commands
+        :param crypto_command: encrypted command line that should be decrypted with the private key.
+        The command is built up in several chunks separated with colon,
+        the last chunk is always a random sequence of characters
+        :return: true if the execution of the command was successful, false otherwise
+        """
+        logging.info("Protocol:do_handle_commands(): new command")
+        success = False
+
+        try:
+            rsa_key = self._crypter.create_RSA_key(self._parameter.private_key_path)
+            command_line = self._crypter.decrypt_RSA(rsa_key, crypto_command)
+            command = self.do_split(command_line)
+            if FLASH_LAMP == command[0]:
+                success = self.do_flash_lamp(command[1], command[2], command[3])
+            # todo - add more commands here
+            else:
+                logging.warning("Protocol:do_handle_commands() received unrecognized command: " + str(command[0]))
+        except Exception as ex:
+            logging.warning("Protocol:do_handle_commands() exception when handling commands: " + str(ex.message))
+        return success
 
     def do_flash_lamp(self, flash_time, do_blink, interval_seconds):
         """
@@ -96,7 +174,7 @@ class Protocol(object):
         :param interval_seconds: int, if blink then interval time
         :return: true if command executed successfully, false otherwise
         """
-        # todo - add tellstick code here
+        # todo - add tell-stick code here
         logging.debug("Protocol:do_flash_lamp("+flash_time+", " + do_blink + ", " + interval_seconds + "): start")
-        self._connection.sendall(DONE)
+        self.write(DONE)
         return True

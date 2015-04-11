@@ -69,6 +69,12 @@ Global
 		{F56A18FC-C88C-4D71-A14F-6F102C80BC0F}.Release|iPhoneSimulator.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = CallMomiOS\CallMomiOS.csproj
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = None
+		$1.ResourceNamePolicy = FileFormatDefault
+		$0.VersionControlPolicy = $2
+		$2.inheritsSet = Mono
+		description = Call my mom using a Tellstick
 	EndGlobalSection
 EndGlobal

@@ -6,96 +6,73 @@ using System.Threading;
 
 namespace CallMomCore
 {
-	public class Call
+	public class Call : CallBase
 	{
-		private readonly ISettingsService _settings;
-		private readonly IStateService _stateMachine;
-		private readonly CancellationTokenSource _cancelation;
-
-
-		public Call ()
+		public override async Task<int> ExecuteAsync (string value = default(string))
 		{
-			_settings = App.Container.Resolve<ISettingsService> ();
-			_stateMachine = App.Container.Resolve<IStateService> ();
-			_cancelation = new CancellationTokenSource ();
-		}
-
-		public async Task<int> Execute ()
-		{
-			Debug.WriteLine ("[Call] - executing call");
 			try {
-				return await Run (_cancelation.Token);	
+				return await Run (value, _cancelation.Token);
 			} catch (OperationCanceledException ocex) {
 				Debug.WriteLine ("[Call] - cancelled (got OperationCanceledException:{0})", U.InnerExMessage (ocex));
 				return ReturnValue.Cancelled;
-			} catch (MomNotRegisteredException nrex) {
-				Debug.WriteLine ("[Call] - not registered (got NotRegisteredException:{0})", U.InnerExMessage (nrex));
-				return ReturnValue.NotRegistered;
 			} catch (MomNetworkException neex) {
 				Debug.WriteLine ("[Call] - network error (got MomNetworkException:{0})", U.InnerExMessage (neex));
 				return ReturnValue.NetworkError;
+			} catch (MomNotRegisteredException nrex) {
+				Debug.WriteLine ("[Call] - not registered (got NotRegisteredException:{0})", U.InnerExMessage (nrex));
+				return ReturnValue.NotRegistered;
 			} catch (Exception ex) {
 				Debug.WriteLine ("[Call] - exception {0}({1})", U.ExType (ex), U.InnerExMessage (ex));
 				return ReturnValue.Error;
-			} finally {
-				_stateMachine.Reset ();
 			}
 
 		}
 
-		public async Task<int> Cancel ()
-		{
-			Debug.WriteLine ("[Call] - cancelling the call");
-
-			await Task.Run (() => {
-				_cancelation.Cancel ();
-				Debug.WriteLine ("[Call] - cancelled");
-			});
-
-			return ReturnValue.Cancelled;
-		}
+		#region implemented abstract members of CommandBase
 
 
-		private async Task<int> Run (CancellationToken token)
+		protected override async Task<int> Run (string value = default(string), CancellationToken token = default(CancellationToken))
 		{
 			Debug.WriteLine ("[Call] -  running");
-			NetworkArguments netArgs = ValidateValues ();
-			INetworkLink _network = App.Container.Resolve<INetworkLink> ();
-			var client = await _network.GetNewConnection (netArgs, token);
-			client.Send ("kkk", token);
 
-			//Debug.WriteLine ("[Call] -  running: dissconnected: " + b.ToString ());
-			await Task.Delay (8000, token);
+			var flashCommand = BuildFlashCommand ();
+			var client = await Connect (token);
+			var version = await DoHandshake (client, token);
+			Debug.WriteLine ("Protocol version: {0}\ncommand: {1} ", version, flashCommand);
 
-			return 7;
+			await client.SendAsync (flashCommand);
+
+			return 0;
 		}
 
-		private NetworkArguments ValidateValues ()
+		#endregion
+
+		private string BuildFlashCommand ()
 		{
-			#if DEVEL
-			if (_settings.GetIP ().Equals (App.DefaultIp) == true) {
-				throw new MomNotRegisteredException (String.Format ("IP is no valid ({0}", App.DefaultIp));
-			}
-			if (_settings.GetCallTime () < 1) {
-				throw new MomNotRegisteredException ("Call time is no valid");
-			}
-			#endif
+			Debug.WriteLine ("[Call] -  bulding command");
+			int flash_time = _settings.GetCallTime ();
+			bool blink = _settings.GetBlinkOrDefault ();
+			int intervall_time = blink == false ? 0 : _settings.GetIntervallTimeOrDefault ();
+			string random = _cryptoService.GetRandomString (20, 40);
 
-			NetworkArguments netArg = new NetworkArguments ();
-			netArg.Ip = _settings.GetIP ();
-			netArg.Port = _settings.GetPort ();
-			netArg.ReceiveTimeout = _settings.GetNetworkTimeoutSeconds ();
-			netArg.SendTimeout = _settings.GetNetworkTimeoutSeconds ();
-			netArg.NoDelay = true;
-			netArg.LingerArguments = new MomLinger {
-				Enable = true,
-				Timeout = 1
-			};
-			netArg.ConnectTimeout = _settings.GetConnectTimeOut ();
+			string flash_command = String.Format ("{0}:{1}:{2}:{3}", flash_time, blink, intervall_time, random);
+			string crypto_command;
+			try {
+				crypto_command = _cryptoService.EncodeRSA (_settings.GetServerPublicKey (), flash_command);
+			} catch (MomSqlException ex) {
+				if (ex.ErrorCode == MomSqlException.NOT_FOUND) {
+					// public key not found, throw register exception
+					throw new MomNotRegisteredException ("App not registered", ex);
 
-			return netArg;
+				}
+				Debug.WriteLine ("Something is wrong with the DB: " + ex.Message);
+				throw ex;
+			}
+
+			string command = String.Format ("command:{0}", crypto_command);
+
+			return command;
 		}
-
 
 	}
 }

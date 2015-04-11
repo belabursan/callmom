@@ -1,105 +1,127 @@
 ﻿using System;
-using System.Drawing;
-
-using Foundation;
 using UIKit;
 using CallMomCore;
 using Autofac;
 using System.Threading.Tasks;
-using System.Net;
 
 
 namespace CallMomiOS
 {
-	public partial class CallMomiOSViewController : UIViewController
+	public partial class CallMomiOSViewController : MomBaseViewController
 	{
-		CallMomCore.ICOController ioc;
-		private static object Lock = new object ();
+		private static object _lock = new object ();
+		private readonly ICOController _callController;
+		private UIBarButtonItem _settingsButton;
+		private UIViewController _settingsViewController;
 
-		private const string DefaultCallMomButtonTitle = "Call Mom";
-		private UIColor DefaultCallMomButtonColor = UIColor.LightGray;
+		private const string _defaultCallMomButtonTitle = "Call Mom";
+		private UIColor _defaultCallMomButtonColor;
+
 
 		public CallMomiOSViewController (IntPtr handle) : base (handle)
 		{
+			_callController = App.Container.Resolve<ICOController> ();
+			_settingsViewController = null;
 		}
 
-		public override void DidReceiveMemoryWarning ()
-		{
-			// Releases the view if it doesn't have a superview.
-			base.DidReceiveMemoryWarning ();
-			
-			// Release any cached data, images, etc that aren't in use.
-		}
 
 		#region View lifecycle
 
 		public override void ViewDidLoad ()
 		{
 			base.ViewDidLoad ();
-			DefaultCallMomButtonColor = CallMomButton.BackgroundColor;
-			MomActivity.StopAnimating ();
-			MomLabel.Hidden = true;
-
-			//ioc = new COController ();//App.Container.Resolve<ICOController> ();
-			ioc = App.Container.Resolve<ICOController> ();
-
-			// Perform any additional setup after loading the view, typically from a nib.
-		}
-
-		public override void ViewWillAppear (bool animated)
-		{
-			base.ViewWillAppear (animated);
-		}
-
-		public override void ViewDidAppear (bool animated)
-		{
-			base.ViewDidAppear (animated);
-		}
-
-		public override void ViewWillDisappear (bool animated)
-		{
-			base.ViewWillDisappear (animated);
-		}
-
-		public override void ViewDidDisappear (bool animated)
-		{
-			base.ViewDidDisappear (animated);
+			this.NavigationController.NavigationBar.TintColor = UIColor.Orange;
+			SetupCallBall ();
+			SetupCancelBall ();
+			SetupInfoBall ();
+			SetupNavigationButton ();
 		}
 
 		#endregion
 
+		private void SetupCallBall ()
+		{
+			CallMomButton.Layer.CornerRadius = CallMomButton.Frame.Size.Height / 2;
+			CallMomButton.Layer.BorderWidth = 8;
+			CallMomButton.Layer.BorderColor = UIColor.Gray.CGColor;
+			_defaultCallMomButtonColor = CallMomButton.BackgroundColor;
+		}
+
+		private void SetupCancelBall ()
+		{
+			CancelButton.Layer.CornerRadius = CancelButton.Frame.Size.Height / 2;
+			CancelButton.Layer.BorderWidth = 3;
+			CancelButton.Layer.BorderColor = UIColor.Gray.CGColor;
+		}
+
+		private void SetupInfoBall ()
+		{
+			Info.Layer.CornerRadius = Info.Frame.Size.Height / 2;
+			Info.Layer.BorderWidth = 0;
+		}
+
+		private void SetupNavigationButton ()
+		{
+			_settingsButton = new UIBarButtonItem (
+				UIImage.FromFile ("settings@2x.png"),
+				UIBarButtonItemStyle.Plain,
+				(s, e) => {
+					if (_settingsViewController == null) {
+						_settingsViewController = this.Storyboard.InstantiateViewController ("CallSettingsViewController") as SettingsViewController;
+					}
+					this.NavigationController.PushViewController (_settingsViewController, true);
+				}
+			);
+
+			NavigationItem.RightBarButtonItem = _settingsButton;
+		}
+
 		partial void UIButton13_TouchUpInside (UIButton sender)
 		{
-			InvokeOnMainThread (async  () => await DoCall ());
+			InvokeOnMainThread (async () => await DoCall ());
 		}
 
 		partial void UIButton15_TouchUpInside (UIButton sender)
 		{
-			InvokeOnMainThread (async  () => await DoCancel ());
+			DoCancel ();
 		}
 
 		private async Task DoCall ()
 		{
-			MomActivity.StartAnimating ();
 			AnimateCallMomStart ();
 
-			int click = await ioc.DoTheCallAsync ();
-
-			if (click != ReturnValue.AlreadyRunning) {
-				MomActivity.StopAnimating ();
-			}
-
+			int click = await _callController.DoTheCallAsync ();
 			Console.WriteLine ("[GUI] - call ended with code {0}", click);
-			//todo handle returnvalue
+			AnimateInfo (HandleResult (click));
 		}
 
-		private async Task DoCancel ()
+		private void DoCancel ()
 		{
-			int ret = await ioc.CancelTheCall ();
+			int ret = _callController.CancelTheCall ();
 			if (ret == ReturnValue.Cancelled) {
 				AnimateCallMomCancel ();
 			}
 			// else ReturnValue.NotStarted
+		}
+
+		void AnimateInfo (string info)
+		{
+			Console.WriteLine ("--- setting title: " + info);
+			Info.Enabled = false;
+			Info.SetTitle (info, UIControlState.Normal);
+			Info.Enabled = true;
+			UIView.Animate (3.0f, 1, UIViewAnimationOptions.CurveLinear,
+				() => {
+					this.Info.BackgroundColor = UIColor.Orange;
+				},
+				() => {
+					this.Info.BackgroundColor = UIColor.White;
+					Info.Enabled = false;
+					Info.SetTitle (String.Empty, UIControlState.Normal);
+					Info.Enabled = true;
+				}
+			);
+
 		}
 
 		private void AnimateCallMomStart ()
@@ -114,15 +136,22 @@ namespace CallMomiOS
 
 		private void AnimateCallMomButtonColor (UIColor color, string title)
 		{
-			lock (Lock) {
+			lock (_lock) {
+				nfloat bowi = this.CallMomButton.Layer.BorderWidth;
+				CallMomButton.Enabled = false;
 				CallMomButton.SetTitle (title, UIControlState.Normal);
+				CallMomButton.Enabled = true;
 				UIView.Animate (1.0f, 0, UIViewAnimationOptions.CurveLinear,
 					() => {
 						this.CallMomButton.BackgroundColor = color;
+						this.CallMomButton.Layer.BorderWidth = (bowi + 2);
 					},
 					() => {
-						this.CallMomButton.BackgroundColor = DefaultCallMomButtonColor;
-						CallMomButton.SetTitle (DefaultCallMomButtonTitle, UIControlState.Normal);
+						this.CallMomButton.BackgroundColor = _defaultCallMomButtonColor;
+						this.CallMomButton.Layer.BorderWidth = bowi;
+						CallMomButton.Enabled = false;
+						CallMomButton.SetTitle (_defaultCallMomButtonTitle, UIControlState.Normal);
+						CallMomButton.Enabled = true;
 					}
 				);
 			}
