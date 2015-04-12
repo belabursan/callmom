@@ -11,6 +11,8 @@ namespace CallMomCore
 		Task<string> ReceiveAsync (CancellationToken token = default(CancellationToken));
 
 		Task<byte[]> ReceiveAsBytesAsync (CancellationToken token = default(CancellationToken));
+
+		void Close ();
 	}
 }
 

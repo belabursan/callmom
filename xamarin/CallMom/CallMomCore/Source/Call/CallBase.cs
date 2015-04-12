@@ -41,6 +41,9 @@ namespace CallMomCore
 			} catch (OperationCanceledException ocex) {
 				Debug.WriteLine ("[BaseCommand] - cancelled (got OperationCanceledException:{0})", U.InnerExMessage (ocex));
 				return ReturnValue.Cancelled;
+			} catch (MomNotRegisteredException nrex) {
+				Debug.WriteLine ("[BaseCommand] - not registered (got NotRegisteredException:{0})", U.InnerExMessage (nrex));
+				return ReturnValue.NotRegistered;
 			} catch (MomNetworkException neex) {
 				Debug.WriteLine ("[BaseCommand] - network error (got MomNetworkException:{0})", U.InnerExMessage (neex));
 				return ReturnValue.NetworkError;

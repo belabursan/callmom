@@ -8,25 +8,6 @@ namespace CallMomCore
 {
 	public class Call : CallBase
 	{
-		public override async Task<int> ExecuteAsync (string value = default(string))
-		{
-			try {
-				return await Run (value, _cancelation.Token);
-			} catch (OperationCanceledException ocex) {
-				Debug.WriteLine ("[Call] - cancelled (got OperationCanceledException:{0})", U.InnerExMessage (ocex));
-				return ReturnValue.Cancelled;
-			} catch (MomNetworkException neex) {
-				Debug.WriteLine ("[Call] - network error (got MomNetworkException:{0})", U.InnerExMessage (neex));
-				return ReturnValue.NetworkError;
-			} catch (MomNotRegisteredException nrex) {
-				Debug.WriteLine ("[Call] - not registered (got NotRegisteredException:{0})", U.InnerExMessage (nrex));
-				return ReturnValue.NotRegistered;
-			} catch (Exception ex) {
-				Debug.WriteLine ("[Call] - exception {0}({1})", U.ExType (ex), U.InnerExMessage (ex));
-				return ReturnValue.Error;
-			}
-
-		}
 
 		#region implemented abstract members of CommandBase
 
@@ -34,14 +15,19 @@ namespace CallMomCore
 		protected override async Task<int> Run (string value = default(string), CancellationToken token = default(CancellationToken))
 		{
 			Debug.WriteLine ("[Call] -  running");
+			IConnectedNetworkClient client = null;
+			try {
+				var flashCommand = BuildFlashCommand ();
+				client = await Connect (token);
+				var version = await DoHandshake (client, token);
+				Debug.WriteLine ("Protocol version: {0}\ncommand: {1} ", version, flashCommand);
 
-			var flashCommand = BuildFlashCommand ();
-			var client = await Connect (token);
-			var version = await DoHandshake (client, token);
-			Debug.WriteLine ("Protocol version: {0}\ncommand: {1} ", version, flashCommand);
-
-			await client.SendAsync (flashCommand);
-
+				await client.SendAsync (flashCommand);
+			} finally {
+				if (client != null) {
+					client.Close ();
+				}
+			}
 			return 0;
 		}
 

@@ -41,6 +41,8 @@ namespace CallMomCore
 		void InsertServerPublicKey (byte[] publicKey);
 
 		void ResetTODefaults ();
+
+		void FirstTimeInit ();
 	}
 }
 

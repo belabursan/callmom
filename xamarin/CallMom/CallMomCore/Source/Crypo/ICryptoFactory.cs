@@ -7,6 +7,8 @@ namespace CallMomCore
 		byte[] GetSha256Hash (string data);
 
 		string EncodeAES (byte[] key, string data);
+
+		string EncodeRSA (byte[] key, string data);
 	}
 }
 

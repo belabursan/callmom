@@ -23,7 +23,7 @@ namespace CallMomCore
 			await client.SendAsync (registerCommand);
 			var publicKey = await client.ReceiveAsBytesAsync (token);
 			if (publicKey == null || publicKey.Length < 32) {
-				throw new ArgumentException ("public key is corrupt or null");
+				throw new MomNotRegisteredException ("public key is corrupt or null");
 			}
 			_settings.InsertServerPublicKey (publicKey);
 

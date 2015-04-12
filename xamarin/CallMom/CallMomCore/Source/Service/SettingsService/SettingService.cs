@@ -14,6 +14,7 @@ namespace CallMomCore
 		private const int BLINK = 5;
 		private const int INTERVALLTIME = 6;
 		private const int PUBLICKEY = 7;
+		private const int INITIATED = 8;
 
 		public SettingService (ISQLiteLink sql)
 		{
@@ -135,6 +136,35 @@ namespace CallMomCore
 		public void InsertServerPublicKey (byte[] publicKey)
 		{
 			Insert (PUBLICKEY, publicKey.AsString (0, publicKey.Length));
+		}
+
+		private bool GetInitiated ()
+		{
+			try {
+				return ValueAsBoolean (INITIATED);
+			} catch (MomSqlException ex) {
+				if (ex.ErrorCode == MomSqlException.NOT_FOUND) {
+					return false;
+				}
+				throw ex;
+			}
+		}
+
+		void InsertInitiated (bool initiated)
+		{
+			Insert (BLINK, initiated.ToString ());
+		}
+
+		public void FirstTimeInit ()
+		{
+			if (!GetInitiated ()) {
+				InsertCallTime (Defaults.CALLTIMEOUT);
+				InsertIP (Defaults.IP);
+				InsertPort (Defaults.PORT);
+				InsertNetworkTimeoutSeconds (Defaults.NETTIMEOUT);
+				InsertConnectTimeOut (Defaults.CONNECTTIMEOUT);
+				InsertInitiated (true);
+			}
 		}
 
 		#endregion

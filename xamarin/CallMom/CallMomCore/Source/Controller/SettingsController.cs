@@ -32,7 +32,6 @@ namespace CallMomCore
 			if (_register != null) {
 				Cancel ();
 			}
-
 			_settingsService.ResetTODefaults ();
 		}
 
@@ -74,7 +73,7 @@ namespace CallMomCore
 
 		public string GetAbout ()
 		{
-			return "blabla";
+			return "Call my mom by\nactivating a Tellstick\n and blink with the\nlamps.";
 		}
 
 		#endregion

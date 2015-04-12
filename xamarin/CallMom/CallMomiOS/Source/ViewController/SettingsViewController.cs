@@ -178,6 +178,7 @@ namespace CallMomiOS
 		partial void RegisterButton_TouchUpInside (UIButton sender)
 		{
 			UIAlertView alert = new UIAlertView ();
+			SaveValues ();
 			alert.Title = "Enter Password";
 			alert.AddButton ("Register");
 			alert.AddButton ("Cancel");
@@ -203,15 +204,27 @@ namespace CallMomiOS
 		void HandleRegisterResult (int result)
 		{
 			if (result == ReturnValue.Success) {
-				this.View.ReloadInputViews ();
+				SwapButtons (true);
 			} else {
 				ShowInfo (HandleResult (result));
 			}
 		}
 
+		void SwapButtons (bool b)
+		{
+			UIView.Animate (
+				0.5f,
+				0.5f,
+				UIViewAnimationOptions.CurveLinear,
+				() => ShowResetAndRegistered (b),
+				null
+			);
+		}
+
 		partial void ResetButton_TouchUpInside (UIButton sender)
 		{
 			_settingsController.DoReset ();
+			SwapButtons (false);
 		}
 
 		partial void IPTextFieldClicked (UITextField sender)

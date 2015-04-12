@@ -3,6 +3,7 @@ using UIKit;
 using CallMomCore;
 using Autofac;
 using System.Threading.Tasks;
+using CoreGraphics;
 
 
 namespace CallMomiOS
@@ -95,7 +96,8 @@ namespace CallMomiOS
 
 			int click = await _callController.DoTheCallAsync ();
 			Console.WriteLine ("[GUI] - call ended with code {0}", click);
-			AnimateInfo (HandleResult (click));
+
+			AnimateInfo (HandleResult (click), click == ReturnValue.Success);
 		}
 
 		private void DoCancel ()
@@ -107,14 +109,15 @@ namespace CallMomiOS
 			// else ReturnValue.NotStarted
 		}
 
-		void AnimateInfo (string info)
+		void AnimateInfo (string info, bool success)
 		{
 			Info.Enabled = false;
 			Info.SetTitle (info, UIControlState.Normal);
 			Info.Enabled = true;
+			CGColor borderColor = success ? UIColor.Green.CGColor : UIColor.Red.CGColor;
 			UIView.Animate (3.0f, 1, UIViewAnimationOptions.CurveLinear,
 				() => {
-					this.Info.Layer.BorderColor = UIColor.Red.CGColor;
+					this.Info.Layer.BorderColor = borderColor;
 					this.Info.SetTitleColor (UIColor.Black, UIControlState.Normal);
 					this.Info.BackgroundColor = UIColor.Orange;
 				},

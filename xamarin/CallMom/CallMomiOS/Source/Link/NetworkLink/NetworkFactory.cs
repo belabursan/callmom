@@ -49,7 +49,6 @@ namespace CallMomiOS
 			}
 		}
 
-
 		#endregion
 
 		private static Socket GetSocket (NetworkArguments netArgs, CancellationToken token = default(CancellationToken))

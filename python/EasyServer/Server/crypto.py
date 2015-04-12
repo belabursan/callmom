@@ -63,7 +63,8 @@ class BCrypt(object):
         :param data:
         :return: an RSA public key
         """
-        return PKCS1_OAEP.new(RSA.importKey(data))
+        x = RSA.importKey(data)
+        return PKCS1_OAEP.new(x)
 
     def encrypt_RSA(self, rsa_key, data):
         """
@@ -75,14 +76,15 @@ class BCrypt(object):
         logging.debug("BCrypt:encrypt_RSA(): encrypting data")
         return rsa_key.encrypt(data).encode('base64')
 
-    def decrypt_RSA(self, rsa_key, package):
+    def decrypt_RSA(self, rsa_key, data):
         """"
         param: public_key_loc rsa key
         param: package String to be decrypted
         return decrypted string
         """
         logging.debug("BCrypt:decrypt_RSA(): decrypting data")
-        return rsa_key.decrypt(b64decode(package))
+        z = b64decode(data)
+        return rsa_key.decrypt(z)
 
     def decrypt_AES(self, key, data):
         """

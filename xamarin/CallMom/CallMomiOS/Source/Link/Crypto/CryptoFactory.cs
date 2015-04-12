@@ -52,6 +52,29 @@ namespace CallMomiOS
 			}
 		}
 
+
+		public string EncodeRSA (byte[] key, string data)
+		{
+			try {
+				using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider ()) {
+					RSAParameters RSAKey = new RSAParameters ();
+					RSAKey.Modulus = key;
+					RSAKey.Exponent = new byte[]{ 1, 0, 1 };
+
+					RSA.ImportParameters (RSAKey); 
+					var encryptedData = RSA.Encrypt (data.AsBytes (), false);
+
+					var x = encryptedData.ToArray ();
+					var z = x.AsBase64String ();
+					return z;
+					
+				}
+			} catch (CryptographicException e) {
+				Console.WriteLine ("[Crypto] - exception in encryptRSA: " + e.Message);
+				throw e;
+			}
+		}
+
 		#endregion
 
 		private byte[] Pad (string data, int blockSize)

@@ -35,7 +35,7 @@ namespace CallMomCore
 
 		public string EncodeRSA (byte[] key, string data)
 		{
-			return "todo - using System.Security.Cryptography must be used in ios and android, implement sevice";
+			return _factory.EncodeRSA (key, data);
 		}
 
 		public string CreateRSAKey (string data, int blockSize, string padding)

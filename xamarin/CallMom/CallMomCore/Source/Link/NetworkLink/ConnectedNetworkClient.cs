@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 using System.Text;
+using System.Diagnostics;
 
 namespace CallMomCore
 {
@@ -16,6 +17,18 @@ namespace CallMomCore
 		}
 
 		#region IConnectedNetworkClient implementation
+
+		public void Close ()
+		{
+			try {
+				if (_stream != null) {
+					_stream.Flush ();
+					_stream.Dispose ();
+				}
+			} catch (Exception x) {
+				Debug.WriteLine ("ending client");
+			}
+		}
 
 		public async Task SendAsync (string data, CancellationToken token = default(CancellationToken))
 		{

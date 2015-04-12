@@ -55,7 +55,7 @@ namespace CallMomCore
 		{
 			Debug.WriteLine ("[Init] - setting defaults");
 			ISettingsService settings = App.Container.Resolve<ISettingsService> ();
-			settings.ResetTODefaults ();
+			settings.FirstTimeInit ();
 		}
 
 	}
