@@ -12,13 +12,13 @@ namespace CallMomCore
 
 		string CreateRSAKey (string data, int blockSize, string padding);
 
-		string EncodeRSA (byte[] key, string data);
+		string EncodeRSA (byte[] key, byte[] data);
 
 		string DecodeRSA (string key, string data);
 
 		string EncodeAES (byte[] key, string data);
 
-		string DecodeAES (string key, string data);
+		string DecodeAES (byte[] key, string data);
 	}
 }
 

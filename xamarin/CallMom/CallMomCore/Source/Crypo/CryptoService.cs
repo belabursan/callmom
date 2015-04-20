@@ -33,7 +33,7 @@ namespace CallMomCore
 			return _factory.GetSha256Hash (data);
 		}
 
-		public string EncodeRSA (byte[] key, string data)
+		public string EncodeRSA (byte[] key, byte[] data)
 		{
 			return _factory.EncodeRSA (key, data);
 		}
@@ -53,7 +53,7 @@ namespace CallMomCore
 			return _factory.EncodeAES (key, data);
 		}
 
-		public string DecodeAES (string key, string data)
+		public string DecodeAES (byte[] key, string data)
 		{
 			throw new NotImplementedException ();
 		}

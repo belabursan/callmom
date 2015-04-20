@@ -44,7 +44,7 @@ namespace CallMomCore
 			string flash_command = String.Format ("{0}:{1}:{2}:{3}", flash_time, blink, intervall_time, random);
 			string crypto_command;
 			try {
-				crypto_command = _cryptoService.EncodeRSA (_settings.GetServerPublicKey (), flash_command);
+				crypto_command = _cryptoService.EncodeRSA (_settings.GetServerPublicKey (), flash_command.AsBytes ());
 			} catch (MomSqlException ex) {
 				if (ex.ErrorCode == MomSqlException.NOT_FOUND) {
 					// public key not found, throw register exception

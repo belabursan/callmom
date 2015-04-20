@@ -53,7 +53,7 @@ namespace CallMomiOS
 		}
 
 
-		public string EncodeRSA (byte[] key, string data)
+		public string EncodeRSA (byte[] key, byte[] data)
 		{
 			try {
 				using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider ()) {
@@ -62,9 +62,12 @@ namespace CallMomiOS
 					RSAKey.Exponent = new byte[]{ 1, 0, 1 };
 
 					RSA.ImportParameters (RSAKey); 
-					var encryptedData = RSA.Encrypt (data.AsBytes (), false);
+					Debug.WriteLine ("___DATA__len:{0}_data: {1}", data.Length, data.AsHexString ());
+					Debug.WriteLine ("___KEY__len:{0}_data: {1}", key.Length, key.AsHexString ());
+					var encryptedData = RSA.Encrypt (data, true);
 
 					var x = encryptedData.ToArray ();
+					Debug.WriteLine ("_____{0}_: {1}", x.Length, x.AsHexString ());
 					var z = x.AsBase64String ();
 					return z;
 					

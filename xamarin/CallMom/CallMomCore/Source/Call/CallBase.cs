@@ -54,31 +54,62 @@ namespace CallMomCore
 
 		}
 
+		/// <summary>
+		/// Performs the handshake to the server and gets the version number of the protocol.
+		/// </summary>
+		/// <returns>The version of the protocol as string in format x.x.x</returns>
+		/// <param name="client">Connected network client holding the socket</param>
+		/// <param name="token">Cancellation Token.</param>
 		protected async Task<string> DoHandshake (IConnectedNetworkClient client, CancellationToken token)
 		{
 			Debug.WriteLine ("[BaseCommand] - starting handshake");
 
-			await client.SendAsync ("hello", token);
+			await client.SendAsync (Protocol.HELLO, token);
 			string answer = await client.ReceiveAsync (token);
-			var answerList = answer.Split (':');
+			return ValidateAnswer (answer);
+		}
 
-			if (answerList != null && answerList.Length != 2) {
-				throw new MomProtocolException ("Not welcome!");
+		protected async Task<byte[]> SendKey (IConnectedNetworkClient client, CancellationToken token)
+		{
+			Debug.WriteLine ("[BaseCommand] - starting send key");
+
+			byte[] aesKey = _cryptoService.GetSha256Hash (_cryptoService.GetRandomString (512));
+			string crKey = _cryptoService.EncodeRSA (_settings.GetServerPublicKey (), aesKey);
+			string command = String.Format ("{0}{1}{2}", Protocol.XCHANGEKEY, Protocol.SPLITTER, crKey);
+			await client.SendAsync (command, token);
+			string answer = await client.ReceiveAsync (token);
+			ValidateAnswer (answer);
+			return aesKey;
+
+		}
+
+		private static string ValidateAnswer (string answer)
+		{
+			if (String.IsNullOrEmpty (answer)) {
+				throw new MomProtocolException ("Illegal answer");
 			}
-			//Debug.WriteLine ("[Call] -  received: " + answerList [0] + ":" + answerList [1].Trim ());
 
-			var answerHeader = answerList [0].Trim ();
-			if (!"welcome".Equals (answerHeader)) {
-				string message = String.Empty;
-				if ("failed".Equals (answerHeader)) {
-					message = " Server returned \"failed\". Did I sent the right command?";
+			var answerList = answer.Split (Protocol.SPLITTER);
+			switch (answerList [0].Trim ()) {
+			case Protocol.WELCOME:
+				if (answerList.Length > 1) {
+					return answerList [1].Trim ();
 				} else {
-					message = String.Format ("Server returned {0}", answerHeader);
+					throw new MomProtocolException ("Missing version");
 				}
-				throw new MomProtocolException (String.Format ("Not welcome!{0}", message));
+			case Protocol.SUCCESS:
+				return Protocol.SUCCESS;
+			case Protocol.FAILED:
+				if (answerList.Length > 1) {
+					throw new MomProtocolException (String.Format ("Failed: {0}", answerList [1]));
+				} else {
+					throw new MomProtocolException (String.Format ("Failed"));
+				}
+			case Protocol.EXIT:
+				throw new MomProtocolException (Protocol.EXIT);
+			default:
+				throw new MomProtocolException ("Wrong answer");
 			}
-			Debug.WriteLine ("[BaseCommand] - handshake: {0}", answerHeader);
-			return answerList [1];
 		}
 
 		protected async Task<IConnectedNetworkClient> Connect (CancellationToken token)

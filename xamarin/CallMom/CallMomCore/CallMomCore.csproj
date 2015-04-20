@@ -73,6 +73,7 @@
     <Compile Include="Source\Controller\Containers\SettingsData.cs" />
     <Compile Include="Source\Exceptions\MomArgumentException.cs" />
     <Compile Include="Source\Call\CallBase.cs" />
+    <Compile Include="Source\Utils\Protocol.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <ItemGroup>

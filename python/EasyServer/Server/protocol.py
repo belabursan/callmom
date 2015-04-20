@@ -8,19 +8,20 @@ import sys
 from crypto import BCrypt
 
 # send commands
-END = "exit"
-WELCOME = "welcome"
-SUCCESS = "success"
-FAILED = "failed"
+EXIT = "Exit"
+WELCOME = "Welcome"
+SUCCESS = "Success"
+FAILED = "Failed"
 
 # receive commands
-HELLO = "hello"
-FLASH_LAMP = "flash_lamp"
-COMMAND = "command"
-REGISTER = "register"
+HELLO = "H"
+FLASH_LAMP = "Flash_lamp"
+COMMAND = "Command"
+REGISTER = "Register"
+XCHANGEKEY = "X"
 
-BUFFER_SIZE = 512
-VERSION = "v0.1"
+BUFFER_SIZE = 8192
+VERSION = "v0.0.1"
 SPLITTER = ":"
 LINE_END = "\n"
 
@@ -38,6 +39,7 @@ class Protocol(object):
         self._connection = connection
         self._parameter = parameter
         self._crypter = BCrypt(parameter)
+        self._key = None
 
     def read(self):
         return self._connection.recv(BUFFER_SIZE).decode('utf-8').strip()
@@ -64,13 +66,14 @@ class Protocol(object):
         """
         logging.debug("Protocol:run(): running the protocol")
 
-        if self.handshake():
-            if self.handle_messages():
-                self.write(SUCCESS)
-            else:
-                self.write(FAILED)
-
-        self.write(END)
+        self.handshake()
+        self.handle_messages()
+        if self._key is None:
+            # it probably was a register command
+            logging.info("Protocol:run(): registered new user successfully")
+            return
+        self.handle_messages()
+        self.write(EXIT)
         time.sleep(5)
         return
 
@@ -81,12 +84,23 @@ class Protocol(object):
         :exception: throws Socket.timeout exception
         """
         data = self.read()
-        if HELLO == data:
-            self.write(WELCOME + SPLITTER + VERSION)
-            logging.info("Protocol:handshake(): handshake successful")
-            return True
-        logging.warning("Protocol:handshake(): handshake failed")
-        return False
+        if HELLO != data:
+            logging.warning("Protocol:handshake(): handshake failed")
+            raise ValueError("Handshake failed(" + data + ")")
+
+        self.write(WELCOME + SPLITTER + VERSION)
+        logging.info("Protocol:handshake(): handshake successful")
+
+    def get_key(self):
+        logging.debug("Protocol:get_key(): start")
+        data = self.read()
+        data = self.do_split(data)
+        if data[0] is not XCHANGEKEY:
+            raise ValueError("Expecting command " + XCHANGEKEY)
+        self._key = self._crypter.decrypt_RSA(self._parameter.private_key_path, data[1])
+        self.write(SUCCESS)
+
+
 
     def handle_messages(self):
         """
@@ -97,23 +111,19 @@ class Protocol(object):
         logging.debug("Protocol:handle_messages(): new message")
 
         data = self.read()
-        success = False
-        try:
-            message = self.do_split(data)
-            if message[0] == COMMAND:
-                success = self.do_handle_commands(message[1])
-            elif message[0] == REGISTER:
-                success = self.do_register(message[1])
-            else:
-                # handle other messages
-                pass
-        except Exception as ex:
-            logging.warning("Protocol:handle_messages(): got "
-                            + str(sys.exc_info()[0])
-                            + " when executing message: "
-                            + ex.message)
 
-        return success
+        message = self.do_split(data)
+
+        if message[0] == COMMAND:
+            self.do_handle_commands(message[1])
+        elif message[0] == REGISTER:
+            self.do_register(message[1])
+        elif message[0] == XCHANGEKEY:
+            self.get_key()
+        # handle other messages
+        else:
+            logging.warning("Protocol:handle_messages(): got " + message[0])
+            raise ValueError("Unrecognized message: " + message[0])
 
     def do_register(self, crypto_command):
         """
@@ -131,8 +141,11 @@ class Protocol(object):
             command = self.do_split(command_line)
             if command[0] == self._parameter.password_hash:
                 # password is ok, send the public key
-                public_key = open(self._parameter.public_key_path, "r")
-                self.write(public_key.read(BUFFER_SIZE))
+                public_key = open(self._parameter.public_key_path, "r").read(BUFFER_SIZE)
+                random = self._crypter.create_random(64)
+                crypto = self._crypter.encrypt_AES(self._parameter.password_hash, public_key + SPLITTER + random)
+
+                self.write(XCHANGEKEY + SPLITTER + crypto)
                 success = True
         except Exception as ex:
             logging.warning("Protocol:do_register(): got "
@@ -141,7 +154,7 @@ class Protocol(object):
                             + str(ex.message))
         return success
 
-    def do_handle_commands(self, crypto_command):
+    def do_handle_commands(self, crypto_command, key):
         """
         Handles commands
         :param crypto_command: encrypted command line that should be decrypted with the private key.
@@ -153,8 +166,11 @@ class Protocol(object):
         success = False
 
         try:
-            rsa_key = self._crypter.create_RSA_key(self._parameter.private_key_path)
-            command_line = self._crypter.decrypt_RSA(rsa_key, crypto_command)
+            # rsa_key = self._crypter.create_RSA_key(self._parameter.private_key_path)
+            command_line = self._crypter.decrypt_RSA(self._parameter.private_key_path, crypto_command)
+            # cc = str(command_line)
+            # vv = command_line.decode()
+            # bb = command_line.decode("utf-8")
             command = self.do_split(command_line)
             if FLASH_LAMP == command[0]:
                 success = self.do_flash_lamp(command[1], command[2], command[3])

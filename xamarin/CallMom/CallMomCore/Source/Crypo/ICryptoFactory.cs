@@ -8,7 +8,7 @@ namespace CallMomCore
 
 		string EncodeAES (byte[] key, string data);
 
-		string EncodeRSA (byte[] key, string data);
+		string EncodeRSA (byte[] key, byte[] data);
 	}
 }
 
