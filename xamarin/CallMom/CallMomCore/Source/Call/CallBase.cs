@@ -95,10 +95,14 @@ namespace CallMomCore
 				if (answerList.Length > 1) {
 					return answerList [1].Trim ();
 				} else {
-					throw new MomProtocolException ("Missing version");
+					throw new MomProtocolException ("Missing body");
 				}
 			case Protocol.SUCCESS:
-				return Protocol.SUCCESS;
+				if (answerList.Length > 1) {
+					return answerList [1].Trim ();
+				} else {
+					return Protocol.SUCCESS;
+				}
 			case Protocol.FAILED:
 				if (answerList.Length > 1) {
 					throw new MomProtocolException (String.Format ("Failed: {0}", answerList [1]));

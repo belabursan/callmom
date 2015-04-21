@@ -133,7 +133,6 @@ class Protocol(object):
         second part is a random number
         :return: true if registered successfully, false otherwise
         """
-        success = False
         logging.debug("Protocol:do_register(): registering new user")
 
         try:
@@ -145,14 +144,13 @@ class Protocol(object):
                 random = self._crypter.create_random(64)
                 crypto = self._crypter.encrypt_AES(self._parameter.password_hash, public_key + SPLITTER + random)
 
-                self.write(XCHANGEKEY + SPLITTER + crypto)
-                success = True
+                self.write(REGISTER + SPLITTER + crypto)
+
         except Exception as ex:
             logging.warning("Protocol:do_register(): got "
                             + str(sys.exc_info()[0])
                             + " when executing registering: "
                             + str(ex.message))
-        return success
 
     def do_handle_commands(self, crypto_command, key):
         """

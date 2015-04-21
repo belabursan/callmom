@@ -47,7 +47,7 @@ namespace CallMomCore
 		byte[] HandleRegisterAnswer (string answer, byte[] key)
 		{
 			string[] parts = answer.Split (Protocol.SPLITTER);
-			if (Protocol.XCHANGEKEY.Equals (parts [0])) {
+			if (Protocol.Register.Equals (parts [0])) {
 				string decrypted = _cryptoService.DecodeAES (key, parts [1]);
 				string[] body = decrypted.Split (Protocol.SPLITTER);
 				return body [0].AsBytes ();

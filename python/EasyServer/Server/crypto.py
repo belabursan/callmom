@@ -121,9 +121,9 @@ class BCrypt(object):
         """
         logging.debug("BCrypt:encrypt_AES(): encrypting")
         # pad = lambda x: x + (self._block_size - len(x) % self._block_size) * self._padding
-        # encoder = lambda cipher, in_data: b64encode(cipher.encrypt(pad(in_data)))
+        encoder = lambda cipher, in_data: b64encode(cipher.encrypt(self.pad_PKCS7(in_data)))
 
-        # return encoder(self.make_aes_key(clear_key), data)
+        return encoder(self.make_aes_key(clear_key), data)
 
     def make_aes_key(self, aes_key):
         """
