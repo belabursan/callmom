@@ -9,7 +9,7 @@ import os
 import logging
 import hashlib
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_OAEP, AES, PKCS1_v1_5
+from Crypto.Cipher import PKCS1_OAEP, AES
 import binascii
 import StringIO
 from base64 import b64decode, b64encode
@@ -91,15 +91,6 @@ class BCrypt(object):
 
         return res
 
-    def RemovePKCS15Padding(self,  padded_msg):
-        if len(padded_msg) < 2 or padded_msg[0]!='\x02':
-            raise ValueError # or whatever
-        p = padded_msg.find('\x00')
-        if p < 0:
-            raise ValueError # or whatever
-        return padded_msg[p+1:]
-
-
     def decrypt_AES(self, key, data):
         """
         Decrypts a string encrypted with AES
@@ -120,10 +111,14 @@ class BCrypt(object):
         :return: the encrypted string
         """
         logging.debug("BCrypt:encrypt_AES(): encrypting")
-        # pad = lambda x: x + (self._block_size - len(x) % self._block_size) * self._padding
-        encoder = lambda cipher, in_data: b64encode(cipher.encrypt(self.pad_PKCS7(in_data)))
 
-        return encoder(self.make_aes_key(clear_key), data)
+        output = StringIO.StringIO()
+        val = self._block_size - (len(data) % self._block_size)
+        for _ in xrange(val):
+            output.write('%02x' % val)
+        data += binascii.unhexlify(output.getvalue())
+
+        return b64encode(self.make_aes_key(clear_key).encrypt(data))
 
     def make_aes_key(self, aes_key):
         """
@@ -133,11 +128,3 @@ class BCrypt(object):
         """
         key = AES.new(aes_key.decode("hex"), self._aes_mode, self._aes_iv)
         return key
-
-    def pad_PKCS7(self, text):
-        l = len(text)
-        output = StringIO.StringIO()
-        val = self._block_size - (l % self._block_size)
-        for _ in xrange(val):
-            output.write('%02x' % val)
-        return text + binascii.unhexlify(output.getvalue())

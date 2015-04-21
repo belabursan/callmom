@@ -12,7 +12,7 @@ namespace CallMomCore
 	public static class Extensions
 	{
 		/// <summary>
-		/// Converts a string to bytes encoded as UTF-8
+		/// Converts a string encoded as UTF-8 to a byte array
 		/// </summary>
 		/// <returns>byte array</returns>
 		/// <param name="data"> String to convert</param>
@@ -28,7 +28,22 @@ namespace CallMomCore
 		}
 
 		/// <summary>
-		/// Converts a string to bytes encoded as UTF-16 (Unicode)
+		/// Takes a base64 encoded string and converts it to a byte array
+		/// </summary>
+		/// <returns>The bytes from base64.</returns>
+		/// <param name="data">Data.</param>
+		public static byte[] AsBytesFromBase64 (this string data)
+		{
+			try {
+				return Convert.FromBase64String (data);
+			} catch (Exception ex) {
+				Debug.WriteLine ("Exception in AsBytesFromBase64 extension: {0}", ex.Message);
+				throw;
+			} 
+		}
+
+		/// <summary>
+		/// Takes a UTF-8 encoded string and converts it to a byte array
 		/// </summary>
 		/// <returns>byte array</returns>
 		/// <param name="data"> String to convert</param>
@@ -49,6 +64,8 @@ namespace CallMomCore
 		/// <returns>The bytes as string.</returns>
 		/// <param name="data">Byte array to convert</param>
 		/// <exception cref="Exception">If converting the byte array has failed</exception>
+		/// <param name = "offset">offset</param>
+		/// <param name = "length">length</param>
 		public static string AsString (this byte[] data, int offset, int length)
 		{
 			try {
@@ -59,21 +76,28 @@ namespace CallMomCore
 			}
 		}
 
+		/// <summary>
+		/// Converts a byte array to string encoded as UTF-8 
+		/// </summary>
+		/// <returns>The bytes as string.</returns>
+		/// <param name="data">Byte array to convert</param>
+		/// <exception cref="Exception">If converting the byte array has failed</exception>
+
+		public static string AsString (this byte[] data)
+		{
+			return data.AsString (0, data.Length);
+		}
+
 
 		/// <summary>
-		/// Converts a byte array to string encoded as UTF-16 (Unicode)
+		/// Converts a byte array to string encoded as Base64
 		/// </summary>
 		/// <returns>The bytes as string.</returns>
 		/// <param name="data">Byte array to convert</param>
 		/// <exception cref="Exception">If converting the byte array has failed</exception>
 		public static string AsBase64String (this byte[] data)
 		{
-			try {
-				return Convert.ToBase64String (data);
-			} catch (Exception ex) {
-				Debug.WriteLine ("Exception in AsBase64String extension: {0}", ex.Message);
-				throw;
-			}
+			return data.AsBase64String (0, data.Length);
 		}
 
 		/// <summary>
@@ -89,7 +113,7 @@ namespace CallMomCore
 			try {
 				return Convert.ToBase64String (data, offset, length);
 			} catch (Exception ex) {
-				Debug.WriteLine ("Exception in AsBase64String 2 extension: {0}", ex.Message);
+				Debug.WriteLine ("Exception in AsBase64String extension: {0}", ex.Message);
 				throw;
 			}
 		}

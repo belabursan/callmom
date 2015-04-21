@@ -35,10 +35,10 @@ namespace CallMomCore
 		private string BuildRegisterCommand (byte[] sha256Hash, CancellationToken token = default(CancellationToken))
 		{
 			Debug.WriteLine ("[Register] - building command");
-			string random = _cryptoService.GetRandomString (32, 64, token);
+			string random = _cryptoService.GetRandomString (56, 64, token);
 			//Debug.WriteLine ("random: " + random);
 
-			var command = String.Format ("{0}:{1}", sha256Hash.AsHexString (), random);
+			var command = String.Format ("{0}{1}{2}", sha256Hash.AsHexString (), Protocol.SPLITTER, random);
 			var crypto_command = _cryptoService.EncodeAES (sha256Hash, command.AsBytes (), token);
 
 			return String.Format ("{0}{1}{2}", Protocol.Register, Protocol.SPLITTER, crypto_command);
@@ -48,7 +48,7 @@ namespace CallMomCore
 		{
 			string[] parts = answer.Split (Protocol.SPLITTER);
 			if (Protocol.Register.Equals (parts [0])) {
-				string decrypted = _cryptoService.DecodeAES (key, parts [1].AsBytes (), token);
+				string decrypted = _cryptoService.DecodeAES (key, parts [1].AsBytesFromBase64 (), token);
 				string[] body = decrypted.Split (Protocol.SPLITTER);
 				return body [0].AsBytes ();
 			}

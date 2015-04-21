@@ -1,7 +1,6 @@
 ﻿using System;
 using CallMomCore;
 using System.Security.Cryptography;
-using System.Text;
 using System.Linq;
 using System.IO;
 using System.Diagnostics;
@@ -11,8 +10,14 @@ namespace CallMomiOS
 {
 	public class CryptoFactory : ICryptoFactory
 	{
+		private enum CryptoType
+		{
+			Encrypt,
+			Decrypt
+		}
+
 		private readonly SHA256 _sha256Hasher;
-		private int _blockSize;
+		private readonly int _blockSize;
 
 		public CryptoFactory (int blockSize = Defaults.BLOCKSIZE)
 		{
@@ -24,43 +29,31 @@ namespace CallMomiOS
 
 		public byte[] GetSha256Hash (string data, CancellationToken token = default(CancellationToken))
 		{
-			token.ThrowIfCancellationRequested ();
+			if (token != default(CancellationToken))
+				token.ThrowIfCancellationRequested ();
+			
 			return _sha256Hasher.ComputeHash (data.AsBytes ());
 		}
 
 		public string EncodeAES (byte[] key, byte[] data, CancellationToken token = default(CancellationToken))
 		{
-			byte[] dataBytes = Pad (data, _blockSize, token);
-
-			using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider ()) {
-				aes.BlockSize = _blockSize * 8;
-				aes.KeySize = Defaults.KEYSIZE * 8;
-
-				aes.Key = key;
-				aes.IV = Defaults.AESIV;
-
-				aes.Mode = CipherMode.CBC;
-				aes.Padding = PaddingMode.None;
-
-				using (ICryptoTransform encryptor = aes.CreateEncryptor ()) {
-					using (MemoryStream memoStream = new MemoryStream ()) {
-						using (CryptoStream cryptoStream = new CryptoStream (memoStream, encryptor, CryptoStreamMode.Write)) {
-							token.ThrowIfCancellationRequested ();
-							cryptoStream.Write (dataBytes, 0, dataBytes.Length);
-							cryptoStream.FlushFinalBlock ();
-							return memoStream.ToArray ().AsBase64String ();
-						}
-					}
-				}
+			try {
+				return Crypt (key, data, CryptoType.Encrypt, token);
+			} catch (CryptographicException cx) {
+				Console.WriteLine ("[Crypto] - exception in EncodeAES(): " + cx.Message);
+				throw new MomProtocolException (cx.Message, cx);
 			}
 		}
 
-
 		public string DecodeAES (byte[] key, byte[] data, CancellationToken token = default(CancellationToken))
 		{
-			throw new NotImplementedException ();
+			try {
+				return Crypt (key, data, CryptoType.Decrypt, token);
+			} catch (CryptographicException cx) {
+				Console.WriteLine ("[Crypto] - exception in DecodeAES(): " + cx.Message);
+				throw new MomProtocolException (cx.Message, cx);
+			}
 		}
-
 
 		public string EncodeRSA (byte[] key, byte[] data, CancellationToken token = default(CancellationToken))
 		{
@@ -73,7 +66,10 @@ namespace CallMomiOS
 					RSA.ImportParameters (RSAKey); 
 					Debug.WriteLine ("___DATA__len:{0}_data: {1}", data.Length, data.AsHexString ());
 					Debug.WriteLine ("___KEY__len:{0}_data: {1}", key.Length, key.AsHexString ());
-					token.ThrowIfCancellationRequested ();
+
+					if (token != default(CancellationToken))
+						token.ThrowIfCancellationRequested ();
+					
 					var encryptedData = RSA.Encrypt (data, true);
 
 					var x = encryptedData.ToArray ();
@@ -91,6 +87,39 @@ namespace CallMomiOS
 
 		#endregion
 
+		private string Crypt (byte[] key, byte[] data, CryptoType cryptoType, CancellationToken token)
+		{
+			using (var aes = new AesManaged ()) {
+				aes.BlockSize = _blockSize * 8;
+				aes.KeySize = Defaults.KEYSIZE * 8;
+				ICryptoTransform cryptor = null;
+
+				if (cryptoType == CryptoType.Encrypt) {
+					cryptor = aes.CreateEncryptor (key, Defaults.AESIV);
+				} else {
+					cryptor = aes.CreateDecryptor (key, Defaults.AESIV);
+				}
+				using (cryptor) {
+					using (var memoStream = new MemoryStream ()) {
+						using (var cryptoStream = new CryptoStream (memoStream, cryptor, CryptoStreamMode.Write)) {
+
+							if (token != default(CancellationToken))
+								token.ThrowIfCancellationRequested ();
+
+							cryptoStream.Write (data, 0, data.Length);
+							cryptoStream.FlushFinalBlock ();
+
+							if (cryptoType == CryptoType.Encrypt)
+								return memoStream.ToArray ().AsBase64String ();
+							else
+								return memoStream.ToArray ().AsString ();
+						}
+					}
+				}
+			}
+		}
+
+		/*
 		private static byte[] Pad (byte[] inData, int blockSize, CancellationToken token = default(CancellationToken))
 		{
 			//todo - check if this is needed...
@@ -118,7 +147,7 @@ namespace CallMomiOS
 			}
 			return data;
 		}
-
+		*/
 	}
 }
 
