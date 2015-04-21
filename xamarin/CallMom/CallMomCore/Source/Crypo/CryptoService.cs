@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 
 
 namespace CallMomCore
 {
 	public class CryptoService : ICryptoService
 	{
-		private const string _chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+		private const string _chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTVWXYZ";
 		private static Random _random;
 		private readonly ICryptoFactory _factory;
 
@@ -16,46 +17,41 @@ namespace CallMomCore
 			_random = new Random ((int)DateTime.Now.Ticks);
 		}
 
-		public string GetRandomString (int length = Defaults.BLOCKSIZE)
+		public string GetRandomString (int length = Defaults.BLOCKSIZE, CancellationToken token = default(CancellationToken))
 		{
+			token.ThrowIfCancellationRequested ();
 			return new string (
 				Enumerable.Repeat (_chars, length).Select (s => s [_random.Next (s.Length)]).ToArray ()
 			);
 		}
 
-		public string GetRandomString (int minLength = Defaults.BLOCKSIZE, int maxLength = Defaults.KEYSIZE)
+		public string GetRandomString (
+			int minLength = Defaults.BLOCKSIZE,
+			int maxLength = Defaults.KEYSIZE,
+			CancellationToken token = default(CancellationToken))
 		{
-			return GetRandomString (_random.Next (minLength, maxLength));
+			return GetRandomString (_random.Next (minLength, maxLength), token);
 		}
 
-		public byte[] GetSha256Hash (string data)
+		public byte[] GetSha256Hash (string data, CancellationToken token = default(CancellationToken))
 		{
+			token.ThrowIfCancellationRequested ();
 			return _factory.GetSha256Hash (data);
 		}
 
-		public string EncodeRSA (byte[] key, byte[] data)
+		public string EncodeRSA (byte[] key, byte[] data, CancellationToken token = default(CancellationToken))
 		{
-			return _factory.EncodeRSA (key, data);
+			return _factory.EncodeRSA (key, data, token);
 		}
 
-		public string CreateRSAKey (string data, int blockSize, string padding)
+		public string EncodeAES (byte[] key, byte[] data, CancellationToken token = default(CancellationToken))
 		{
-			throw new NotImplementedException ();
+			return _factory.EncodeAES (key, data, token);
 		}
 
-		public string DecodeRSA (string key, string data)
+		public string DecodeAES (byte[] key, byte[] data, CancellationToken token = default(CancellationToken))
 		{
-			throw new NotImplementedException ();
-		}
-
-		public string EncodeAES (byte[] key, string data)
-		{
-			return _factory.EncodeAES (key, data);
-		}
-
-		public string DecodeAES (byte[] key, string data)
-		{
-			throw new NotImplementedException ();
+			return _factory.DecodeAES (key, data, token);
 		}
 	}
 }

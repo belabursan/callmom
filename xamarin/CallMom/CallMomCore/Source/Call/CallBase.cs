@@ -73,7 +73,7 @@ namespace CallMomCore
 		{
 			Debug.WriteLine ("[BaseCommand] - starting send key");
 
-			byte[] aesKey = _cryptoService.GetSha256Hash (_cryptoService.GetRandomString (512));
+			byte[] aesKey = _cryptoService.GetSha256Hash (_cryptoService.GetRandomString (512, token));
 			string crKey = _cryptoService.EncodeRSA (_settings.GetServerPublicKey (), aesKey);
 			string command = String.Format ("{0}{1}{2}", Protocol.XCHANGEKEY, Protocol.SPLITTER, crKey);
 			await client.SendAsync (command, token);

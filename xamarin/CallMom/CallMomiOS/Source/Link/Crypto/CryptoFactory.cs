@@ -5,6 +5,7 @@ using System.Text;
 using System.Linq;
 using System.IO;
 using System.Diagnostics;
+using System.Threading;
 
 namespace CallMomiOS
 {
@@ -21,14 +22,15 @@ namespace CallMomiOS
 
 		#region ICryptoFactory implementation
 
-		public byte[] GetSha256Hash (string data)
+		public byte[] GetSha256Hash (string data, CancellationToken token = default(CancellationToken))
 		{
+			token.ThrowIfCancellationRequested ();
 			return _sha256Hasher.ComputeHash (data.AsBytes ());
 		}
 
-		public string EncodeAES (byte[] key, string data)
+		public string EncodeAES (byte[] key, byte[] data, CancellationToken token = default(CancellationToken))
 		{
-			byte[] dataBytes = Pad (data, _blockSize);
+			byte[] dataBytes = Pad (data, _blockSize, token);
 
 			using (AesCryptoServiceProvider aes = new AesCryptoServiceProvider ()) {
 				aes.BlockSize = _blockSize * 8;
@@ -43,6 +45,7 @@ namespace CallMomiOS
 				using (ICryptoTransform encryptor = aes.CreateEncryptor ()) {
 					using (MemoryStream memoStream = new MemoryStream ()) {
 						using (CryptoStream cryptoStream = new CryptoStream (memoStream, encryptor, CryptoStreamMode.Write)) {
+							token.ThrowIfCancellationRequested ();
 							cryptoStream.Write (dataBytes, 0, dataBytes.Length);
 							cryptoStream.FlushFinalBlock ();
 							return memoStream.ToArray ().AsBase64String ();
@@ -53,7 +56,13 @@ namespace CallMomiOS
 		}
 
 
-		public string EncodeRSA (byte[] key, byte[] data)
+		public string DecodeAES (byte[] key, byte[] data, CancellationToken token = default(CancellationToken))
+		{
+			throw new NotImplementedException ();
+		}
+
+
+		public string EncodeRSA (byte[] key, byte[] data, CancellationToken token = default(CancellationToken))
 		{
 			try {
 				using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider ()) {
@@ -64,6 +73,7 @@ namespace CallMomiOS
 					RSA.ImportParameters (RSAKey); 
 					Debug.WriteLine ("___DATA__len:{0}_data: {1}", data.Length, data.AsHexString ());
 					Debug.WriteLine ("___KEY__len:{0}_data: {1}", key.Length, key.AsHexString ());
+					token.ThrowIfCancellationRequested ();
 					var encryptedData = RSA.Encrypt (data, true);
 
 					var x = encryptedData.ToArray ();
@@ -78,12 +88,15 @@ namespace CallMomiOS
 			}
 		}
 
+
 		#endregion
 
-		private byte[] Pad (string data, int blockSize)
+		private static byte[] Pad (byte[] inData, int blockSize, CancellationToken token = default(CancellationToken))
 		{
-			byte[] dataBytes = data.AsBytes ();
-			int dataLength = dataBytes.Length;
+			//todo - check if this is needed...
+			byte[] data = (byte[])inData.Clone ();
+
+			int dataLength = data.Length;
 			int padLength = blockSize;
 
 			if (dataLength < blockSize) {
@@ -94,14 +107,16 @@ namespace CallMomiOS
 					padLength -= modulus;
 				}
 			}
+			token.ThrowIfCancellationRequested ();
+
 			int newLength = dataLength + padLength;
-			Array.Resize<byte> (ref dataBytes, newLength);
+			Array.Resize<byte> (ref data, newLength);
 			byte pad = (byte)(0x0F & (byte)padLength);
 
 			for (; dataLength < newLength;) {
-				dataBytes [dataLength++] = pad;
+				data [dataLength++] = pad;
 			}
-			return dataBytes;
+			return data;
 		}
 
 	}
