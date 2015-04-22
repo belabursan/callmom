@@ -38,8 +38,8 @@ class LocalClient(threading.Thread):
             logging.debug("LocalClient:run(): running client")
             protocol = Protocol(self._connection, self._params)
             protocol.execute()
-        except:
-            logging.error("LocalClient:run(): exception in client: " + str(sys.exc_info()[0]))
+        except Exception as ex:
+            logging.error("LocalClient:run(): exception in client: " + str(sys.exc_info()[0]) + ": " + str(ex.message))
             pass
         finally:
             self.close()

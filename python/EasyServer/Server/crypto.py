@@ -75,21 +75,14 @@ class BCrypt(object):
         """
         logging.debug("BCrypt:decrypt_RSA(): decrypting data")
 
-        encrypted = b64decode(data)
+        # encrypted = b64decode(str(data))
 
         rsa_key = RSA.importKey(open(rsa_key_path, "r").read())
         oaep_key = PKCS1_OAEP.new(rsa_key)
 
-        res = oaep_key.decrypt(encrypted)
+        decrypted = oaep_key.decrypt(b64decode(str(data)))
 
-        """
-        print("datalen:" + str(len(data)))
-        print("reslen" + str(len(res)))
-        print("zlen: " + str(len(z)))
-        print("XXX: " + z.encode("hex"))
-        """
-
-        return res
+        return decrypted
 
     def decrypt_AES(self, key, data):
         """
@@ -128,3 +121,6 @@ class BCrypt(object):
         """
         key = AES.new(aes_key.decode("hex"), self._aes_mode, self._aes_iv)
         return key
+
+    def crc(self, data):
+        return binascii.crc(data)

@@ -22,6 +22,7 @@ namespace CallMomCore
 				var version = await DoHandshake (client, token);
 				Debug.WriteLine ("Protocol version: {0}\ncommand: {1} ", version, flashCommand);
 				// todo call sendkey, check answer lrc
+				byte[] key = await SendKey (client, token);
 				await client.SendAsync (flashCommand);
 			} finally {
 				if (client != null) {

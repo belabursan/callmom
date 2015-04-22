@@ -34,6 +34,7 @@ namespace CallMomCore
 		{
 			byte[] b = data.AsBytes ();
 			await _stream.WriteAsync (b, 0, b.Length, token);
+			await _stream.FlushAsync (token);
 		}
 
 

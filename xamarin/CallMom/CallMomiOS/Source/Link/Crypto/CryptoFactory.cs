@@ -70,12 +70,11 @@ namespace CallMomiOS
 					if (token != default(CancellationToken))
 						token.ThrowIfCancellationRequested ();
 					
-					var encryptedData = RSA.Encrypt (data, true);
+					var encryptedData = RSA.Encrypt (data, true).ToArray ().AsBase64String ();
 
-					var x = encryptedData.ToArray ();
-					Debug.WriteLine ("_____{0}_: {1}", x.Length, x.AsHexString ());
-					var z = x.AsBase64String ();
-					return z;
+					Debug.WriteLine ("_____64bytes-{0}_: {1}", encryptedData.Length, encryptedData);
+
+					return encryptedData;
 					
 				}
 			} catch (CryptographicException e) {

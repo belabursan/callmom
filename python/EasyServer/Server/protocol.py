@@ -91,14 +91,13 @@ class Protocol(object):
         self.write(WELCOME + SPLITTER + VERSION)
         logging.info("Protocol:handshake(): handshake successful")
 
-    def get_key(self):
+    def get_key(self, data):
         logging.debug("Protocol:get_key(): start")
-        data = self.read()
-        data = self.do_split(data)
-        if data[0] is not XCHANGEKEY:
-            raise ValueError("Expecting command " + XCHANGEKEY)
-        self._key = self._crypter.decrypt_RSA(self._parameter.private_key_path, data[1])
-        self.write(SUCCESS)
+
+        # crc = self._crypter.crc(data[1])
+        self._key = self._crypter.decrypt_RSA(self._parameter.private_key_path, data)
+
+        self.write(SUCCESS + SPLITTER + "05")
 
 
 
@@ -119,7 +118,7 @@ class Protocol(object):
         elif message[0] == REGISTER:
             self.do_register(message[1])
         elif message[0] == XCHANGEKEY:
-            self.get_key()
+            self.get_key(message[1])
         # handle other messages
         else:
             logging.warning("Protocol:handle_messages(): got " + message[0])
@@ -190,5 +189,5 @@ class Protocol(object):
         """
         # todo - add tell-stick code here
         logging.debug("Protocol:do_flash_lamp("+flash_time+", " + do_blink + ", " + interval_seconds + "): start")
-        self.write(DONE)
+        self.write(EXIT)
         return True
