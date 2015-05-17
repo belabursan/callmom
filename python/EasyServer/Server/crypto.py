@@ -12,7 +12,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP, AES
 import binascii
 import StringIO
-from base64 import b64decode, b64encode
+import base64
 
 
 class BCrypt(object):
@@ -74,14 +74,30 @@ class BCrypt(object):
         return decrypted string
         """
         logging.debug("BCrypt:decrypt_RSA(): decrypting data")
+        logging.debug("Got("+str(len(data))+"): " + data)
 
-        # encrypted = b64decode(str(data))
+        encrypted = bytearray(base64.decodestring(data))
+        xx = binascii.hexlify(encrypted)
+        print("xxx: "+str(len(encrypted))+": " + xx)
 
-        rsa_key = RSA.importKey(open(rsa_key_path, "r").read())
+
+
+        private_key = open(rsa_key_path, "r").read()
+        rsa_key = RSA.importKey(private_key)
+
         oaep_key = PKCS1_OAEP.new(rsa_key)
 
-        decrypted = oaep_key.decrypt(b64decode(str(data)))
+        decrypted = oaep_key.decrypt(encrypted)
 
+        #eeetostr = str(data)
+
+        #fffdecoded = b64decode(unicode( data))
+        # binascii.b2a_hex(fffdecoded)
+        #gggdecrypted = rsa_key.decrypt(fffdecoded)
+
+        print("1111 Decrypted("+str(len(decrypted))+"): " + str(binascii.hexlify(decrypted)))
+        #decrypted = str(gggdecrypted)
+        #print("2222 Decrypted("+str(len(decrypted))+"): " + str(decrypted))
         return decrypted
 
     def decrypt_AES(self, key, data):
@@ -93,7 +109,7 @@ class BCrypt(object):
         """
         logging.debug("BCrypt:decrypt_AES(): decrypting")
 
-        decrypted = self.make_aes_key(key).decrypt(b64decode(str(data)))
+        decrypted = self.make_aes_key(key).decrypt(base64.b64decode(str(data)))
         return decrypted[:(len(decrypted) - int(binascii.hexlify(decrypted[-1]), 16))]
 
     def encrypt_AES(self, clear_key, data):
@@ -111,7 +127,7 @@ class BCrypt(object):
             output.write('%02x' % val)
         data += binascii.unhexlify(output.getvalue())
 
-        return b64encode(self.make_aes_key(clear_key).encrypt(data))
+        return base64.b64encode(self.make_aes_key(clear_key).encrypt(data))
 
     def make_aes_key(self, aes_key):
         """
@@ -124,3 +140,11 @@ class BCrypt(object):
 
     def crc(self, data):
         return binascii.crc(data)
+
+    def RemovePKCS15Padding(self, padded_msg ):
+        if len(padded_msg) < 2 or padded_msg[0] != '\x02':
+            raise ValueError
+        p = padded_msg.find('\x00')
+        if p < 0:
+            raise ValueError
+        return padded_msg[p+1:]

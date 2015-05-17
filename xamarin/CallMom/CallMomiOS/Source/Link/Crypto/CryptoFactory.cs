@@ -5,6 +5,7 @@ using System.Linq;
 using System.IO;
 using System.Diagnostics;
 using System.Threading;
+using System.Text;
 
 namespace CallMomiOS
 {
@@ -64,15 +65,18 @@ namespace CallMomiOS
 					RSAKey.Exponent = new byte[]{ 1, 0, 1 };
 
 					RSA.ImportParameters (RSAKey); 
-					Debug.WriteLine ("___DATA__len:{0}_data: {1}", data.Length, data.AsHexString ());
-					Debug.WriteLine ("___KEY__len:{0}_data: {1}", key.Length, key.AsHexString ());
+					Debug.WriteLine ("\n___DATAasHex__len:{0}_data: {1}", data.Length, data.AsHexString ());
+					Debug.WriteLine ("___KEYasHex__len:{0}:{1}_data: {2}", key.Length, key.Length * 8, key.AsHexString ());
 
 					if (token != default(CancellationToken))
 						token.ThrowIfCancellationRequested ();
 					
-					var encryptedData = RSA.Encrypt (data, true).ToArray ().AsBase64String ();
+					var z = RSA.Encrypt (data, true).ToArray ();
 
-					Debug.WriteLine ("_____64bytes-{0}_: {1}", encryptedData.Length, encryptedData);
+					//Array.Reverse (x);
+					Debug.WriteLine ("\n\n___ENCasHex__len:{0}_data: {1}", z.Length, z.AsHexString ());
+					var encryptedData = z.AsBase64String ();
+					Debug.WriteLine ("\n_____64byteStr-{0}_: {1}", encryptedData.Length, encryptedData);
 
 					return encryptedData;
 					
@@ -85,6 +89,26 @@ namespace CallMomiOS
 
 
 		#endregion
+
+		private  RSAParameters ParseKeyFromString (string raw_key)
+		{
+			string RSA_XML_KEY = "<?xml version=\"1.0\" encoding=\"utf-16\"?><RSAParameters xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"><Exponent>AQAB</Exponent><Modulus>{0}</Modulus></RSAParameters>";
+
+			string temp = raw_key;// Encoding.ASCII.GetString (System.Convert.FromBase64String (raw_key));
+			string t = temp;
+			int s = temp.IndexOf ('\n') + 1;
+			int l = temp.LastIndexOf ('\n');
+			temp = temp.Substring (s, temp.Length - s - (temp.Length - l));
+			try {
+
+				var sr = new System.IO.StringReader (string.Format (RSA_XML_KEY, temp.Replace ("\n", "")));
+				var xs = new System.Xml.Serialization.XmlSerializer (typeof(RSAParameters));
+				var publickey = (RSAParameters)xs.Deserialize (sr);
+				return publickey;
+			} catch (Exception) {
+				return new RSAParameters ();
+			}
+		}
 
 		private string Crypt (byte[] key, byte[] data, CryptoType cryptoType, CancellationToken token)
 		{

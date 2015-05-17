@@ -75,9 +75,9 @@ namespace CallMomCore
 
 			byte[] aesKey = _cryptoService.GetSha256Hash (_cryptoService.GetRandomString (512, token));
 			Debug.WriteLine ("-----sending aeskey: " + aesKey.AsHexString ());
-			string crKey = _cryptoService.EncodeRSA (_settings.GetServerPublicKey (), aesKey);
+			string encryptedKey = _cryptoService.EncodeRSA (_settings.GetServerPublicKey (), aesKey);
 			//todo - fix lrc later, now just acceptvar crc = 
-			string command = String.Format ("{0}{1}{2}", Protocol.XCHANGEKEY, Protocol.SPLITTER, crKey);
+			string command = String.Format ("{0}{1}{2}", Protocol.XCHANGEKEY, Protocol.SPLITTER, encryptedKey);
 			await client.SendAsync (command, token);
 			string answer = await client.ReceiveAsync (token);
 			var inCrc = ValidateAnswer (answer);
