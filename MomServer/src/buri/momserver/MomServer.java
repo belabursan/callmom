@@ -1,9 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package buri.momserver;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -15,7 +13,15 @@ public class MomServer {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        Server s = new Server();
+        s.start();
+        
+        try {
+            //just sleep for now, fix shotdownhook later!!!
+            Thread.sleep(100000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MomServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
 }
