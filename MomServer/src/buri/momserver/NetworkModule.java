@@ -14,12 +14,12 @@ import javax.net.ssl.SSLServerSocketFactory;
  *
  * @author Bela Bursan
  */
-final class ComModule {
+final class NetworkModule {
 
     private final int port, nrOfMaxClients;
     private final boolean reuseAddress;
     private ServerSocket servSoc;
-    private static ComModule comModule = null;
+    private static NetworkModule network = null;
 
     /**
      * Creates a new communication module
@@ -29,7 +29,7 @@ final class ComModule {
      * the same time
      * @param reuseAddress sets the reuse address option of the socket
      */
-    private ComModule(int port, int nrOfMaxClients, boolean reuseAddress) {
+    private NetworkModule(int port, int nrOfMaxClients, boolean reuseAddress) {
         this.port = port;
         this.nrOfMaxClients = nrOfMaxClients;
         this.reuseAddress = reuseAddress;
@@ -43,11 +43,11 @@ final class ComModule {
      * the same time
      * @param reuseAddress sets the reuse address option of the socket
      */
-    static ComModule getInstance(int port, int nrOfMaxClients, boolean reuseAddress) {
-        if (comModule == null) {
-            comModule = new ComModule(port, nrOfMaxClients, reuseAddress);
+    static NetworkModule getInstance(int port, int nrOfMaxClients, boolean reuseAddress) {
+        if (network == null) {
+            network = new NetworkModule(port, nrOfMaxClients, reuseAddress);
         }
-        return comModule;
+        return network;
     }
 
     /**
@@ -99,7 +99,7 @@ final class ComModule {
                 System.out.println("closing server socket ...:" + ex.getMessage());
             }
         }
-        comModule = null;
+        network = null;
     }
 
     /**

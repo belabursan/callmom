@@ -9,25 +9,45 @@ import java.io.IOException;
  */
 public final class MomServer {
 
-    static final String VERSION = "0.0.1";
-    private Server server;
+    static final String VERSION = "0.0.2";
+    private ServerCore serverCore;
 
+    /**
+     * Closes the server and terminates the execution
+     *
+     * @throws InterruptedException if the closing thread is interrupted by the
+     * OS
+     */
     private void close() throws InterruptedException {
-        if (server != null) {
-            server.closeServer();
-            server = null;
+        System.out.println("closing MomServer");
+        if (serverCore != null) {
+            serverCore.closeServer();
+            serverCore = null;
         }
     }
 
+    /**
+     * Signals the wait in the run() method. Only called by the shutdown hook!
+     */
     private synchronized void shutDown() {
+        System.out.println("got shutdown signal");
         notifyAll();
     }
 
+    /**
+     * Starts and runs the server, blocks until a shutdown is initialized and
+     * then closes the server
+     *
+     * @param args command line arguments, holds an alternative path to the
+     * property file
+     * @throws InterruptedException if interrupted during the close process
+     */
     private synchronized void run(String[] args) throws InterruptedException {
         try {
             registerShutDownHook();
-            server = Server.getInstance(args.length > 0 ? args[0] : ServerProperties.PROPERTY_FILE_NAME);
-            server.startServer();
+            serverCore = ServerCore.getInstance(args.length > 0 ? args[0] : ServerProperties.PROPERTY_FILE_NAME);
+            serverCore.startServer();
+            System.out.println("MomServer v" + VERSION + " started, exit with Ctrl+C");
             wait();
 
         } catch (InterruptedException ix) {
