@@ -11,20 +11,7 @@ public final class MomServer {
 
     static final String VERSION = "0.0.2";
     private ServerCore serverCore;
-
-    /**
-     * Closes the server and terminates the execution
-     *
-     * @throws InterruptedException if the closing thread is interrupted by the
-     * OS
-     */
-    private void close() throws InterruptedException {
-        System.out.println("closing MomServer");
-        if (serverCore != null) {
-            serverCore.closeServer();
-            serverCore = null;
-        }
-    }
+    private Thread shutdownThread;
 
     /**
      * Signals the wait in the run() method. Only called by the shutdown hook!
@@ -43,8 +30,8 @@ public final class MomServer {
      * @throws InterruptedException if interrupted during the close process
      */
     private synchronized void run(String[] args) throws InterruptedException {
+        registerShutDownHook();
         try {
-            registerShutDownHook();
             serverCore = ServerCore.getInstance(args.length > 0 ? args[0] : ServerProperties.PROPERTY_FILE_NAME);
             serverCore.startServer();
             System.out.println("MomServer v" + VERSION + " started, exit with Ctrl+C");
@@ -55,8 +42,13 @@ public final class MomServer {
         } catch (IOException ex) {
             System.out.println("could not start the server: " + ex.getMessage());
         }
-
-        close();
+        
+        System.out.println("closing MomServer");
+        if (serverCore != null) {
+            serverCore.closeServer();
+            serverCore = null;
+        }
+        Runtime.getRuntime().removeShutdownHook(shutdownThread);
     }
 
     /**
@@ -64,12 +56,13 @@ public final class MomServer {
      * shutdown
      */
     private void registerShutDownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread() {
+        shutdownThread = new Thread() {
             @Override
             public void run() {
                 shutDown();
             }
-        });
+        };
+        Runtime.getRuntime().addShutdownHook(shutdownThread);
     }
 
     /**
@@ -83,7 +76,7 @@ public final class MomServer {
             final MomServer mom = new MomServer();
             mom.run(args);
         } catch (InterruptedException ex) {
-            System.out.println("Main thread interrupted, exiting!");
+            System.out.println("Main thread interrupted, exiting! (" + ex.getMessage() + ")");
         }
     }
 }
