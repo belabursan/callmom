@@ -3,39 +3,67 @@ package buri.momserver;
 import java.io.IOException;
 
 /**
+ * MomServer main class
  *
  * @author belabursan
  */
-public class MomServer {
-    public static final String VERSION = "0.0.1";
-    
-    private static volatile boolean closed;
+public final class MomServer {
 
-    private static void close() {
-        closed = true;
-        
+    static final String VERSION = "0.0.1";
+    private Server server;
+
+    private void close() throws InterruptedException {
+        if (server != null) {
+            server.closeServer();
+            server = null;
+        }
+    }
+
+    private synchronized void shutDown() {
+        notifyAll();
+    }
+
+    private synchronized void run(String[] args) throws InterruptedException {
+        try {
+            registerShutDownHook();
+            server = Server.getInstance(args.length > 0 ? args[0] : ServerProperties.PROPERTY_FILE_NAME);
+            server.startServer();
+            wait();
+
+        } catch (InterruptedException ix) {
+            System.out.println("Interrupted, exiting: " + ix.getMessage());
+        } catch (IOException ex) {
+            System.out.println("could not start the server: " + ex.getMessage());
+        }
+
+        close();
     }
 
     /**
-     * @param args the command line arguments
+     * Creates a shutdown hook the hook will call the shutDown() method at
+     * shutdown
      */
-    public static void main(String[] args) throws IOException {
-        closed = false;
+    private void registerShutDownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
-            public void run() { MomServer.close(); }
+            public void run() {
+                shutDown();
+            }
         });
+    }
 
-        ServerProperties.createDefaultPropertyFile();
-        Server s = Server.getInstance(ServerProperties.PROPERTY_FILE_NAME);
-        s.start();
-        
+    /**
+     * Main method, everything starts and ends here
+     *
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        Thread.currentThread().setName("MainThread");
         try {
-            //just sleep for now, fix shotdownhook later!!!
-            Thread.sleep(100000);
+            final MomServer mom = new MomServer();
+            mom.run(args);
         } catch (InterruptedException ex) {
-            System.out.println("wwwwwwwwwww");
+            System.out.println("Main thread interrupted, exiting!");
         }
     }
-    
 }

@@ -11,6 +11,7 @@ import javax.net.ssl.SSLServerSocketFactory;
 
 /**
  * Communication module, starts a server socket on the defined port
+ *
  * @author Bela Bursan
  */
 final class ComModule {
@@ -18,6 +19,7 @@ final class ComModule {
     private final int port, nrOfMaxClients;
     private final boolean reuseAddress;
     private ServerSocket servSoc;
+    private static ComModule comModule = null;
 
     /**
      * Creates a new communication module
@@ -27,15 +29,30 @@ final class ComModule {
      * the same time
      * @param reuseAddress sets the reuse address option of the socket
      */
-    ComModule(int port, int nrOfMaxClients, boolean reuseAddress) {
+    private ComModule(int port, int nrOfMaxClients, boolean reuseAddress) {
         this.port = port;
         this.nrOfMaxClients = nrOfMaxClients;
         this.reuseAddress = reuseAddress;
     }
 
     /**
+     * Creates a new communication module
+     *
+     * @param port port to listen on
+     * @param nrOfMaxClients maximum number of clients to allow connection at
+     * the same time
+     * @param reuseAddress sets the reuse address option of the socket
+     */
+    static ComModule getInstance(int port, int nrOfMaxClients, boolean reuseAddress) {
+        if (comModule == null) {
+            comModule = new ComModule(port, nrOfMaxClients, reuseAddress);
+        }
+        return comModule;
+    }
+
+    /**
      * Creates a server socket, bound to the specified port.
-     * 
+     *
      * @throws SocketException if the reuse address option cannot be set
      * @throws IOException if the socket cannot be created
      */
@@ -46,7 +63,7 @@ final class ComModule {
 
     /**
      * Starts a SSL server socket
-     * 
+     *
      * @throws SocketException if the reuse address option cannot be set
      * @throws IOException if the socket cannot be created
      */
@@ -57,8 +74,8 @@ final class ComModule {
     }
 
     /**
-     * Listens for a connection to be made to this socket and accepts it.
-     * The method blocks until a connection is made.
+     * Listens for a connection to be made to this socket and accepts it. The
+     * method blocks until a connection is made.
      *
      * @return the new java.net.Socket
      * @throws java.io.IOException
@@ -73,7 +90,7 @@ final class ComModule {
     /**
      * Closes the server socket
      */
-    void closeServerSocket() {
+    void close() {
         if (servSoc != null) {
             try {
                 servSoc.close();
@@ -82,6 +99,7 @@ final class ComModule {
                 System.out.println("closing server socket ...:" + ex.getMessage());
             }
         }
+        comModule = null;
     }
 
     /**

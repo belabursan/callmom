@@ -2,39 +2,36 @@ package buri.momserver;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Bela Bursan
  */
-class Server extends Thread implements Runnable {
+final class Server extends Thread implements Runnable {
 
     private static Server server = null;
     private volatile boolean alive;
     private final LinkedBlockingQueue<Runnable> clientQueue;
     private final ExecutorService threadPool;
-    private final ComModule network;
-    
+    private ComModule network;
 
-    private Server(ServerProperties properties) {
+    private Server(ServerProperties properties) throws IOException {
         alive = false;
         clientQueue = new LinkedBlockingQueue<>();
         threadPool = new ThreadPoolExecutor(3, 200, 60, TimeUnit.SECONDS, clientQueue);
-        network = new ComModule(
+        network = ComModule.getInstance(
                 properties.getPort(),
                 properties.getNumberOfClients(),
                 properties.isReuseAddress()
         );
+        network.startTCPServer();
     }
 
-    static Server getInstance(String propertiesPath) throws IOException{
+    static Server getInstance(String propertiesPath) throws IOException {
         if (server == null) {
             server = new Server(ServerProperties.readProperties(new File(propertiesPath)));
         }
@@ -43,20 +40,16 @@ class Server extends Thread implements Runnable {
 
     @Override
     public void run() {
+        Thread.currentThread().setName("ServerThread");
         try {
-            ServerProperties.createDefaultPropertyFile();
-            /*
-            try {
             while (alive) {
+                System.out.println("kkkk");
+                Thread.sleep(1000);
+            }
+        } catch (InterruptedException ix) {
 
-            }
-            } catch (InterruptedException ix) {
-            
-            }
-            */
-        } catch (IOException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
         }
+
     }
 
     /**
@@ -88,6 +81,10 @@ class Server extends Thread implements Runnable {
             }
         } catch (InterruptedException ix) {
             //should never occur
+        }
+        if (network != null) {
+            network.close();
+            network = null;
         }
         this.join();
         //TODO close other things of the server if needed

@@ -12,7 +12,7 @@ import java.util.Properties;
  *
  * @author belabursan
  */
-class ServerProperties {
+final class ServerProperties {
 
     public static final String PORT = "port";
     public static final String MAX_CLIENTS = "maxClients";
