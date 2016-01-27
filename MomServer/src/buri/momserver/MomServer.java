@@ -9,7 +9,7 @@ import java.io.IOException;
  */
 public final class MomServer {
 
-    static final String VERSION = "0.0.2";
+    static final String VERSION = "0.0.3";
     private ServerCore serverCore;
     private Thread shutdownThread;
 

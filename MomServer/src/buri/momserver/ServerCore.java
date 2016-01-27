@@ -2,8 +2,9 @@ package buri.momserver;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -16,8 +17,7 @@ final class ServerCore extends Thread implements Runnable {
 
     private static ServerCore server = null;
     private volatile boolean alive;
-    private final LinkedBlockingQueue<Runnable> clientQueue;
-    private final ExecutorService threadPool;
+    private final ThreadPoolExecutor threadPool;
     private NetworkModule network;
 
     /**
@@ -29,8 +29,22 @@ final class ServerCore extends Thread implements Runnable {
      */
     private ServerCore(ServerProperties properties) throws IOException {
         alive = false;
-        clientQueue = new LinkedBlockingQueue<>();
-        threadPool = new ThreadPoolExecutor(3, 200, 60, TimeUnit.SECONDS, clientQueue);
+
+        threadPool = new ThreadPoolExecutor(2, properties.getNumberOfClients() + 1, 60, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
+        threadPool.prestartAllCoreThreads();
+        threadPool.setRejectedExecutionHandler(new RejectedExecutionHandler() {
+            @Override
+            public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+                System.out.println("threadpool rejected a runnable");
+                System.out.println("Active count: " + executor.getActiveCount());
+                if (r instanceof IClientTask) {
+                    ((IClientTask) r).close();
+                }
+                executor.remove(r);
+                executor.purge();
+            }
+        });
+
         network = NetworkModule.getInstance(
                 properties.getPort(),
                 properties.getNumberOfClients(),
@@ -57,15 +71,20 @@ final class ServerCore extends Thread implements Runnable {
      * Method where the server thread is run
      */
     @Override
-    public void run() {
+    public synchronized void run() {
         Thread.currentThread().setName("ServerThread");
         try {
             while (alive) {
-                System.out.println("kkkk");
-                Thread.sleep(1000);//remove later, only test code
+                try {
+                    threadPool.execute(IClientTask.newInstance(network.getSocket()));
+                } catch (IOException ex) {
+                    System.out.println("Got IO exception when waiting for new client: " + ex.getMessage());
+                    //failed to get socket, what to do next?
+                    wait(1000);
+                }
             }
         } catch (InterruptedException ix) {
-
+            System.out.println("ServerThread Interrupted");
         }
 
     }
@@ -90,8 +109,9 @@ final class ServerCore extends Thread implements Runnable {
      * @throws InterruptedException in case of the calling thread is interrupted
      * during this call
      */
-    void closeServer() throws InterruptedException {
+    synchronized void closeServer() throws InterruptedException {
         alive = false;
+        notifyAll();
         threadPool.shutdown();
         try {
             if (!threadPool.awaitTermination(5, TimeUnit.SECONDS)) {
