@@ -77,14 +77,11 @@ final class NetworkModule {
      * Listens for a connection to be made to this socket and accepts it. The
      * method blocks until a connection is made.
      *
-     * @return the new java.net.Socket
-     * @throws java.io.IOException
+     * @return a new, connected java.net.Socket
+     * @throws java.io.IOException in case of the server socket is being shut down
      */
     Socket getSocket() throws IOException {
-        if (servSoc != null) {
-            return servSoc.accept();
-        }
-        return null;
+        return servSoc.accept();
     }
 
     /**

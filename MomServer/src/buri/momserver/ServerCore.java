@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -19,6 +18,7 @@ final class ServerCore extends Thread implements Runnable {
     private volatile boolean alive;
     private final ThreadPoolExecutor threadPool;
     private NetworkModule network;
+    private static final Object LOCK = new Object();
 
     /**
      * Creates a new server instance
@@ -79,14 +79,14 @@ final class ServerCore extends Thread implements Runnable {
                     threadPool.execute(IClientTask.newInstance(network.getSocket()));
                 } catch (IOException ex) {
                     System.out.println("Got IO exception when waiting for new client: " + ex.getMessage());
-                    //failed to get socket, what to do next?
-                    wait(1000);
+                    //failed to get socket, wait 3 seconds and try again
+                    wait(2000);
                 }
             }
         } catch (InterruptedException ix) {
             System.out.println("ServerThread Interrupted");
         }
-
+        //System.out.println("ServerThread ended");
     }
 
     /**
@@ -105,26 +105,34 @@ final class ServerCore extends Thread implements Runnable {
 
     /**
      * Stops all client execution and stops and waits for the server thread
-     *
-     * @throws InterruptedException in case of the calling thread is interrupted
-     * during this call
      */
-    synchronized void closeServer() throws InterruptedException {
+    void closeServer() {
         alive = false;
-        notifyAll();
-        threadPool.shutdown();
-        try {
-            if (!threadPool.awaitTermination(5, TimeUnit.SECONDS)) {
-                threadPool.shutdownNow();
-            }
-        } catch (InterruptedException ix) {
-            //should never occur
-        }
+        System.out.println(" -closing MomServer");
+
         if (network != null) {
             network.close();
             network = null;
         }
-        this.join();
+        if (!threadPool.isTerminated()) {
+            threadPool.shutdown();
+            try {
+                if (!threadPool.awaitTermination(5, TimeUnit.SECONDS)) {
+                    threadPool.shutdownNow();
+                }
+            } catch (InterruptedException ix) {
+                System.out.println("threadpool interrupted when closing server core");
+                //just ignore
+            }
+        }
+        
+        try {
+            this.interrupt();
+            this.join();
+        } catch (InterruptedException iix) {
+            System.out.println("join() interrupted when closing server core");
+            //just ignore
+        }
         //TODO close other things of the server if needed
     }
 }
