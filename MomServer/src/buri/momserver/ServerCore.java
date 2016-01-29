@@ -6,6 +6,8 @@ import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The server core
@@ -18,7 +20,7 @@ final class ServerCore extends Thread implements Runnable {
     private volatile boolean alive;
     private final ThreadPoolExecutor threadPool;
     private NetworkModule network;
-    private static MomLogger log;
+    private static final Logger LOG = Logger.getLogger(MomLogger.LOGGER_NAME);
 
     /**
      * Creates a new server instance
@@ -29,7 +31,6 @@ final class ServerCore extends Thread implements Runnable {
      */
     private ServerCore(ServerProperties properties) throws IOException {
         alive = false;
-        log = MomLogger.getLogger();
         threadPool = new ThreadPoolExecutor(2, properties.getNumberOfClients() + 1, 60, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
         threadPool.prestartAllCoreThreads();
         threadPool.setRejectedExecutionHandler(new RejectedExecutionHandler() {
@@ -51,7 +52,7 @@ final class ServerCore extends Thread implements Runnable {
                 properties.isReuseAddress()
         );
         network.startTCPServer();
-        log.debug("Server core created successfully");
+        LOG.finest("Server core created successfully");
     }
 
     /**
@@ -79,13 +80,13 @@ final class ServerCore extends Thread implements Runnable {
                 try {
                     threadPool.execute(IClientTask.newInstance(network.getSocket()));
                 } catch (IOException ex) {
-                    log.error("Got IO exception when waiting for new client: " + ex.getMessage());
+                    LOG.log(Level.SEVERE, "Got IO exception when waiting for new client: {0}", ex.getMessage());
                     //failed to get socket, wait 3 seconds and try again
                     wait(2000);
                 }
             }
         } catch (InterruptedException ix) {
-            log.debug("ServerThread Interrupted");
+            LOG.finest("ServerThread Interrupted");
         }
         //System.out.println("ServerThread ended");
     }
@@ -97,7 +98,7 @@ final class ServerCore extends Thread implements Runnable {
      * @return true if the server is alive after this call, false otherwise
      */
     boolean startServer() {
-        log.debug("starting to run core");
+        LOG.finest("starting to run core");
         if (this.getState() == State.NEW) {
             alive = true;
             this.start();
@@ -110,7 +111,7 @@ final class ServerCore extends Thread implements Runnable {
      */
     void closeServer() {
         alive = false;
-        log.info(" -closing MomServer");
+        LOG.info(" -closing MomServer");
 
         if (network != null) {
             network.close();
@@ -123,7 +124,7 @@ final class ServerCore extends Thread implements Runnable {
                     threadPool.shutdownNow();
                 }
             } catch (InterruptedException ix) {
-                log.warning("threadpool interrupted when closing server core");
+                LOG.warning("threadpool interrupted when closing server core");
                 //just ignore
             }
         }
@@ -132,7 +133,7 @@ final class ServerCore extends Thread implements Runnable {
             this.interrupt();
             this.join();
         } catch (InterruptedException iix) {
-            log.warning("join() interrupted when closing server core");
+            LOG.warning("join() interrupted when closing server core");
             //just ignore
         }
         //TODO close other things of the server if needed

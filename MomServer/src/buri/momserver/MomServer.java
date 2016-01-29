@@ -12,20 +12,17 @@ import java.util.logging.Logger;
  */
 public final class MomServer {
 
-    static final String VERSION = "0.0.4";
+    static final String VERSION = "0.0.5";
     private ServerCore serverCore;
     private Thread shutDownThread;
-    private final MomLogger log;
-    
-    public MomServer() throws SecurityException, IOException{
-        this.log = MomLogger.getLogger();
-    }
+    private static final Logger LOG = Logger.getLogger(MomLogger.LOGGER_NAME);
 
     /**
-     * Signals the wait in the run() method. Only called by the shutdown hook!
+     * Signals the wait in the run() method. Also closes the server core. Only
+     * called by the shutdown hook!
      */
     private synchronized void shutDown() {
-        log.info(" -got shutdown signal");
+        LOG.warning(" -got shutdown signal");
         if (serverCore != null) {
             serverCore.closeServer();
             serverCore = null;
@@ -44,12 +41,12 @@ public final class MomServer {
     private synchronized void execute(final CLArguments arguments) throws InterruptedException {
         registerShutDownHook();
         try {
-            log.debug("starting to execute server");
+            LOG.finest("starting to execute server");
             serverCore = ServerCore.getInstance(arguments.getPropertyFilePath());
             if (serverCore.startServer()) {
                 System.out.println("MomServer v" + VERSION + " started, exit with Ctrl+C");
                 if (arguments.isDaemon()) {
-                    log.warning("server will run as daemon");
+                    LOG.warning("server will run as daemon");
                     System.out.println("IS DAEMON");
                     File pidfile = new File(System.getProperty("daemon.pidfile"));
                     pidfile.deleteOnExit();
@@ -60,9 +57,9 @@ public final class MomServer {
                 wait();
             }
         } catch (InterruptedException ix) {
-            log.error("Intrrupted exception: " + ix.getMessage());
+            LOG.log(Level.SEVERE, "Intrrupted exception: {0}", ix.getMessage());
         } catch (IOException ex) {
-            log.error("IO exception: " + ex.getMessage());
+            LOG.log(Level.SEVERE, "IO exception: {0}", ex.getMessage());
         } finally {
             awaitShutdownHook();
         }
@@ -74,9 +71,9 @@ public final class MomServer {
      * @throws InterruptedException
      */
     private void awaitShutdownHook() throws InterruptedException {
-        log.info("awaiting shut down hook");
+        LOG.info("awaiting shut down hook");
         if (shutDownThread.getState() != Thread.State.NEW) {
-            log.debug("shutdown hook startat, now trying to join");
+            LOG.finest("shutdown hook startat, now trying to join");
             shutDownThread.join();
         }
     }
@@ -86,7 +83,7 @@ public final class MomServer {
      * shutdown
      */
     private void registerShutDownHook() {
-        log.info("registering shut down hook");
+        LOG.info("registering shut down hook");
         shutDownThread = new Thread() {
             @Override
             public void run() {
@@ -102,16 +99,14 @@ public final class MomServer {
      *
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         Thread.currentThread().setName("MainThread");
         System.out.println("");
         try {
             CLArguments arguments = CLArguments.resolveArguments(args);
-            if (arguments.isDebug()) {
-                MomLogger.initLogger(Level.FINEST);
-            }
-            MomLogger log = MomLogger.getLogger();
-            log.error("Starting MomServer v" + VERSION);
+
+            MomLogger.initLogger(arguments.isDebug() ? Level.FINEST : Level.WARNING);
+            LOG.severe("Starting MomServer v" + VERSION);
             final MomServer mom = new MomServer();
             mom.execute(arguments);
         } catch (InterruptedException ex) {
