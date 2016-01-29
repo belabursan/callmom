@@ -18,7 +18,7 @@ final class ServerCore extends Thread implements Runnable {
     private volatile boolean alive;
     private final ThreadPoolExecutor threadPool;
     private NetworkModule network;
-    private static final Object LOCK = new Object();
+    private static MomLogger log;
 
     /**
      * Creates a new server instance
@@ -29,7 +29,7 @@ final class ServerCore extends Thread implements Runnable {
      */
     private ServerCore(ServerProperties properties) throws IOException {
         alive = false;
-
+        log = MomLogger.getLogger();
         threadPool = new ThreadPoolExecutor(2, properties.getNumberOfClients() + 1, 60, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
         threadPool.prestartAllCoreThreads();
         threadPool.setRejectedExecutionHandler(new RejectedExecutionHandler() {
@@ -51,6 +51,7 @@ final class ServerCore extends Thread implements Runnable {
                 properties.isReuseAddress()
         );
         network.startTCPServer();
+        log.debug("Server core created successfully");
     }
 
     /**
@@ -78,13 +79,13 @@ final class ServerCore extends Thread implements Runnable {
                 try {
                     threadPool.execute(IClientTask.newInstance(network.getSocket()));
                 } catch (IOException ex) {
-                    System.out.println("Got IO exception when waiting for new client: " + ex.getMessage());
+                    log.error("Got IO exception when waiting for new client: " + ex.getMessage());
                     //failed to get socket, wait 3 seconds and try again
                     wait(2000);
                 }
             }
         } catch (InterruptedException ix) {
-            System.out.println("ServerThread Interrupted");
+            log.debug("ServerThread Interrupted");
         }
         //System.out.println("ServerThread ended");
     }
@@ -96,6 +97,7 @@ final class ServerCore extends Thread implements Runnable {
      * @return true if the server is alive after this call, false otherwise
      */
     boolean startServer() {
+        log.debug("starting to run core");
         if (this.getState() == State.NEW) {
             alive = true;
             this.start();
@@ -108,7 +110,7 @@ final class ServerCore extends Thread implements Runnable {
      */
     void closeServer() {
         alive = false;
-        System.out.println(" -closing MomServer");
+        log.info(" -closing MomServer");
 
         if (network != null) {
             network.close();
@@ -121,7 +123,7 @@ final class ServerCore extends Thread implements Runnable {
                     threadPool.shutdownNow();
                 }
             } catch (InterruptedException ix) {
-                System.out.println("threadpool interrupted when closing server core");
+                log.warning("threadpool interrupted when closing server core");
                 //just ignore
             }
         }
@@ -130,7 +132,7 @@ final class ServerCore extends Thread implements Runnable {
             this.interrupt();
             this.join();
         } catch (InterruptedException iix) {
-            System.out.println("join() interrupted when closing server core");
+            log.warning("join() interrupted when closing server core");
             //just ignore
         }
         //TODO close other things of the server if needed
