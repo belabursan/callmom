@@ -8,11 +8,11 @@ import java.util.logging.Logger;
 /**
  * MomServer main class
  *
- * @author belabursan
+ * @author Bela Bursan
  */
 public final class MomServer {
 
-    static final String VERSION = "0.0.5";
+    static final String VERSION = "0.0.6";
     private ServerCore serverCore;
     private Thread shutDownThread;
     private static final Logger LOG = Logger.getLogger(MomLogger.LOGGER_NAME);
@@ -22,7 +22,7 @@ public final class MomServer {
      * called by the shutdown hook!
      */
     private synchronized void shutDown() {
-        LOG.warning(" -got shutdown signal");
+        LOG.warning("got shutdown signal");
         if (serverCore != null) {
             serverCore.closeServer();
             serverCore = null;
@@ -42,12 +42,16 @@ public final class MomServer {
         registerShutDownHook();
         try {
             LOG.finest("starting to execute server");
+
+            //create and start the server core
             serverCore = ServerCore.getInstance(arguments.getPropertyFilePath());
             if (serverCore.startServer()) {
                 System.out.println("MomServer v" + VERSION + " started, exit with Ctrl+C");
+
                 if (arguments.isDaemon()) {
                     LOG.warning("server will run as daemon");
-                    System.out.println("IS DAEMON");
+
+                    //TODO check this later...
                     File pidfile = new File(System.getProperty("daemon.pidfile"));
                     pidfile.deleteOnExit();
                     System.out.close();
@@ -84,6 +88,7 @@ public final class MomServer {
      */
     private void registerShutDownHook() {
         LOG.info("registering shut down hook");
+
         shutDownThread = new Thread() {
             @Override
             public void run() {
@@ -91,6 +96,7 @@ public final class MomServer {
                 shutDown();
             }
         };
+        //add shutdown hook
         Runtime.getRuntime().addShutdownHook(shutDownThread);
     }
 
@@ -103,10 +109,14 @@ public final class MomServer {
         Thread.currentThread().setName("MainThread");
         System.out.println("");
         try {
+            //parse the command line arguments
             CLArguments arguments = CLArguments.resolveArguments(args);
 
+            //init logger
             MomLogger.initLogger(arguments.isDebug() ? Level.FINEST : Level.WARNING);
             LOG.severe("Starting MomServer v" + VERSION);
+
+            //create and run
             final MomServer mom = new MomServer();
             mom.execute(arguments);
         } catch (InterruptedException ex) {

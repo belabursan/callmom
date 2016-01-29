@@ -6,6 +6,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocketFactory;
 
@@ -20,6 +22,7 @@ final class NetworkModule {
     private final boolean reuseAddress;
     private ServerSocket servSoc;
     private static NetworkModule network = null;
+    private static final Logger LOG = Logger.getLogger(MomLogger.LOGGER_NAME);
 
     /**
      * Creates a new communication module
@@ -33,6 +36,7 @@ final class NetworkModule {
         this.port = port;
         this.nrOfMaxClients = nrOfMaxClients;
         this.reuseAddress = reuseAddress;
+        LOG.finest("network module created");
     }
 
     /**
@@ -59,6 +63,7 @@ final class NetworkModule {
     void startTCPServer() throws SocketException, IOException {
         servSoc = new ServerSocket(port, nrOfMaxClients);
         servSoc.setReuseAddress(reuseAddress);
+        LOG.log(Level.FINEST, "network module started, socket listening on port {0}", port);
     }
 
     /**
@@ -71,6 +76,7 @@ final class NetworkModule {
         ServerSocketFactory ssocketFactory = SSLServerSocketFactory.getDefault();
         servSoc = ssocketFactory.createServerSocket(port);
         servSoc.setReuseAddress(this.reuseAddress);
+        LOG.log(Level.FINEST, "network module started, SSL socket listening on port {0}", port);
     }
 
     /**
@@ -78,7 +84,8 @@ final class NetworkModule {
      * method blocks until a connection is made.
      *
      * @return a new, connected java.net.Socket
-     * @throws java.io.IOException in case of the server socket is being shut down
+     * @throws java.io.IOException in case of the server socket is being shut
+     * down
      */
     Socket getSocket() throws IOException {
         return servSoc.accept();
@@ -88,12 +95,13 @@ final class NetworkModule {
      * Closes the server socket
      */
     void close() {
+        LOG.fine("closing network module");
         if (servSoc != null) {
             try {
                 servSoc.close();
                 servSoc = null;
             } catch (IOException ex) {
-                System.out.println("closing server socket ...:" + ex.getMessage());
+                LOG.log(Level.WARNING, "closing server socket ...:{0}", ex.getMessage());
             }
         }
         network = null;
@@ -118,7 +126,7 @@ final class NetworkModule {
         try {
             return InetAddress.getLocalHost().getHostAddress();
         } catch (UnknownHostException ex) {
-            System.out.println("getServerAddress:unknownHostException: " + ex.getMessage());
+            LOG.log(Level.SEVERE, "getServerAddress:unknownHostException: {0}", ex.getMessage());
         }
         return "";
     }

@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Holds the server properties
@@ -17,11 +19,12 @@ final class ServerProperties {
     public static final String PORT = "port";
     public static final String MAX_CLIENTS = "maxClients";
     public static final String REUSE_ADDRESS = "reuseAddress";
-    public static final String PROPERTY_FILE_NAME = "property.xml";
+    public static final String DEFAULT_PROPERTY_FILE_NAME = "property.xml";
     //
     private static final int DEFAULT_MAX_CLIENTS = 200;
     private static final int DEFAULT_PORT = 10888;
     private static final boolean DEFAULT_REUSE_ADDRESS = true;
+    private static final Logger LOG = Logger.getLogger(MomLogger.LOGGER_NAME);
 
     private int port;
     private int numberOfClients;
@@ -90,6 +93,7 @@ final class ServerProperties {
      * @throws IOException if the property file cannot be read
      */
     static ServerProperties readProperties(File file) throws FileNotFoundException, IOException {
+        LOG.fine("reading properties");
         //load properties from the file
         Properties properties = new Properties();
         properties.loadFromXML(new FileInputStream(file));
@@ -112,13 +116,13 @@ final class ServerProperties {
      * @throws IOException
      */
     static void createDefaultPropertyFile() throws FileNotFoundException, IOException {
+        LOG.finest("creating default properties");
         Properties properties = new Properties();
         properties.put(PORT, String.valueOf(DEFAULT_PORT));
         properties.put(MAX_CLIENTS, String.valueOf(DEFAULT_MAX_CLIENTS));
         properties.put(REUSE_ADDRESS, String.valueOf(DEFAULT_REUSE_ADDRESS));
-        properties.storeToXML(
-                new FileOutputStream(
-                        new File(PROPERTY_FILE_NAME)), "Property file for the MomServer (v" + MomServer.VERSION + ")"
+        properties.storeToXML(new FileOutputStream(
+                new File(DEFAULT_PROPERTY_FILE_NAME)), "Property file for the MomServer (v" + MomServer.VERSION + ")"
         );
     }
 
@@ -135,7 +139,7 @@ final class ServerProperties {
         try {
             return Integer.parseInt(property);
         } catch (NumberFormatException | NullPointerException nx) {
-            System.out.println("failed to parse int: " + nx.getMessage());
+            LOG.log(Level.SEVERE, "failed to parse int: {0}", nx.getMessage());
         }
         return defaultProperty;
     }
@@ -151,7 +155,7 @@ final class ServerProperties {
         try {
             return Boolean.parseBoolean(property);
         } catch (NumberFormatException | NullPointerException nx) {
-            System.out.println("failed to parse boolean: " + nx.getMessage());
+            LOG.log(Level.SEVERE, "failed to parse boolean: {0}", nx.getMessage());
         }
         return defaultProperty;
     }

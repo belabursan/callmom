@@ -22,7 +22,7 @@ class CLArguments {
     private CLArguments() {
         this.daemon = false;
         this.debug = false;
-        this.propertyFilePath = ServerProperties.PROPERTY_FILE_NAME;
+        this.propertyFilePath = ServerProperties.DEFAULT_PROPERTY_FILE_NAME;
     }
 
     /**
