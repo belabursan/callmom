@@ -1,27 +1,32 @@
-package buri.momserver;
+package buri.momserver.defaulclient;
 
+import buri.momserver.core.IClient;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
 import java.util.Collection;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.LinkedList;
 
 /**
  * The server side implementation of the client
  *
  * @author Bela Bursan
  */
-final class Client implements IClient {
+public final class Client implements IClient {
 
-    private final static Logger LOG = Logger.getLogger(MomLogger.LOGGER_NAME);
+    private final LinkedList<String> logger;
 
-    Client() {
+    public Client() {
+        logger = new LinkedList<>();
+    }
+    
+    private void log(String text, Object ... value){
+        logger.addLast(String.format(text, value));
     }
 
     @Override
-    public int main(final Socket socket) {
-        LOG.log(Level.FINEST, "running client: {0}", Thread.currentThread().getName());
+    public int execute(final Socket socket) {
+        log("running client: %s", Thread.currentThread().getName());
 
         //this is just test!!!! remove later
         try {
@@ -39,25 +44,24 @@ final class Client implements IClient {
             }
             System.out.println("enddddd");
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, null, ex);
+            log("Exception: %s", ex.getLocalizedMessage());
         }
         try {
             socket.close();
         } catch (IOException ex) {
-            LOG.log(Level.SEVERE, null, ex);
+            log("IOException: %s", ex.getLocalizedMessage());
         }
         return SUCCESS;
     }
 
     @Override
     public void close() {
-        System.out.println("closing cli");
+        log("closing cli");
     }
 
     @Override
-    public Collection getLogs() {
-        //not implemented in this implementation since we have access to the real logger
-        return null;
+    public Collection<String> getLogs() {
+        return logger;
     }
 
 }

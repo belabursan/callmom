@@ -1,4 +1,4 @@
-package buri.momserver;
+package buri.momserver.core;
 
 import java.io.File;
 import java.io.IOException;

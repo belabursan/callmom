@@ -1,5 +1,6 @@
-package buri.momserver;
+package buri.momserver.core;
 
+import buri.momserver.defaulclient.Client;
 import java.net.Socket;
 import java.util.Collection;
 import java.util.logging.Level;
@@ -44,8 +45,8 @@ final class ClientTask implements Runnable {
         IClient client = null;
         int retValue = IClient.SUCCESS;
         try {
-            client = new Client();
-            retValue = client.main(socket);
+            client = getClient();
+            retValue = client.execute(socket);
         } catch (Exception ex) {
             //catch everything here, we don't want the client exceptions in the server!!!
             LOG.log(Level.SEVERE, "client finished with exception: {0}",
@@ -55,6 +56,22 @@ final class ClientTask implements Runnable {
             //end the client and print logs
             handleLogsAndClose(retValue, client);
         }
+    }
+    
+    
+    /**
+     * Now it returns a new instance of a default client object.
+     * In future this method will decide which client to use(plug-in clients?)
+     * @return a new instance of a Client object
+     */
+    private IClient getClient(){
+        //future:
+        // 1: read socket
+        // 2: decide which socket to use
+        // 3: dinamically load appropiate Client
+        // http://www.oracle.com/technetwork/articles/javase/extensible-137159.html
+        
+        return new Client();
     }
 
     /**

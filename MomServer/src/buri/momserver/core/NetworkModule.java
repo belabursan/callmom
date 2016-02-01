@@ -1,4 +1,4 @@
-package buri.momserver;
+package buri.momserver.core;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -72,7 +72,7 @@ final class NetworkModule {
      * @throws SocketException if the reuse address option cannot be set
      * @throws IOException if the socket cannot be created
      */
-    void startSSLServer(boolean reuseAddress) throws SocketException, IOException {
+    void startSSLServer() throws SocketException, IOException {
         ServerSocketFactory ssocketFactory = SSLServerSocketFactory.getDefault();
         servSoc = ssocketFactory.createServerSocket(port);
         servSoc.setReuseAddress(this.reuseAddress);

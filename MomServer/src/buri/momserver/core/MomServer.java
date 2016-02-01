@@ -1,4 +1,4 @@
-package buri.momserver;
+package buri.momserver.core;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  */
 public final class MomServer {
 
-    static final String VERSION = "0.0.6";
+    static final String VERSION = "0.0.7";
     private ServerCore serverCore;
     private Thread shutDownThread;
     private static final Logger LOG = Logger.getLogger(MomLogger.LOGGER_NAME);
@@ -63,6 +63,7 @@ public final class MomServer {
         } catch (InterruptedException ix) {
             LOG.log(Level.SEVERE, "Intrrupted exception: {0}", ix.getMessage());
         } catch (IOException ex) {
+            System.out.println(String.format("IO exception: %s", ex.getMessage()));
             LOG.log(Level.SEVERE, "IO exception: {0}", ex.getMessage());
         } finally {
             awaitShutdownHook();

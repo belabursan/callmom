@@ -1,4 +1,4 @@
-package buri.momserver;
+package buri.momserver.core;
 
 /**
  * Holds and parses the command line arguments.

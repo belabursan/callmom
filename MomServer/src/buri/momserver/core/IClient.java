@@ -1,4 +1,4 @@
-package buri.momserver;
+package buri.momserver.core;
 
 import java.net.Socket;
 import java.util.Collection;
@@ -20,17 +20,17 @@ public interface IClient {
      * @param socket connected socket
      * @return error code, see constants
      */
-    public int main(final Socket socket);
+    public int execute(final Socket socket);
 
     /**
      * Closes the client. This method will be called by the server when the call
-     * to main() returns
+ to execute() returns
      */
     public void close();
 
     /**
      * Returns the logs of the client. This is only called if the return value
-     * of the main method is not success or it throws an exception
+ of the execute method is not success or it throws an exception
      *
      * @return a collection of strings where every element corresponds to a log
      * line

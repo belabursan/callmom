@@ -1,4 +1,4 @@
-package buri.momserver;
+package buri.momserver.core;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,15 +20,18 @@ final class ServerProperties {
     public static final String MAX_CLIENTS = "maxClients";
     public static final String REUSE_ADDRESS = "reuseAddress";
     public static final String DEFAULT_PROPERTY_FILE_NAME = "property.xml";
+    public static final String SSL = "ssl";
     //
     private static final int DEFAULT_MAX_CLIENTS = 200;
     private static final int DEFAULT_PORT = 10888;
     private static final boolean DEFAULT_REUSE_ADDRESS = true;
+    private static final boolean DEFAULT_SSL = false;
     private static final Logger LOG = Logger.getLogger(MomLogger.LOGGER_NAME);
 
     private int port;
     private int numberOfClients;
     private boolean reuseAddress;
+    private boolean ssl;
 
     /**
      * Returns the port number the server will listen
@@ -83,6 +86,23 @@ final class ServerProperties {
     boolean isReuseAddress() {
         return reuseAddress;
     }
+    
+    
+    /**
+     * Returns a boolean indicating if SSL network connection should be used
+     * @return true if SSL is used, false otherwise
+     */
+    boolean isSSL() {
+        return ssl;
+    }
+
+    /**
+     * Sets the SSL parameter
+     * @param ssl true if SSL should be used, false otherwise
+     */
+    private void setSSL(boolean ssl) {
+        this.ssl = ssl;
+    }
 
     /**
      * Reads properties from a file and converts it to ServerProperties object
@@ -103,6 +123,7 @@ final class ServerProperties {
         p.setPort(p.toInteger(properties.getProperty(PORT), DEFAULT_PORT));
         p.setNumberOfClients(p.toInteger(properties.getProperty(MAX_CLIENTS), DEFAULT_MAX_CLIENTS));
         p.setReuseAddress(p.toBoolean(properties.getProperty(REUSE_ADDRESS), DEFAULT_REUSE_ADDRESS));
+        p.setSSL(p.toBoolean(properties.getProperty(SSL), DEFAULT_SSL));
 
         //TODO - add more properties here
         return p;
@@ -121,6 +142,8 @@ final class ServerProperties {
         properties.put(PORT, String.valueOf(DEFAULT_PORT));
         properties.put(MAX_CLIENTS, String.valueOf(DEFAULT_MAX_CLIENTS));
         properties.put(REUSE_ADDRESS, String.valueOf(DEFAULT_REUSE_ADDRESS));
+        properties.put(SSL, String.valueOf(DEFAULT_SSL));
+        
         properties.storeToXML(new FileOutputStream(
                 new File(DEFAULT_PROPERTY_FILE_NAME)), "Property file for the MomServer (v" + MomServer.VERSION + ")"
         );
@@ -159,5 +182,6 @@ final class ServerProperties {
         }
         return defaultProperty;
     }
+
 
 }

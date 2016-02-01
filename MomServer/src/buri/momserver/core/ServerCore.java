@@ -1,4 +1,4 @@
-package buri.momserver;
+package buri.momserver.core;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +53,11 @@ final class ServerCore extends Thread implements Runnable {
                 properties.getNumberOfClients(),
                 properties.isReuseAddress()
         );
-        network.startTCPServer();
+        if (properties.isSSL()) {
+            network.startSSLServer();
+        } else {
+            network.startTCPServer();
+        }
         LOG.finest("Server core created successfully");
     }
 
