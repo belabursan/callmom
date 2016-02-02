@@ -58,8 +58,8 @@ public class Protocol {
 
     static boolean isValidMessage(TLV tlv, String version) {
         if (tlv.getTag() == TLV_TAG_MESSAGE) {
-            TLV t = tlv.findTag(TLV_TAG_VERSION);
-            if (t.getValueAsString().equalsIgnoreCase(PROTOCOL_VERSION)) {
+            TLV ver = tlv.findTag(TLV_TAG_VERSION);
+            if (ver.getValueAsString().equalsIgnoreCase(PROTOCOL_VERSION)) {
                 return true;
             }
         }

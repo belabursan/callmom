@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
-<comment>Property file for the MomServer (v0.0.6)</comment>
+<comment>Property file for the MomServer (v0.0.8)</comment>
 <entry key="port">10999</entry>
 <entry key="reuseAddress">true</entry>
 <entry key="maxClients">300</entry>

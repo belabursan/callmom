@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  */
 public final class MomServer {
 
-    static final String VERSION = "0.0.7";
+    static final String VERSION = "0.0.8";
     private ServerCore serverCore;
     private Thread shutDownThread;
     private static final Logger LOG = Logger.getLogger(MomLogger.LOGGER_NAME);
@@ -122,7 +122,7 @@ public final class MomServer {
             //init logger
             MomLogger.initLogger(
                     (arguments.isDebug() || properties.isDebug()) ? Level.FINEST : Level.WARNING);
-            LOG.severe(" -++ Starting MomServer v" + VERSION + " ++-");
+            LOG.severe(" --== Starting MomServer v" + VERSION + " ==--");
 
             //create and run
             final MomServer mom = new MomServer();

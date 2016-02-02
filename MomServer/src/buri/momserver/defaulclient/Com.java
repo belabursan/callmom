@@ -113,7 +113,7 @@ final class Com {
 
         return tlv;
     }
-
+    
     /**
      * Sends a TLV object as bytes to the network
      *

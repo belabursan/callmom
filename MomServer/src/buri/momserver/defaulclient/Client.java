@@ -29,6 +29,7 @@ public final class Client implements IClient {
     }
 
     @Override
+    @SuppressWarnings("UseSpecificCatch")
     public int execute(Socket s, boolean debug) {
         this.socket = s;
         this.isDebug = debug;
@@ -47,8 +48,12 @@ public final class Client implements IClient {
                 //read a TLV from the network
                 TLV message = com.read(timeout);
 
+                if (debug) {
+                    log(formatToHtml("got:\n" + message.toString()));
+                }
+
                 //check if protocol is valid
-                if (Protocol.isValidMessage(message, Protocol.PROTOCOL_VERSION)) {
+                if (!Protocol.isValidMessage(message, Protocol.PROTOCOL_VERSION)) {
                     log("message is not valid, bad version? (%s)", Protocol.PROTOCOL_VERSION);
                     response = Protocol.createResponse(Protocol.RESPONSE_505, "Bad version");
                     break;
@@ -60,6 +65,10 @@ public final class Client implements IClient {
                     case Protocol.REQUEST_BLINK:
                         Collection<String> args = Protocol.getArguments(message);
                         String resp = blink(args);
+                        //TODO - handle response from blink method
+
+                        response = Protocol.createResponse(Protocol.RESPONSE_200, null);
+                        sendResponse(response);
                         retValue = SUCCESS;
                         break;
 
@@ -109,6 +118,9 @@ public final class Client implements IClient {
         if (response != null) {
             try {
                 com.send(response);
+                if (isDebug) {
+                    log(formatToHtml("sending:\n" + response.toString()));
+                }
             } catch (IOException ex) {
                 log("Exception when sending response: " + ex.getLocalizedMessage());
             }
@@ -147,6 +159,18 @@ public final class Client implements IClient {
     private String blink(Collection<String> args) {
         System.out.println("handeling blink");
         return "";
+    }
+
+    /**
+     * Formats a string to HTML, changes line ends to <br> and spaces to &nbsp;
+     *
+     * @param text test to convert
+     * @return converted text
+     */
+    private String formatToHtml(String text) {
+        String s = text.replace("\n", "<br>");
+        s = s.replace(" ", "&nbsp;");
+        return s;
     }
 
 }
