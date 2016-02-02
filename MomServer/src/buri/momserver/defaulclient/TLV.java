@@ -1,10 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package buri.momserver.defaulclient;
-
 /**
  * ***************************************************************************
  *
@@ -33,7 +26,7 @@ package buri.momserver.defaulclient;
  *
  ****************************************************************************
  */
-
+package buri.momserver.defaulclient;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
@@ -92,11 +85,13 @@ public final class TLV {
     }
 
     /**
-     * Constructor, creates a new TLV object, tag, form and class must be set.<br>
+     * Constructor, creates a new TLV object, tag, form and class must be
+     * set.<br>
      * If value is set, the length will be set by the constructor
      *
      * @param tag integer tag number
-     * @param isCdo boolean, true if CDO, false if PDO, use the TLV static constants
+     * @param isCdo boolean, true if CDO, false if PDO, use the TLV static
+     * constants
      * @param tlvClass Universal = 0, Application = 1, Context Specific = 2,
      * Private = 3, but use the TLV static constants
      * @param value byte array, if CDO = content of CDO, if PDO value of PDO
@@ -107,7 +102,7 @@ public final class TLV {
         this.tag = tag;
         this.tlvForm = isCdo;
         this.length = 0;
-        
+
         if (!isCdo && value != null) {
             this.value = value;
             this.length = value.length;
@@ -149,17 +144,16 @@ public final class TLV {
 
     /**
      * Creates a new TLV from a byte array<br>
-     * Usage:
-     * <code>
+     * Usage:      * <code>
         TLV t = new TLV();
-        t.createFromByteArray(b, 0, b.length);
-       </code>
+     * t.createFromByteArray(b, 0, b.length);
+     * </code>
      *
      * @param rawValue
      * @param startpos start position in the the buffer
      * @param length number of bytes in the byte buffer to parse
-     * @return the remaining bytes if there was any (maybe
-     * bytes from the next TLV?)
+     * @return the remaining bytes if there was any (maybe bytes from the next
+     * TLV?)
      * @throws IllegalArgumentException
      */
     public byte[] createFromByteArray(byte[] rawValue, int startpos, int length) throws IllegalArgumentException {
@@ -217,7 +211,8 @@ public final class TLV {
     }
 
     /**
-     * Extracts the value of this TLV object and creates new TLV object from it.<br>
+     * Extracts the value of this TLV object and creates new TLV object from
+     * it.<br>
      * This function is recursive and means that all it's child will be
      * extracted
      *
@@ -276,8 +271,7 @@ public final class TLV {
     }
 
     /**
-     * Finds the first occurrence of a TLV object with the specified
-     * tag number
+     * Finds the first occurrence of a TLV object with the specified tag number
      *
      * @param inTagNumber integer tag number to find
      * @return TLV object containing the tag number or null if not found
@@ -314,8 +308,8 @@ public final class TLV {
     /**
      * Get the value of this TLV-tag as a string.<br>
      * If this TLV object is a CDO, null will be returned.<br>
-     * If this TLV object is a PDO and the value is null an 
-     * empty string will be returned
+     * If this TLV object is a PDO and the value is null an empty string will be
+     * returned
      *
      * @return the value of the TLV as a string
      */
@@ -491,8 +485,8 @@ public final class TLV {
     }
 
     /**
-     * Adds a TLV object to the end of "next" list. That means that if next is null the tag
-     * will be append there.<br>
+     * Adds a TLV object to the end of "next" list. That means that if next is
+     * null the tag will be append there.<br>
      * If next is not null the same procedure will be made on the next.
      *
      * @param tlv tag to add
@@ -531,9 +525,10 @@ public final class TLV {
 
     /**
      * Only used by the constructors
+     *
      * @param rawValue
      * @param startPosition
-     * @param length 
+     * @param length
      */
     private void getAndSetFirstTag(byte[] rawValue, int startPosition, int length) {
         TLVFactory.getAndSetFirstTLVTag(this, rawValue, startPosition, length);
@@ -541,8 +536,9 @@ public final class TLV {
 
     /**
      * Used by the public toString()
+     *
      * @param sb
-     * @return 
+     * @return
      */
     private StringBuilder toString(StringBuilder sb) {
         String tabs = "";
@@ -921,4 +917,3 @@ public final class TLV {
     }
 
 }
-

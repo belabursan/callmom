@@ -5,4 +5,6 @@
 <entry key="port">10999</entry>
 <entry key="reuseAddress">true</entry>
 <entry key="maxClients">300</entry>
+<entry key="ssl">false</entry>
+<entry key="debug">true</entry>
 </properties>

@@ -16,14 +16,16 @@ final class ClientTask implements Runnable {
 
     private final static Logger LOG = Logger.getLogger(MomLogger.LOGGER_NAME);
     private final Socket socket;
+    private final boolean isDebug;
 
     /**
      * Creates a new instance of the client task
      *
      * @param socket socket connected to the Internet to save
      */
-    private ClientTask(Socket socket) {
+    private ClientTask(Socket socket, boolean isDebug) {
         this.socket = socket;
+        this.isDebug = isDebug;
         LOG.log(Level.FINEST, "new client task created");
     }
 
@@ -33,8 +35,8 @@ final class ClientTask implements Runnable {
      * @param socket connected socket
      * @return ClientTask
      */
-    static ClientTask newInstance(final Socket socket) {
-        return new ClientTask(socket);
+    static ClientTask newInstance(final Socket socket, final boolean isDebug) {
+        return new ClientTask(socket, isDebug);
     }
 
     /**
@@ -46,31 +48,31 @@ final class ClientTask implements Runnable {
         int retValue = IClient.SUCCESS;
         try {
             client = getClient();
-            retValue = client.execute(socket);
+            retValue = client.execute(socket, isDebug);
         } catch (Exception ex) {
             //catch everything here, we don't want the client exceptions in the server!!!
             LOG.log(Level.SEVERE, "client finished with exception: {0}",
                     ex.getLocalizedMessage());
-            LOG.throwing(this.getClass().getSimpleName(), "run()", ex);
+            //LOG.throwing(this.getClass().getName(), "run()", ex);
         } finally {
             //end the client and print logs
             handleLogsAndClose(retValue, client);
         }
     }
-    
-    
+
     /**
-     * Now it returns a new instance of a default client object.
-     * In future this method will decide which client to use(plug-in clients?)
+     * Now it returns a new instance of a default client object. In future this
+     * method will decide which client to use(plug-in clients?)
+     *
      * @return a new instance of a Client object
      */
-    private IClient getClient(){
+    private IClient getClient() {
         //future:
         // 1: read socket
         // 2: decide which socket to use
         // 3: dinamically load appropiate Client
         // http://www.oracle.com/technetwork/articles/javase/extensible-137159.html
-        
+
         return new Client();
     }
 
@@ -83,13 +85,13 @@ final class ClientTask implements Runnable {
     private void handleLogsAndClose(final int retValue, final IClient client) {
         try {
             if (client != null) {
-                if (retValue != IClient.SUCCESS) {
+                if (retValue != IClient.SUCCESS || isDebug) {
                     Collection<String> logs = client.getLogs();
 
                     //alternatively create new file?
                     if (logs != null && !logs.isEmpty()) {
                         for (String s : logs) {
-                            LOG.log(Level.WARNING, "Client: {0}", s);
+                            LOG.log(Level.WARNING, " + Client: {0}", s);
                         }
                     }
                 }

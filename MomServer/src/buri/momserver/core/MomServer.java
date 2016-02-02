@@ -38,15 +38,17 @@ public final class MomServer {
      * property file
      * @throws InterruptedException if interrupted during the close process
      */
-    private synchronized void execute(final CLArguments arguments) throws InterruptedException {
+    private synchronized void execute(
+            final CLArguments arguments,
+            final ServerProperties properties) throws InterruptedException {
         registerShutDownHook();
         try {
             LOG.finest("starting to execute server");
 
             //create and start the server core
-            serverCore = ServerCore.getInstance(arguments.getPropertyFilePath());
+            serverCore = ServerCore.getInstance(properties);
             if (serverCore.startServer()) {
-                System.out.println("MomServer v" + VERSION + " started, exit with Ctrl+C");
+                System.out.println(" - server started, exit with Ctrl+C");
 
                 if (arguments.isDaemon()) {
                     LOG.warning("server will run as daemon");
@@ -108,18 +110,23 @@ public final class MomServer {
      */
     public static void main(final String[] args) {
         Thread.currentThread().setName("MainThread");
-        System.out.println("");
+        System.out.println("\nStarting MomServer v" + VERSION);
         try {
             //parse the command line arguments
             CLArguments arguments = CLArguments.resolveArguments(args);
 
+            //read properties from file
+            ServerProperties properties = ServerProperties.readProperties(
+                    new File(arguments.getPropertyFilePath()));
+
             //init logger
-            MomLogger.initLogger(arguments.isDebug() ? Level.FINEST : Level.WARNING);
-            LOG.severe("Starting MomServer v" + VERSION);
+            MomLogger.initLogger(
+                    (arguments.isDebug() || properties.isDebug()) ? Level.FINEST : Level.WARNING);
+            LOG.severe(" -++ Starting MomServer v" + VERSION + " ++-");
 
             //create and run
             final MomServer mom = new MomServer();
-            mom.execute(arguments);
+            mom.execute(arguments, properties);
         } catch (InterruptedException ex) {
             System.out.println("Main thread interrupted, exiting! (" + ex.getMessage() + ")");
         } catch (IllegalArgumentException ix) {

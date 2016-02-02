@@ -6,8 +6,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Holds the server properties
@@ -21,17 +19,36 @@ final class ServerProperties {
     public static final String REUSE_ADDRESS = "reuseAddress";
     public static final String DEFAULT_PROPERTY_FILE_NAME = "property.xml";
     public static final String SSL = "ssl";
+    public static final String DEBUG = "debug";
     //
     private static final int DEFAULT_MAX_CLIENTS = 200;
     private static final int DEFAULT_PORT = 10888;
     private static final boolean DEFAULT_REUSE_ADDRESS = true;
     private static final boolean DEFAULT_SSL = false;
-    private static final Logger LOG = Logger.getLogger(MomLogger.LOGGER_NAME);
 
     private int port;
     private int numberOfClients;
     private boolean reuseAddress;
     private boolean ssl;
+    private boolean debug;
+
+    /**
+     * Sets the debug parameter
+     *
+     * @param debug true if debugging is on, false otherwise
+     */
+    private void setDebug(boolean debuıg) {
+        this.debug = debuıg;
+    }
+
+    /**
+     * Return the debug flag
+     *
+     * @return true if debugging is on, false otherwise
+     */
+    boolean isDebug() {
+        return debug;
+    }
 
     /**
      * Returns the port number the server will listen
@@ -47,7 +64,7 @@ final class ServerProperties {
      *
      * @param port port to set
      */
-    void setPort(int port) {
+    private void setPort(int port) {
         this.port = port;
     }
 
@@ -65,7 +82,7 @@ final class ServerProperties {
      *
      * @param numberOfClients max number of clients to set
      */
-    void setNumberOfClients(int numberOfClients) {
+    private void setNumberOfClients(int numberOfClients) {
         this.numberOfClients = numberOfClients;
     }
 
@@ -74,7 +91,7 @@ final class ServerProperties {
      *
      * @param reuseAddress
      */
-    void setReuseAddress(boolean reuseAddress) {
+    private void setReuseAddress(boolean reuseAddress) {
         this.reuseAddress = reuseAddress;
     }
 
@@ -86,10 +103,10 @@ final class ServerProperties {
     boolean isReuseAddress() {
         return reuseAddress;
     }
-    
-    
+
     /**
      * Returns a boolean indicating if SSL network connection should be used
+     *
      * @return true if SSL is used, false otherwise
      */
     boolean isSSL() {
@@ -98,9 +115,10 @@ final class ServerProperties {
 
     /**
      * Sets the SSL parameter
+     *
      * @param ssl true if SSL should be used, false otherwise
      */
-    private void setSSL(boolean ssl) {
+    private void setSsl(boolean ssl) {
         this.ssl = ssl;
     }
 
@@ -113,7 +131,6 @@ final class ServerProperties {
      * @throws IOException if the property file cannot be read
      */
     static ServerProperties readProperties(File file) throws FileNotFoundException, IOException {
-        LOG.fine("reading properties");
         //load properties from the file
         Properties properties = new Properties();
         properties.loadFromXML(new FileInputStream(file));
@@ -123,7 +140,8 @@ final class ServerProperties {
         p.setPort(p.toInteger(properties.getProperty(PORT), DEFAULT_PORT));
         p.setNumberOfClients(p.toInteger(properties.getProperty(MAX_CLIENTS), DEFAULT_MAX_CLIENTS));
         p.setReuseAddress(p.toBoolean(properties.getProperty(REUSE_ADDRESS), DEFAULT_REUSE_ADDRESS));
-        p.setSSL(p.toBoolean(properties.getProperty(SSL), DEFAULT_SSL));
+        p.setSsl(p.toBoolean(properties.getProperty(SSL), DEFAULT_SSL));
+        p.setDebug(p.toBoolean(properties.getProperty(DEBUG), DEFAULT_SSL));
 
         //TODO - add more properties here
         return p;
@@ -137,13 +155,13 @@ final class ServerProperties {
      * @throws IOException
      */
     static void createDefaultPropertyFile() throws FileNotFoundException, IOException {
-        LOG.finest("creating default properties");
         Properties properties = new Properties();
         properties.put(PORT, String.valueOf(DEFAULT_PORT));
         properties.put(MAX_CLIENTS, String.valueOf(DEFAULT_MAX_CLIENTS));
         properties.put(REUSE_ADDRESS, String.valueOf(DEFAULT_REUSE_ADDRESS));
         properties.put(SSL, String.valueOf(DEFAULT_SSL));
-        
+        properties.put(DEBUG, String.valueOf(DEFAULT_SSL));
+
         properties.storeToXML(new FileOutputStream(
                 new File(DEFAULT_PROPERTY_FILE_NAME)), "Property file for the MomServer (v" + MomServer.VERSION + ")"
         );
@@ -162,7 +180,7 @@ final class ServerProperties {
         try {
             return Integer.parseInt(property);
         } catch (NumberFormatException | NullPointerException nx) {
-            LOG.log(Level.SEVERE, "failed to parse int: {0}", nx.getMessage());
+            System.out.println("failed to parse int: " + nx.getMessage());
         }
         return defaultProperty;
     }
@@ -178,10 +196,8 @@ final class ServerProperties {
         try {
             return Boolean.parseBoolean(property);
         } catch (NumberFormatException | NullPointerException nx) {
-            LOG.log(Level.SEVERE, "failed to parse boolean: {0}", nx.getMessage());
+            System.out.println("failed to parse boolean: " + nx.getMessage());
         }
         return defaultProperty;
     }
-
-
 }

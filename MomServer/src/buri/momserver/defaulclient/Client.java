@@ -3,6 +3,7 @@ package buri.momserver.defaulclient;
 import buri.momserver.core.IClient;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.Collection;
 import java.util.LinkedList;
 
@@ -13,10 +14,11 @@ import java.util.LinkedList;
  */
 public final class Client implements IClient {
 
-    private final int timeout = 1000;
+    private final int timeout = 10000;
     private final LinkedList<String> logger;
     private Com com;
     private Socket socket;
+    private boolean isDebug;
 
     public Client() {
         logger = new LinkedList<>();
@@ -27,9 +29,10 @@ public final class Client implements IClient {
     }
 
     @Override
-    public int execute(final Socket socket) {
-        this.socket = socket;
-        int retValue = SUCCESS;
+    public int execute(Socket s, boolean debug) {
+        this.socket = s;
+        this.isDebug = debug;
+        int retValue = FAILURE;
         boolean alive = true;
         TLV response = null;
 
@@ -37,7 +40,7 @@ public final class Client implements IClient {
 
         try {
             //create new communication module
-            this.com = new Com(this.socket);
+            this.com = new Com(this.socket, this.isDebug, this.logger);
 
             while (alive) {
 
@@ -48,7 +51,6 @@ public final class Client implements IClient {
                 if (Protocol.isValidMessage(message, Protocol.PROTOCOL_VERSION)) {
                     log("message is not valid, bad version? (%s)", Protocol.PROTOCOL_VERSION);
                     response = Protocol.createResponse(Protocol.RESPONSE_505, "Bad version");
-                    retValue = FAILURE;
                     break;
                 }
 
@@ -58,49 +60,77 @@ public final class Client implements IClient {
                     case Protocol.REQUEST_BLINK:
                         Collection<String> args = Protocol.getArguments(message);
                         String resp = blink(args);
+                        retValue = SUCCESS;
                         break;
+
                     case Protocol.REQUEST_EXIT:
+                        log("got exit command, finishing...");
                         response = Protocol.createResponse(Protocol.RESPONSE_200, null);
                         alive = false;
+                        retValue = SUCCESS;
                         break;
 
                     default:
                         log("Command not recognized : [%s]", command);
                         response = Protocol.createResponse(Protocol.RESPONSE_501, "Command not recognized");
-                        retValue = FAILURE;
                         //stop execution
                         alive = false;
                         break;
                 }
             }
+        } catch (IllegalArgumentException ix) {
+            log("illegal arg exception when executing client: %s", ix.getLocalizedMessage());
+            response = Protocol.createResponse(Protocol.RESPONSE_400, ix.getLocalizedMessage());
+        } catch (SocketTimeoutException tx) {
+            log("timeout exception when executing client: %s", tx.getLocalizedMessage());
+            response = Protocol.createResponse(Protocol.RESPONSE_408, "Timed out after " + timeout + " milliseconds. ");
+        } catch (IOException ex) {
+            log("io exception when executing client: %s", ex.getLocalizedMessage());
+            response = null; //no response, the network is down
         } catch (Exception ex) {
-            retValue = FAILURE;
-            log("exception when executing client: %s", ex.getLocalizedMessage());
+            //catch all other exception
+            log("Exception when executing client: %s", ex.getLocalizedMessage());
             response = Protocol.createResponse(Protocol.RESPONSE_500, ex.getLocalizedMessage());
         } finally {
-
-            if (socket != null) {
-                //send response
-                if (response != null) {
-                    com.send(response);
-                }
-
-                //close socket
-                try {
-                    socket.close();
-                } catch (IOException ex) {
-                    log("IOexception when closing socket");
-                }
-            }
+            sendResponse(response);
+            close();
         }
 
         return retValue;
     }
 
+    /**
+     * Sends a response to the connected client
+     *
+     * @param response TLV object to send
+     */
+    private void sendResponse(TLV response) {
+        //send response
+        if (response != null) {
+            try {
+                com.send(response);
+            } catch (IOException ex) {
+                log("Exception when sending response: " + ex.getLocalizedMessage());
+            }
+        }
+    }
+
     @Override
-    public void close() {
+    public synchronized void close() {
         log("closing client");
-        //TODO close
+        if (com != null) {
+            com.close();
+            com = null;
+        }
+        if (socket != null) {
+            try {
+                socket.shutdownInput();
+                socket.close();
+            } catch (IOException ex) {
+                log("IOEx when closing socket: %s", ex.getLocalizedMessage());
+            }
+            this.socket = null;
+        }
     }
 
     @Override
@@ -108,8 +138,15 @@ public final class Client implements IClient {
         return logger;
     }
 
+    /**
+     * This method calls the Tell-stick and makes a lamp to blink
+     *
+     * @param args list of arguments
+     * @return
+     */
     private String blink(Collection<String> args) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("handeling blink");
+        return "";
     }
 
 }

@@ -1,6 +1,5 @@
 package buri.momserver.core;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.SynchronousQueue;
@@ -21,6 +20,7 @@ final class ServerCore extends Thread implements Runnable {
     private final ThreadPoolExecutor threadPool;
     private NetworkModule network;
     private static final Logger LOG = Logger.getLogger(MomLogger.LOGGER_NAME);
+    private final ServerProperties properties;
 
     /**
      * Creates a new server instance
@@ -31,6 +31,7 @@ final class ServerCore extends Thread implements Runnable {
      */
     private ServerCore(ServerProperties properties) throws IOException {
         alive = false;
+        this.properties = properties;
         //create and prestart threadpool
         threadPool = new ThreadPoolExecutor(2, properties.getNumberOfClients() + 1, 60, TimeUnit.SECONDS, new SynchronousQueue<Runnable>());
         threadPool.prestartAllCoreThreads();
@@ -64,13 +65,13 @@ final class ServerCore extends Thread implements Runnable {
     /**
      * Returns a singleton instance of the server core
      *
-     * @param propertiesPath path to property file
+     * @param properties property file
      * @return the only instance of the ServerCore object
      * @throws IOException if the property file cannot be read
      */
-    static ServerCore getInstance(String propertiesPath) throws IOException {
+    static ServerCore getInstance(ServerProperties properties) throws IOException {
         if (server == null) {
-            server = new ServerCore(ServerProperties.readProperties(new File(propertiesPath)));
+            server = new ServerCore(properties);
         }
         return server;
     }
@@ -85,7 +86,7 @@ final class ServerCore extends Thread implements Runnable {
             LOG.fine("waiting for clients to connect...");
             while (alive) {
                 try {
-                    threadPool.execute(ClientTask.newInstance(network.getSocket()));
+                    threadPool.execute(ClientTask.newInstance(network.getSocket(), properties.isDebug()));
                 } catch (IOException ex) {
                     LOG.log(Level.SEVERE, "Got IO exception when waiting for new client: {0}", ex.getMessage());
                     //failed to get socket, wait 3 seconds and try again

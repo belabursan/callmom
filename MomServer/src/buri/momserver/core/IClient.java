@@ -18,9 +18,10 @@ public interface IClient {
      * Main method for the client, execution starts here
      *
      * @param socket connected socket
+     * @param isDebug indicates if the debug is on(true) or off(false)
      * @return error code, see constants
      */
-    public int execute(final Socket socket);
+    public int execute(final Socket socket, boolean isDebug);
 
     /**
      * Closes the client. This method will be called by the server when the call
