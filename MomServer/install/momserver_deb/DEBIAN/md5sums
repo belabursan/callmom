@@ -1,0 +1,5 @@
+MD5 (etc/init.d/momserver) = 5381137d7df2bc0f09bc45e4d7342300
+MD5 (etc/momserver.conf) = c143235a124d238fe047fd2e6f404725
+MD5 (usr/local/bin/momserver/momserver.jar) = 27903ea9aa9ce4c494f0e6bcb0b06d02
+MD5 (usr/local/bin/momserver/momserver.sh) = 2570b388b8a5457e57befeadb0c011aa
+MD5 (usr/local/man/man1/momserver.1.gz) = 68f1757d2a03124de91959bdbcad5926

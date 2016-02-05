@@ -38,8 +38,8 @@ final class ServerCore extends Thread implements Runnable {
         threadPool.setRejectedExecutionHandler(new RejectedExecutionHandler() {
             @Override
             public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-                System.out.println("threadpool rejected a runnable");
-                System.out.println("Active count: " + executor.getActiveCount());
+                Logger.getLogger(MomLogger.LOGGER_NAME).severe("threadpool rejected a runnable");
+                Logger.getLogger(MomLogger.LOGGER_NAME).log(Level.SEVERE, "Active count: {0}", executor.getActiveCount());
                 if (r instanceof IClient) {
                     ((IClient) r).close();
                 }

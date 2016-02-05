@@ -1,0 +1,23 @@
+.TH momserver 1 "2016-02-05" "version 1.0.0"
+.SH NAME
+Momserver - server for the call mom project
+.SH SYNOPSIS
+.B [--debug] [--daemon] [-p
+.I filename
+.B ]
+.SH DESCRIPTION
+Small server waiting for clients to connect and then perform some action on the local Tellstick.
+The server is normally run as a daemon.
+.PP
+To start the server type the following to console:> /etc/init.d/momserver start
+.PP
+To stop the server type the following to console:> /etc/init.d/momserver stop
+.SH OPTIONS
+.IP --daemon
+starts the server as daemon
+.IP --debug
+starts the server in debug mode and not as a daemon
+.IP "-p <path/to/file>"
+Specifies an alternative path to the configuration file. If not given then /etc/momserver.conf will be used
+.SH AUTHOR
+"Bela Bursan <burszan@gmail.com>"

@@ -63,13 +63,7 @@ public final class Client implements IClient {
                 String command = Protocol.getCommand(message);
                 switch (command) {
                     case Protocol.REQUEST_BLINK:
-                        Collection<String> args = Protocol.getArguments(message);
-                        String resp = blink(args);
-                        //TODO - handle response from blink method
-
-                        response = Protocol.createResponse(Protocol.RESPONSE_200, null);
-                        sendResponse(response);
-                        retValue = SUCCESS;
+                        retValue = blink(Protocol.getArguments(message));
                         break;
 
                     case Protocol.REQUEST_EXIT:
@@ -156,9 +150,34 @@ public final class Client implements IClient {
      * @param args list of arguments
      * @return
      */
-    private String blink(Collection<String> args) {
-        System.out.println("handeling blink");
-        return "";
+    private int blink(Collection<String> args) throws InterruptedException {
+        log("handeling blink");
+
+        int[] devices = new int[]{1, 2};
+        try {
+            String[] ss = args.toArray(new String[args.size()]);
+
+            int on = Integer.parseInt(ss[0]);
+            int off = Integer.parseInt(ss[1]);
+            int time = Integer.parseInt(ss[2]);
+
+            if (on < 0 || off < 0 || time < 0) {
+                throw new IllegalArgumentException("bad arguments");
+            }
+
+            sendResponse(Protocol.createResponse(Protocol.RESPONSE_202, null));
+
+            TellStick stick = TellStick.getInstance(logger);
+
+            if (stick.multiPeriod(on, off, time, devices)) {
+                return Client.SUCCESS;
+            }
+            stick.resetDevices(devices);
+        } catch (NumberFormatException nx) {
+            throw new IllegalArgumentException("bad arguments: " + nx.getLocalizedMessage());
+        }
+        return Client.FAILURE;
+
     }
 
     /**

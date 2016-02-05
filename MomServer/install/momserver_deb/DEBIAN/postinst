@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+# Bela Bursan <burszan@gmail.com>
+# post install script for momserver
+
+
+set -e
+
+if [ "$1" = "configure" ] ; then
+	echo "changing mode to +x"	
+	chmod +x /usr/local/bin/momserver/momserver.sh
+	chmod +x /etc/init.d/momserver
+	chmod +x /etc/momserver.conf
+	
+	echo "creating symlinks for momserver"
+	if [ -h /etc/rc2.d/S98momserver ]
+	then
+		echo "found old S symlink for momserver, removing it and creating a new one"
+		rm /etc/rc2.d/S98momserver		
+	fi
+	ln -s /etc/init.d/momserver /etc/rc2.d/S98momserver
+
+	if [ -h /etc/rc1.d/K98momserver ]
+	then
+		echo "found old K symlink for momserver, removing it and creating a new one"
+		rm /etc/rc1.d/K98momserver
+	fi
+	ln -s /etc/init.d/momserver /etc/rc1.d/K98momserver
+	
+	echo "done"
+	echo ""
+	echo "  INFO:  start the server by running: /etc/init.d/momserver start"	
+	echo ""
+	echo "  INFO:  stop the server by running: /etc/init.d/momserver stop"
+	echo ""
+fi
+
+exit 0

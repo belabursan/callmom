@@ -12,7 +12,7 @@ import java.util.logging.Logger;
  */
 public final class MomServer {
 
-    static final String VERSION = "0.0.8";
+    static final String VERSION = "1.0.0";
     private ServerCore serverCore;
     private Thread shutDownThread;
     private static final Logger LOG = Logger.getLogger(MomLogger.LOGGER_NAME);
@@ -48,9 +48,7 @@ public final class MomServer {
             //create and start the server core
             serverCore = ServerCore.getInstance(properties);
             if (serverCore.startServer()) {
-                System.out.println(" - server started, exit with Ctrl+C");
-
-                if (arguments.isDaemon()) {
+                if (arguments.isDaemon() && !arguments.isDebug()) {
                     LOG.warning("server will run as daemon");
 
                     //TODO check this later...
@@ -58,6 +56,8 @@ public final class MomServer {
                     pidfile.deleteOnExit();
                     System.out.close();
                     System.err.close();
+                } else{
+                    System.out.println(" - server started, exit with Ctrl+C");
                 }
                 //wait until the shut down hook is activated
                 wait();
@@ -65,7 +65,6 @@ public final class MomServer {
         } catch (InterruptedException ix) {
             LOG.log(Level.SEVERE, "Intrrupted exception: {0}", ix.getMessage());
         } catch (IOException ex) {
-            System.out.println(String.format("IO exception: %s", ex.getMessage()));
             LOG.log(Level.SEVERE, "IO exception: {0}", ex.getMessage());
         } finally {
             awaitShutdownHook();
@@ -110,11 +109,14 @@ public final class MomServer {
      */
     public static void main(final String[] args) {
         Thread.currentThread().setName("MainThread");
-        System.out.println("\nStarting MomServer v" + VERSION);
+        
         try {
             //parse the command line arguments
             CLArguments arguments = CLArguments.resolveArguments(args);
 
+            if(!arguments.isDaemon()){
+                System.out.println("\nStarting MomServer v" + VERSION);
+            }
             //read properties from file
             ServerProperties properties = ServerProperties.readProperties(
                     new File(arguments.getPropertyFilePath()));
@@ -128,11 +130,11 @@ public final class MomServer {
             final MomServer mom = new MomServer();
             mom.execute(arguments, properties);
         } catch (InterruptedException ex) {
-            System.out.println("Main thread interrupted, exiting! (" + ex.getMessage() + ")");
+            LOG.log(Level.SEVERE, "Main thread interrupted, exiting! ({0})", ex.getMessage());
         } catch (IllegalArgumentException ix) {
-            System.out.println("Failed to start the server: " + ix.getMessage());
+            LOG.log(Level.SEVERE, "Failed to start the server: {0}", ix.getMessage());
         } catch (SecurityException | IOException ex) {
-            System.out.println("Could not start logger: " + ex.getMessage());
+            LOG.log(Level.SEVERE, "Could not start logger: {0}", ex.getMessage());
         } finally {
             MomLogger.closeLogger();
         }

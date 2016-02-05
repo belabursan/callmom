@@ -1,0 +1,23 @@
+#! /bin/sh
+# Momserver start script
+#
+# Bela Bursan <burszan@gmail.com>
+# Description: Auto-starts the Momserver
+# pidfile: /var/run/momserver.pid
+
+# export JAVA_HOME=/usr/lib/jvm/java-6-sun
+
+case $1 in
+start)
+     sh /usr/local/bin/momserver/momserver.sh start
+     ;;
+stop)  
+     sh /usr/local/bin/momserver/momserver.sh stop
+     ;;
+restart)
+     sh /usr/local/bin/momserver/momserver.sh stop
+     sh /usr/local/bin/momserver/momserver.sh start
+     ;;
+esac
+
+exit 0

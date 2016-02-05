@@ -17,7 +17,7 @@ final class ServerProperties {
     public static final String PORT = "port";
     public static final String MAX_CLIENTS = "maxClients";
     public static final String REUSE_ADDRESS = "reuseAddress";
-    public static final String DEFAULT_PROPERTY_FILE_NAME = "property.xml";
+    public static final String DEFAULT_PROPERTY_FILE_NAME = "/etc/momserver.conf";
     public static final String SSL = "ssl";
     public static final String DEBUG = "debug";
     //
@@ -163,7 +163,7 @@ final class ServerProperties {
         properties.put(DEBUG, String.valueOf(DEFAULT_SSL));
 
         properties.storeToXML(new FileOutputStream(
-                new File(DEFAULT_PROPERTY_FILE_NAME)), "Property file for the MomServer (v" + MomServer.VERSION + ")"
+                new File(DEFAULT_PROPERTY_FILE_NAME)), "Configuration file for the MomServer (v" + MomServer.VERSION + ")"
         );
     }
 

@@ -1,0 +1,12 @@
+Package: momserver
+Version: 1.0.0
+Section: misc
+Priority: optional
+Architecture: all
+Essential: no
+Depends: oracle-java8-jdk (>= 7)
+Pre-Depends: oracle-java8-jdk
+Installed-Size: 1000
+Maintainer: Bela Bursan <burszan@gmail.com>
+Provides: momserver
+Description: Small server listening on the network for connections and then performs actions on mom’s tell-stick, as flashing a lamp.

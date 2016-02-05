@@ -25,7 +25,7 @@ final class MomLogger {
     private static final Logger LOGGER = Logger.getLogger(LOGGER_NAME);
     private static FileHandler fileHandler = null;
     //
-    private static String logDirectoryPath = "logs";
+    private static String logDirectoryPath = "/var/log/momserver/";
     private static Level logLevel = Level.WARNING;
     private static int logFileSize = 500000;
     private static int noofLogFiles = 10;
@@ -116,7 +116,8 @@ final class MomLogger {
         console.setLevel(Level.OFF);
         fileHandler = new FileHandler(
                 logdir.getAbsolutePath() + File.separator + LOG_FILE_NAME,
-                logFileSize, noofLogFiles,
+                logFileSize,
+                noofLogFiles,
                 true);
         fileHandler.setLevel(logLevel);
         fileHandler.setFormatter(new MomHtmlFormatter());

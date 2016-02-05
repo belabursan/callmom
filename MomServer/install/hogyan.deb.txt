@@ -1,0 +1,27 @@
+ Oldalak:
+
+http://www.cyberciti.biz/faq/linux-unix-creating-a-manpage/
+http://www.linuxfordevices.com/c/a/Linux-For-Devices-Articles/How-to-make-deb-packages/
+
+Parancsok:
+tar cvzf momserver.tar.gz momserver-0.1.0-x86.deb readme.txt
+md5sum momserver-0.1.0-x86.deb
+sudo dpkg -i momserver-0.1.0-x86.deb
+sudo dpkg -b  momserv_deb momserver-0.1.0-x86.deb
+sudo apt-get remove momserver
+momserver
+ar -x momserver-0.1.0-x86.deb
+gzip /usr/local/man/man7/momserver.7
+
+
+Leírás:
+Módosítani a control filet a momserver_deb/DEBIAN katalogusba
+Módosítani a scripteket a momserver_deb/DEBIAN katalogusba. most uresek tehat semmit nem csínalnak.
+Elkészíteni a changelogot
+Elkészíteni a man filet.(gzip /usr/local/man/man7/momserver.7)
+Lehetséges md5sumot is csinálni( md5sum -b >md5sums `find etc usr -type f` a momserver_deb katalogba)
+Készíteni egy katalogstrukturát a momserver_deb katalogusba pl: momserver_deb/usr/local/bin/app
+mikor kész futtani a dpkg-t
+
+
+
