@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 # Momserver start script
 #
 # Bela Bursan <burszan@gmail.com>
@@ -9,15 +9,19 @@
 
 case $1 in
 start)
-     sh /usr/local/bin/momserver/momserver.sh start
-     ;;
-stop)  
-     sh /usr/local/bin/momserver/momserver.sh stop
-     ;;
+	echo "starting momserver"
+    sh /usr/local/bin/momserver/momserver.sh start
+    ;;
+stop)
+	echo "finishing momserver"
+    sh /usr/local/bin/momserver/momserver.sh stop
+    ;;
 restart)
-     sh /usr/local/bin/momserver/momserver.sh stop
-     sh /usr/local/bin/momserver/momserver.sh start
-     ;;
+    sh /usr/local/bin/momserver/momserver.sh stop
+    sh /usr/local/bin/momserver/momserver.sh start
+    ;;
 esac
 
+
+echo "done"
 exit 0

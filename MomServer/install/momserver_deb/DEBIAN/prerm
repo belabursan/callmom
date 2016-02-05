@@ -11,12 +11,12 @@ if [ "$1" = "remove" ] || [ "$1" = "upgrade"] ; then
 	then
 		if [ -f /var/run/momserver.pid ]
 		then
-			echo "closing momserver"
+			echo "momserver: closing server"
 			sh /etc/init.d/momserver stop
 		fi			
 	fi
 
-	echo "removing symlinks"
+	echo "momserver: removing symlinks"
 	if [ -h /etc/rc2.d/S98momserver ]
 	then
 		rm /etc/rc2.d/S98momserver
@@ -27,13 +27,13 @@ if [ "$1" = "remove" ] || [ "$1" = "upgrade"] ; then
 		rm /etc/rc1.d/K98momserver
 	fi
 	
-	echo "removing configuration file"
+	echo "momserver: removing configuration file"
 	if [ -f /etc/momserver.conf ]
 	then
 		rm /etc/momserver.conf
 	fi
 
-	echo "compressing and moving old logs to /tmp"	
+	echo "momserver: compressing and moving old logs to /tmp"	
 	if [ -d /var/log/momserver ]
 	then
 		tar cvzf /tmp/old_momserver_logs.tar.gz /var/log/momserver

@@ -7,22 +7,22 @@
 set -e
 
 if [ "$1" = "configure" ] ; then
-	echo "changing mode to +x"	
+	echo "momserver: changing mode to +x"	
 	chmod +x /usr/local/bin/momserver/momserver.sh
 	chmod +x /etc/init.d/momserver
 	chmod +x /etc/momserver.conf
 	
-	echo "creating symlinks for momserver"
+	echo "momserver: creating symlinks for the server"
 	if [ -h /etc/rc2.d/S98momserver ]
 	then
-		echo "found old S symlink for momserver, removing it and creating a new one"
+		echo "momserver: found old S symlink, removing it and creating a new one"
 		rm /etc/rc2.d/S98momserver		
 	fi
 	ln -s /etc/init.d/momserver /etc/rc2.d/S98momserver
 
 	if [ -h /etc/rc1.d/K98momserver ]
 	then
-		echo "found old K symlink for momserver, removing it and creating a new one"
+		echo "momserver: found old K symlink, removing it and creating a new one"
 		rm /etc/rc1.d/K98momserver
 	fi
 	ln -s /etc/init.d/momserver /etc/rc1.d/K98momserver
