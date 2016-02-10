@@ -20,6 +20,7 @@ namespace CallMomCore
 			try {
 				Port = port.AsInteger ();
 			} catch (Exception ex) {
+				System.Diagnostics.Debug.WriteLine ("could not parse port (" + port + "): " + ex.Message);
 				Port = -1;
 			}
 			TimeoutSec = (int)timeoutSec;

@@ -128,7 +128,7 @@ namespace CallMomiOS
 
 		}
 
-		async void ShowAbout ()
+		void ShowAbout ()
 		{
 			new UIAlertView (
 				"About CallMom",

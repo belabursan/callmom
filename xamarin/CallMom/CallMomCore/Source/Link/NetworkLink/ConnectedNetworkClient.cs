@@ -26,7 +26,7 @@ namespace CallMomCore
 					_stream.Dispose ();
 				}
 			} catch (Exception x) {
-				Debug.WriteLine ("ending client");
+				Debug.WriteLine ("ending client: "+ x.Message);
 			}
 		}
 
